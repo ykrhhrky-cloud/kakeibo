@@ -185,10 +185,10 @@
     </header>
 
     <!-- ==================== メインコンテンツ ==================== -->
-    <main class="flex-1 flex flex-col min-h-0 px-3.5 pt-2 pb-1 overflow-hidden">
+    <main class="flex-1 flex flex-col min-h-0 px-3 pt-1.5 pb-1 overflow-hidden">
 
       <!-- ==================== TAB 1: ホーム ==================== -->
-      <section id="view-home" class="flex-1 flex flex-col min-h-0 space-y-2.5 overflow-hidden">
+      <section id="view-home" class="flex-1 flex flex-col min-h-0 space-y-1.5 overflow-hidden">
 
         <!-- 対象期間バー（テキストタップで大枠プリセット、矢印タップで年月直接指定） -->
         <div class="flex-shrink-0 flex items-center justify-between px-1 text-xs">
@@ -241,24 +241,24 @@
         </div>
 
         <!-- ==================== サマリカード（背景: 薄青 ＆ 各ブロック: 白カード ＆ 太字強調 ＆ スワイプ対応） ==================== -->
-        <div class="relative overflow-hidden rounded-3xl">
-          <div id="swipeCardArea" class="bg-gradient-to-tr from-[#1557b0] to-[#1a73e8] rounded-3xl p-3 card-shadow border border-blue-400/40 relative select-none flex flex-col space-y-2 will-change-transform cursor-grab active:cursor-grabbing text-white">
+        <div class="relative overflow-hidden rounded-2xl flex-shrink-0">
+          <div id="swipeCardArea" class="bg-gradient-to-tr from-[#1557b0] to-[#1a73e8] rounded-2xl p-2.5 card-shadow border border-blue-400/40 relative select-none flex flex-col space-y-1.5 will-change-transform cursor-grab active:cursor-grabbing text-white">
             
             <!-- 上段：残高と収支ボックス（すべて白背景で統一＆高さ・横幅完全フィット） -->
-            <div class="flex items-stretch space-x-2">
+            <div class="flex items-stretch space-x-1.5">
               
-              <!-- 左側白ブロック：当期残高 ＆ 前期比 ＆ 通算残高（横幅を最適化して余白を解消） -->
-              <div class="w-[42%] bg-white rounded-2xl p-2.5 shadow-2xs border border-blue-100 flex flex-col justify-between min-w-0 flex-shrink-0 text-slate-800">
+              <!-- 左側白ブロック：当期残高 ＆ 前期比 ＆ 通算残高 -->
+              <div class="w-[42%] bg-white rounded-xl p-2 shadow-2xs border border-blue-100 flex flex-col justify-between min-w-0 flex-shrink-0 text-slate-800">
                 <div>
-                  <span class="text-[10px] font-black text-slate-700 tracking-tight block">当期収支残高</span>
-                  <div class="flex items-baseline space-x-0.5 my-0.5">
-                    <span class="text-xs font-bold font-mono text-slate-400">¥</span>
-                    <span id="periodNetTotal" class="text-[23px] font-black font-mono text-slate-900 tracking-tight leading-none">0</span>
+                  <span class="text-[9.5px] font-black text-slate-700 tracking-tight block">当期収支残高</span>
+                  <div class="flex items-baseline space-x-0.5 my-0">
+                    <span class="text-[11px] font-bold font-mono text-slate-400">¥</span>
+                    <span id="periodNetTotal" class="text-[20px] font-black font-mono text-slate-900 tracking-tight leading-none">0</span>
                   </div>
                 </div>
 
                 <!-- 前期比・通算残高 -->
-                <div class="flex flex-col space-y-0.5 pt-1 border-t border-slate-100 text-[9px]">
+                <div class="flex flex-col space-y-0.5 pt-1 border-t border-slate-100 text-[8.5px]">
                   <div class="flex items-center space-x-1">
                     <span id="diffVsPrevPeriod" class="font-mono font-bold text-slate-500 truncate">（前期比 ±¥0）</span>
                   </div>
@@ -269,22 +269,22 @@
                 </div>
               </div>
 
-              <!-- 右側白ブロック：期間中収入、期間中支出、内訳（固定/変動）の縦3行構成（左と高さを完全一致） -->
-              <div class="flex-1 bg-white rounded-2xl p-2.5 shadow-2xs border border-blue-100 flex flex-col justify-between min-w-0 text-slate-800">
+              <!-- 右側白ブロック：期間中収入、期間中支出、内訳（固定/変動）の縦3行構成 -->
+              <div class="flex-1 bg-white rounded-xl p-2 shadow-2xs border border-blue-100 flex flex-col justify-between min-w-0 text-slate-800">
                 <!-- 1行目: 期間中収入 -->
                 <div class="flex items-center justify-between">
-                  <span class="text-[10px] text-slate-800 font-extrabold tracking-tight">期間中収入</span>
-                  <span id="incomeTotal" class="text-xs sm:text-sm font-black font-mono text-emerald-700 truncate">¥0</span>
+                  <span class="text-[9.5px] text-slate-800 font-extrabold tracking-tight">期間中収入</span>
+                  <span id="incomeTotal" class="text-xs font-black font-mono text-emerald-700 truncate">¥0</span>
                 </div>
 
                 <!-- 2行目: 期間中支出 -->
-                <div class="flex items-center justify-between pt-1 border-t border-slate-100">
-                  <span class="text-[10px] text-slate-800 font-extrabold tracking-tight">期間中支出</span>
-                  <span id="expenseTotal" class="text-xs sm:text-sm font-black font-mono text-rose-700 truncate">▲¥0</span>
+                <div class="flex items-center justify-between pt-0.5 border-t border-slate-100">
+                  <span class="text-[9.5px] text-slate-800 font-extrabold tracking-tight">期間中支出</span>
+                  <span id="expenseTotal" class="text-xs font-black font-mono text-rose-700 truncate">▲¥0</span>
                 </div>
 
                 <!-- 3行目: 内訳（固定 / 変動） -->
-                <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[9px]">
+                <div class="flex items-center justify-between pt-0.5 border-t border-slate-100 text-[8.5px]">
                   <div class="flex items-center space-x-1">
                     <span class="text-slate-600 font-bold">固定:</span>
                     <span id="fixedExpenseTotal" class="font-mono font-bold text-slate-700 truncate">¥0</span>
@@ -298,25 +298,25 @@
 
             </div>
 
-            <!-- 下段：予実管理アコーディオン（白バッジ＆見やすいコントラスト） -->
-            <div class="pt-1 border-t border-white/20">
+            <!-- 下段：予実管理アコーディオン -->
+            <div class="pt-0.5 border-t border-white/20">
               <div class="flex items-center justify-between">
-                <button type="button" onclick="toggleBudgetCollapse()" class="px-2.5 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30 text-[10px] font-black flex items-center space-x-1.5 active:scale-95 transition shadow-2xs">
+                <button type="button" onclick="toggleBudgetCollapse()" class="px-2 py-0.5 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30 text-[9.5px] font-black flex items-center space-x-1 active:scale-95 transition shadow-2xs">
                   <span>予実管理</span>
-                  <svg id="budgetCollapseArrow" class="w-3 h-3 text-white transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                  <svg id="budgetCollapseArrow" class="w-2.5 h-2.5 text-white transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
               </div>
 
               <!-- 展開される予算バー＆残り金額＆鉛筆マーク -->
-              <div id="budgetAccordionContent" class="hidden pt-2 pb-0.5 space-y-1.5 animate-scale-up">
+              <div id="budgetAccordionContent" class="hidden pt-1.5 pb-0.5 space-y-1 animate-scale-up">
                 <div class="flex items-center space-x-2">
-                  <div class="flex-1 bg-white/25 h-2.5 rounded-full overflow-hidden relative border border-white/30">
+                  <div class="flex-1 bg-white/25 h-2 rounded-full overflow-hidden relative border border-white/30">
                     <div id="budgetProgressBar" class="h-full bg-white rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
                   </div>
                   <div class="flex items-center space-x-1.5 flex-shrink-0">
-                    <span id="budgetRemainingDisplay" class="text-[10px] font-black font-mono text-white drop-shadow-xs">あと ¥0</span>
+                    <span id="budgetRemainingDisplay" class="text-[9.5px] font-black font-mono text-white drop-shadow-xs">あと ¥0</span>
                     <button type="button" onclick="openBudgetModal()" class="p-1 text-white hover:bg-white/20 active:scale-90 transition rounded-lg bg-white/15" title="予算設定と詳細">
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     </button>
                   </div>
                 </div>
@@ -326,37 +326,39 @@
           </div>
         </div>
 
-        <!-- ==================== クイックアクションボタン ==================== -->
-        <div class="flex-shrink-0 grid grid-cols-2 gap-2.5">
-          <label for="quickReceiptInput" class="flex items-center justify-center space-x-2 py-2.5 px-3 bg-white hover:bg-slate-50 text-blue-600 rounded-2xl card-shadow border-2 border-slate-200/90 active:scale-95 transition cursor-pointer">
+        <!-- ==================== クイックアクションボタン（1行3列にスリム統合して省スペース化） ==================== -->
+        <div class="flex-shrink-0 grid grid-cols-3 gap-1.5">
+          <!-- 1. 画像取込 -->
+          <label for="quickReceiptInput" class="flex items-center justify-center space-x-1 py-1.5 px-1 bg-white hover:bg-slate-50 text-blue-600 rounded-xl card-shadow border border-slate-200/90 active:scale-95 transition cursor-pointer">
             <input type="file" id="quickReceiptInput" accept="image/*" multiple class="hidden" onchange="handleReceiptUpload(event, false)">
-            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            <span class="text-xs font-bold text-slate-700">画像を取り込んで登録</span>
+            <svg class="w-3.5 h-3.5 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span class="text-[11px] font-bold text-slate-700 truncate">画像取込</span>
           </label>
 
-          <button onclick="openManualModal('expense')" class="flex items-center justify-center space-x-2 py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-700 rounded-2xl card-shadow border-2 border-slate-200/90 active:scale-95 transition">
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-            <span class="text-xs font-bold text-slate-700">手入力で記帳</span>
+          <!-- 2. メンバー指定取込 -->
+          <button type="button" onclick="openMemberSelectForReceiptModal()" class="flex items-center justify-center space-x-1 py-1.5 px-1 bg-white hover:bg-slate-50 text-slate-700 rounded-xl card-shadow border border-slate-200/90 active:scale-95 transition">
+            <span class="text-xs">👥</span>
+            <span class="text-[11px] font-bold text-slate-700 truncate">メンバー指定</span>
+          </button>
+          <input type="file" id="memberReceiptInput" accept="image/*" multiple class="hidden" onchange="handleReceiptUploadWithMember(event)">
+
+          <!-- 3. 手入力記帳 -->
+          <button type="button" onclick="openManualModal('expense')" class="flex items-center justify-center space-x-1 py-1.5 px-1 bg-white hover:bg-slate-50 text-slate-700 rounded-xl card-shadow border border-slate-200/90 active:scale-95 transition">
+            <svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            <span class="text-[11px] font-bold text-slate-700 truncate">手入力</span>
           </button>
         </div>
 
-        <!-- メンバー内訳を指定して登録するボタン（タップで先にメンバーを選択） -->
-        <button type="button" onclick="openMemberSelectForReceiptModal()" class="flex-shrink-0 flex items-center justify-center space-x-1.5 py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 rounded-2xl card-shadow border-2 border-slate-200/90 active:scale-95 transition text-xs font-bold">
-          <span>👥</span>
-          <span>メンバー内訳を指定してレシート登録</span>
-        </button>
-        <input type="file" id="memberReceiptInput" accept="image/*" multiple class="hidden" onchange="handleReceiptUploadWithMember(event)">
-
-        <!-- ==================== 収支の明細リスト（独立スクロール） ==================== -->
-        <div class="flex-1 min-h-0 bg-white rounded-3xl p-3.5 card-shadow border-2 border-slate-200/90 flex flex-col overflow-hidden">
+        <!-- ==================== 収支の明細リスト（独立スクロール・表示領域最大化） ==================== -->
+        <div class="flex-1 min-h-0 bg-white rounded-2xl p-2.5 card-shadow border-2 border-slate-200/90 flex flex-col overflow-hidden">
           
           <!-- リストヘッダー -->
-          <div id="listHeaderNormal" class="flex items-center justify-between pb-2 border-b border-slate-100 flex-shrink-0">
+          <div id="listHeaderNormal" class="flex items-center justify-between pb-1.5 border-b border-slate-100 flex-shrink-0">
             <h2 class="text-xs font-extrabold text-slate-800">収支の明細</h2>
             
-            <div class="flex items-center space-x-1.5">
+            <div class="flex items-center space-x-1">
               <!-- ソートセレクタ -->
-              <select id="sortOrder" onchange="renderTransactionsList()" class="bg-slate-100 text-slate-700 rounded-xl px-2 py-1 text-[11px] font-bold outline-none border border-slate-200/50">
+              <select id="sortOrder" onchange="renderTransactionsList()" class="bg-slate-100 text-slate-700 rounded-lg px-1.5 py-0.5 text-[10px] font-bold outline-none border border-slate-200/50">
                 <option value="date_desc">最新順</option>
                 <option value="date_asc">古い順</option>
                 <option value="amount_desc">金額が高い順</option>
@@ -365,9 +367,9 @@
               </select>
 
               <div class="relative">
-                <button type="button" onclick="toggleCategoryFilterMenu()" id="btnCategoryFilterTrigger" class="bg-slate-100 text-slate-700 rounded-xl px-2 py-1 text-[11px] font-bold flex items-center space-x-1 border border-slate-200/50 active:scale-95 transition">
-                  <span id="selectedCategoryLabel" class="max-w-[75px] truncate">全科目</span>
-                  <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                <button type="button" onclick="toggleCategoryFilterMenu()" id="btnCategoryFilterTrigger" class="bg-slate-100 text-slate-700 rounded-lg px-1.5 py-0.5 text-[10px] font-bold flex items-center space-x-0.5 border border-slate-200/50 active:scale-95 transition">
+                  <span id="selectedCategoryLabel" class="max-w-[70px] truncate">全科目</span>
+                  <svg class="w-2.5 h-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
 
                 <!-- 科目選択ドロップダウン（全選択 ＆ 全解除ボタン） -->
@@ -385,27 +387,27 @@
               </div>
 
               <!-- 整理ボタン -->
-              <button onclick="toggleSelectMode(true)" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95 transition">
+              <button onclick="toggleSelectMode(true)" class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95 transition">
                 整理
               </button>
             </div>
           </div>
 
           <!-- 種別絞り込みバー（収支(すべて) / 支出 / 収入） -->
-          <div class="flex items-center space-x-1 p-1 bg-slate-100 rounded-2xl text-[11px] font-bold my-1.5 flex-shrink-0">
-            <button type="button" onclick="setTxTypeFilter('all')" id="btnFilterTypeAll" class="flex-1 py-1 rounded-xl bg-white text-blue-600 shadow-xs transition text-center">
+          <div class="flex items-center space-x-1 p-0.5 bg-slate-100 rounded-xl text-[10px] font-bold my-1 flex-shrink-0">
+            <button type="button" onclick="setTxTypeFilter('all')" id="btnFilterTypeAll" class="flex-1 py-0.5 rounded-lg bg-white text-blue-600 shadow-xs transition text-center font-black">
               収支 (すべて)
             </button>
-            <button type="button" onclick="setTxTypeFilter('expense')" id="btnFilterTypeExpense" class="flex-1 py-1 rounded-xl text-slate-500 hover:text-slate-800 transition text-center">
+            <button type="button" onclick="setTxTypeFilter('expense')" id="btnFilterTypeExpense" class="flex-1 py-0.5 rounded-lg text-slate-500 hover:text-slate-800 transition text-center font-bold">
               支出のみ
             </button>
-            <button type="button" onclick="setTxTypeFilter('income')" id="btnFilterTypeIncome" class="flex-1 py-1 rounded-xl text-slate-500 hover:text-slate-800 transition text-center">
+            <button type="button" onclick="setTxTypeFilter('income')" id="btnFilterTypeIncome" class="flex-1 py-0.5 rounded-lg text-slate-500 hover:text-slate-800 transition text-center font-bold">
               収入のみ
             </button>
           </div>
 
           <!-- リストヘッダー（整理・削除モード） -->
-          <div id="listHeaderSelect" class="hidden flex items-center justify-between pb-2.5 border-b border-slate-100 flex-shrink-0">
+          <div id="listHeaderSelect" class="hidden flex items-center justify-between pb-2 border-b border-slate-100 flex-shrink-0">
             <div class="flex items-center space-x-2">
               <span id="selectedCountBadge" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">0件選択</span>
               <button onclick="selectAllItems()" class="text-xs text-slate-500 hover:text-slate-800 font-bold underline">全選択</button>
@@ -417,11 +419,11 @@
           </div>
 
           <!-- 明細カードリスト -->
-          <div id="transactionList" class="flex-1 overflow-y-auto custom-scrollbar pt-2.5 pr-1.5 space-y-2"></div>
+          <div id="transactionList" class="flex-1 overflow-y-auto custom-scrollbar pt-1.5 pr-1 space-y-1.5"></div>
 
           <!-- 空表示 -->
-          <div id="emptyListState" class="hidden flex-1 flex flex-col items-center justify-center text-center p-6 text-slate-400">
-            <div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-xl mb-2">👛</div>
+          <div id="emptyListState" class="hidden flex-1 flex flex-col items-center justify-center text-center p-4 text-slate-400">
+            <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-lg mb-1.5">👛</div>
             <p class="text-xs font-bold text-slate-500">この期間の明細はありません</p>
             <p class="text-[10px] text-slate-400 mt-0.5">カメラまたは手入力で追加できます</p>
           </div>
@@ -558,8 +560,18 @@
             </div>
           </div>
 
-          <!-- グラフ直下の内訳ブレイクダウン詳細リスト（重なりなく全項目を完全把握） -->
-          <div id="pieBreakdownListContainer" class="pt-2 border-t border-slate-100 space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar"></div>
+          <!-- グラフ直下の内訳ブレイクダウン詳細リスト（アコーディオン展開） -->
+          <div id="rankingSectionWrapper" class="pt-2 border-t border-slate-100">
+            <button type="button" onclick="toggleRankingCollapse()" class="w-full flex items-center justify-between py-1 px-1 rounded-xl hover:bg-slate-50 text-slate-700 transition active:scale-[0.99]">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-xs">📋</span>
+                <span class="text-xs font-extrabold text-slate-800">ランキング詳細リスト</span>
+                <span id="rankingItemCountBadge" class="text-[10px] text-slate-400 font-bold">(0件)</span>
+              </div>
+              <svg id="rankingCollapseArrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="pieBreakdownListContainer" class="hidden pt-1.5 space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar animate-scale-up"></div>
+          </div>
         </div>
 
         <!-- 収支推移グラフ -->
@@ -1400,6 +1412,7 @@
     let receiptAbortController = null;
     let isCardAnimating = false;
     let isBudgetExpanded = false;
+    let isRankingExpanded = false;
 
     function toggleBudgetCollapse() {
       isBudgetExpanded = !isBudgetExpanded;
@@ -1411,6 +1424,21 @@
           if (arrow) arrow.classList.add('rotate-180');
         } else {
           content.classList.add('hidden');
+          if (arrow) arrow.classList.remove('rotate-180');
+        }
+      }
+    }
+
+    function toggleRankingCollapse() {
+      isRankingExpanded = !isRankingExpanded;
+      const container = document.getElementById('pieBreakdownListContainer');
+      const arrow = document.getElementById('rankingCollapseArrow');
+      if (container) {
+        if (isRankingExpanded) {
+          container.classList.remove('hidden');
+          if (arrow) arrow.classList.add('rotate-180');
+        } else {
+          container.classList.add('hidden');
           if (arrow) arrow.classList.remove('rotate-180');
         }
       }
@@ -2757,7 +2785,7 @@
       const isNewItem = recentNewTxIds.has(t.id);
 
       const card = document.createElement('div');
-      card.className = `p-3 rounded-2xl border transition flex items-center justify-between cursor-pointer active:scale-[0.99] select-none ${
+      card.className = `p-2 px-2.5 rounded-xl border transition flex items-center justify-between cursor-pointer active:scale-[0.99] select-none ${
         isSelected 
           ? 'bg-blue-50/90 border-blue-300' 
           : isNewItem
@@ -2774,62 +2802,62 @@
       };
 
       const checkboxHtml = isSelectionMode ? `
-        <div class="mr-2.5 flex-shrink-0">
-          <div class="w-4 h-4 rounded-full border flex items-center justify-center ${
+        <div class="mr-2 flex-shrink-0">
+          <div class="w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
             isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 bg-white'
           }">
-            ${isSelected ? '<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>' : ''}
+            ${isSelected ? '<svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>' : ''}
           </div>
         </div>
       ` : '';
 
-      const iconElement = getCategoryIcon(t.category, 'w-6 h-6');
+      const iconElement = getCategoryIcon(t.category, 'w-4 h-4');
       const grp = getCategoryGroup(t.category);
       
       let groupBadge = '';
       if (t.type === 'expense') {
         if (grp === 'fixed') {
-          groupBadge = '<span class="px-1.5 py-0.2 bg-indigo-50 text-indigo-700 rounded text-[9px] font-bold">固定費</span>';
+          groupBadge = '<span class="px-1 py-0.2 bg-indigo-50 text-indigo-700 rounded text-[8.5px] font-bold">固定</span>';
         } else {
-          groupBadge = '<span class="px-1.5 py-0.2 bg-amber-50 text-amber-700 rounded text-[9px] font-bold">変動費</span>';
+          groupBadge = '<span class="px-1 py-0.2 bg-amber-50 text-amber-700 rounded text-[8.5px] font-bold">変動</span>';
         }
       }
 
-      // 金額の直前に配置する「収入」「支出」バッジ & 金額文字色（落ち着いたシックなトーン）
+      // 金額の直前に配置する「収入」「支出」バッジ & 金額文字色
       const typeBadgeHtml = t.type === 'income'
-        ? '<span class="px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-extrabold text-[9px] border border-emerald-200 mr-1.5 flex-shrink-0">収入</span>'
-        : '<span class="px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-700 font-extrabold text-[9px] border border-rose-200 mr-1.5 flex-shrink-0">支出</span>';
+        ? '<span class="px-1 py-0.2 rounded bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200 mr-1 flex-shrink-0">収入</span>'
+        : '<span class="px-1 py-0.2 rounded bg-rose-50 text-rose-700 font-extrabold text-[8.5px] border border-rose-200 mr-1 flex-shrink-0">支出</span>';
       const amountColorClass = t.type === 'income' ? 'text-emerald-700' : 'text-rose-700';
 
-      const memoSub = t.memo ? `<span class="text-[10px] text-slate-400 truncate block max-w-[140px]">${escapeHtml(t.memo)}</span>` : '';
+      const memoSub = t.memo ? `<span class="text-[9.5px] text-slate-400 truncate block max-w-[120px]">${escapeHtml(t.memo)}</span>` : '';
       const displayDate = t.date ? t.date.slice(5).replace('-', '/') : '';
 
       let memberBadgeHtml = '';
       if (t.type === 'expense' && t.member && membersList.includes(t.member)) {
         const meta = memberMeta[t.member];
-        memberBadgeHtml = `<span class="px-1.5 py-0.2 rounded border ${meta.borderCol} ${meta.lightBg} ${meta.textCol} text-[9px] font-extrabold flex items-center"><span>${t.member}</span></span>`;
+        memberBadgeHtml = `<span class="px-1 py-0.2 rounded border ${meta.borderCol} ${meta.lightBg} ${meta.textCol} text-[8.5px] font-extrabold flex items-center"><span>${t.member}</span></span>`;
       }
 
       const newBadgeHtml = isNewItem 
-        ? '<span class="px-1.5 py-0.5 rounded-md bg-blue-600 text-white font-black text-[8px] tracking-tight shadow-xs animate-pulse mr-1.5 flex-shrink-0">NEW</span>'
+        ? '<span class="px-1 py-0.2 rounded bg-blue-600 text-white font-black text-[7.5px] tracking-tight shadow-xs animate-pulse mr-1 flex-shrink-0">NEW</span>'
         : '';
 
       card.innerHTML = `
-        <div class="flex items-center min-w-0 pr-2 space-x-2.5">
+        <div class="flex items-center min-w-0 pr-1.5 space-x-2">
           ${checkboxHtml}
-          <div class="w-10 h-10 rounded-2xl bg-white border border-blue-100 flex items-center justify-center flex-shrink-0 shadow-2xs">
+          <div class="w-8 h-8 rounded-xl bg-white border border-blue-100 flex items-center justify-center flex-shrink-0 shadow-2xs">
             ${iconElement}
           </div>
           <div class="min-w-0">
             <div class="flex items-center space-x-1">
               ${newBadgeHtml}
               <p class="text-xs font-bold text-slate-800 truncate">${escapeHtml(t.title || '未分類')}</p>
-              <span class="text-[10px] font-semibold text-slate-400 flex-shrink-0">${displayDate}</span>
+              <span class="text-[9.5px] font-semibold text-slate-400 flex-shrink-0">${displayDate}</span>
             </div>
-            <div class="flex items-center space-x-1 mt-0.5">
+            <div class="flex items-center space-x-1 mt-0">
               ${groupBadge}
               ${memberBadgeHtml}
-              <span class="px-1.5 py-0.2 bg-white rounded border border-slate-200/60 text-[9px] font-bold text-slate-600">${escapeHtml(t.category)}</span>
+              <span class="px-1 py-0.2 bg-white rounded border border-slate-200/60 text-[8.5px] font-bold text-slate-600">${escapeHtml(t.category)}</span>
               ${memoSub}
             </div>
           </div>
@@ -3923,6 +3951,8 @@
       if (data.length === 0 || totalExpense === 0) {
         if (emptyState) emptyState.classList.remove('hidden');
         if (breakdownContainer) breakdownContainer.innerHTML = '';
+        const countBadge = document.getElementById('rankingItemCountBadge');
+        if (countBadge) countBadge.textContent = '(0件)';
         return;
       }
       if (emptyState) emptyState.classList.add('hidden');
@@ -4191,8 +4221,13 @@
     // ==================== グラフ直下の内訳ブレイクダウン一覧描画 ====================
     function renderPieBreakdownList(labels, dataList, colorList, totalExpense, totalAllExpense) {
       const container = document.getElementById('pieBreakdownListContainer');
+      const countBadge = document.getElementById('rankingItemCountBadge');
       if (!container) return;
       container.innerHTML = '';
+
+      if (countBadge) {
+        countBadge.textContent = `(${labels.length}件)`;
+      }
 
       labels.forEach((name, i) => {
         const val = dataList[i] || 0;
