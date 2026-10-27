@@ -242,23 +242,23 @@
 
         <!-- ==================== サマリカード（背景: 薄青 ＆ 各ブロック: 白カード ＆ 太字強調 ＆ スワイプ対応） ==================== -->
         <div class="relative overflow-hidden rounded-3xl">
-          <div id="swipeCardArea" class="bg-[#dbeafe] rounded-3xl p-3 card-shadow border-2 border-blue-200/90 relative select-none flex flex-col space-y-2 will-change-transform cursor-grab active:cursor-grabbing">
+          <div id="swipeCardArea" class="bg-gradient-to-tr from-[#1557b0] to-[#1a73e8] rounded-3xl p-3 card-shadow border border-blue-400/40 relative select-none flex flex-col space-y-2 will-change-transform cursor-grab active:cursor-grabbing text-white">
             
             <!-- 上段：残高と収支ボックス（すべて白背景で統一＆高さ・横幅完全フィット） -->
             <div class="flex items-stretch space-x-2">
               
               <!-- 左側白ブロック：当期残高 ＆ 前期比 ＆ 通算残高（横幅を最適化して余白を解消） -->
-              <div class="w-[44%] bg-white rounded-2xl p-2.5 shadow-2xs border border-blue-100 flex flex-col justify-between min-w-0 flex-shrink-0">
+              <div class="w-[42%] bg-white rounded-2xl p-2.5 shadow-2xs border border-blue-100 flex flex-col justify-between min-w-0 flex-shrink-0 text-slate-800">
                 <div>
-                  <span class="text-[11px] font-black text-slate-900 tracking-tight block">当期収支残高</span>
-                  <div class="flex items-baseline space-x-1 my-0.5">
+                  <span class="text-[10px] font-black text-slate-700 tracking-tight block">当期収支残高</span>
+                  <div class="flex items-baseline space-x-0.5 my-0.5">
                     <span class="text-xs font-bold font-mono text-slate-400">¥</span>
-                    <span id="periodNetTotal" class="text-[25px] font-black font-mono text-slate-900 tracking-tight leading-none">0</span>
+                    <span id="periodNetTotal" class="text-[23px] font-black font-mono text-slate-900 tracking-tight leading-none">0</span>
                   </div>
                 </div>
 
                 <!-- 前期比・通算残高 -->
-                <div class="flex flex-col space-y-0.5 pt-1 border-t border-slate-100 text-[9.5px]">
+                <div class="flex flex-col space-y-0.5 pt-1 border-t border-slate-100 text-[9px]">
                   <div class="flex items-center space-x-1">
                     <span id="diffVsPrevPeriod" class="font-mono font-bold text-slate-500 truncate">（前期比 ±¥0）</span>
                   </div>
@@ -269,32 +269,28 @@
                 </div>
               </div>
 
-              <!-- 右側白ブロック：期間中収入 ＆ 期間中支出 ＆ 直下の固定・変動（高さを揃えて配置） -->
-              <div class="flex-1 min-w-0 flex flex-col justify-between space-y-1.5">
-                <div class="grid grid-cols-2 gap-1.5 flex-1">
-                  
-                  <!-- 収入ブロック（白背景、文字: 青系太字、数字: 黒・大幅拡大） -->
-                  <div class="bg-white rounded-xl py-2 px-1.5 text-center shadow-2xs border border-blue-100 flex flex-col justify-center">
-                    <span class="text-[10.5px] text-blue-700 font-black block leading-none mb-1 tracking-tight">期間中収入</span>
-                    <span id="incomeTotal" class="text-sm sm:text-base font-black font-mono text-slate-900 truncate block leading-tight tracking-tight">+¥0</span>
-                  </div>
-
-                  <!-- 支出ブロック（白背景、文字: 赤系太字、数字: 黒・大幅拡大） -->
-                  <div class="bg-white rounded-xl py-2 px-1.5 text-center shadow-2xs border border-blue-100 flex flex-col justify-center">
-                    <span class="text-[10.5px] text-rose-600 font-black block leading-none mb-1 tracking-tight">期間中支出</span>
-                    <span id="expenseTotal" class="text-sm sm:text-base font-black font-mono text-slate-900 truncate block leading-tight tracking-tight">-¥0</span>
-                  </div>
-
+              <!-- 右側白ブロック：期間中収入、期間中支出、内訳（固定/変動）の縦3行構成（左と高さを完全一致） -->
+              <div class="flex-1 bg-white rounded-2xl p-2.5 shadow-2xs border border-blue-100 flex flex-col justify-between min-w-0 text-slate-800">
+                <!-- 1行目: 期間中収入 -->
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] text-slate-800 font-extrabold tracking-tight">期間中収入</span>
+                  <span id="incomeTotal" class="text-xs sm:text-sm font-black font-mono text-emerald-700 truncate">¥0</span>
                 </div>
 
-                <!-- 支出内訳ミニブロック（白背景、文字はグレー、左右均等に配置） -->
-                <div class="bg-white rounded-xl py-1.5 px-2 border border-blue-100 shadow-2xs grid grid-cols-2 gap-1 text-[8.5px]">
-                  <div class="flex items-center justify-between pr-1.5 border-r border-slate-100">
-                    <span class="text-slate-500 font-bold">固定</span>
+                <!-- 2行目: 期間中支出 -->
+                <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+                  <span class="text-[10px] text-slate-800 font-extrabold tracking-tight">期間中支出</span>
+                  <span id="expenseTotal" class="text-xs sm:text-sm font-black font-mono text-rose-700 truncate">▲¥0</span>
+                </div>
+
+                <!-- 3行目: 内訳（固定 / 変動） -->
+                <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[9px]">
+                  <div class="flex items-center space-x-1">
+                    <span class="text-slate-600 font-bold">固定:</span>
                     <span id="fixedExpenseTotal" class="font-mono font-bold text-slate-700 truncate">¥0</span>
                   </div>
-                  <div class="flex items-center justify-between pl-1.5">
-                    <span class="text-slate-500 font-bold">変動</span>
+                  <div class="flex items-center space-x-1">
+                    <span class="text-slate-600 font-bold">変動:</span>
                     <span id="variableExpenseTotal" class="font-mono font-bold text-slate-700 truncate">¥0</span>
                   </div>
                 </div>
@@ -302,24 +298,24 @@
 
             </div>
 
-            <!-- 下段：予実管理アコーディオン（イラスト・常時金額なし・文字のみ） -->
-            <div class="pt-1 border-t border-blue-200/80">
+            <!-- 下段：予実管理アコーディオン（白バッジ＆見やすいコントラスト） -->
+            <div class="pt-1 border-t border-white/20">
               <div class="flex items-center justify-between">
-                <button type="button" onclick="toggleBudgetCollapse()" class="text-[10px] font-black text-blue-950 hover:text-blue-900 flex items-center space-x-1 active:scale-95 transition">
+                <button type="button" onclick="toggleBudgetCollapse()" class="px-2.5 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30 text-[10px] font-black flex items-center space-x-1.5 active:scale-95 transition shadow-2xs">
                   <span>予実管理</span>
-                  <svg id="budgetCollapseArrow" class="w-3 h-3 text-blue-700 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                  <svg id="budgetCollapseArrow" class="w-3 h-3 text-white transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
               </div>
 
               <!-- 展開される予算バー＆残り金額＆鉛筆マーク -->
               <div id="budgetAccordionContent" class="hidden pt-2 pb-0.5 space-y-1.5 animate-scale-up">
                 <div class="flex items-center space-x-2">
-                  <div class="flex-1 bg-white h-2 rounded-full overflow-hidden relative border border-blue-200">
-                    <div id="budgetProgressBar" class="h-full bg-blue-600 rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
+                  <div class="flex-1 bg-white/25 h-2.5 rounded-full overflow-hidden relative border border-white/30">
+                    <div id="budgetProgressBar" class="h-full bg-white rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
                   </div>
-                  <div class="flex items-center space-x-1 flex-shrink-0">
-                    <span id="budgetRemainingDisplay" class="text-[10px] font-bold font-mono text-slate-800">あと ¥0</span>
-                    <button type="button" onclick="openBudgetModal()" class="p-1 text-slate-600 hover:text-blue-800 active:scale-90 transition rounded-lg" title="予算設定と詳細">
+                  <div class="flex items-center space-x-1.5 flex-shrink-0">
+                    <span id="budgetRemainingDisplay" class="text-[10px] font-black font-mono text-white drop-shadow-xs">あと ¥0</span>
+                    <button type="button" onclick="openBudgetModal()" class="p-1 text-white hover:bg-white/20 active:scale-90 transition rounded-lg bg-white/15" title="予算設定と詳細">
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     </button>
                   </div>
@@ -334,8 +330,8 @@
         <div class="flex-shrink-0 grid grid-cols-2 gap-2.5">
           <label for="quickReceiptInput" class="flex items-center justify-center space-x-2 py-2.5 px-3 bg-white hover:bg-slate-50 text-blue-600 rounded-2xl card-shadow border-2 border-slate-200/90 active:scale-95 transition cursor-pointer">
             <input type="file" id="quickReceiptInput" accept="image/*" multiple class="hidden" onchange="handleReceiptUpload(event, false)">
-            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            <span class="text-xs font-bold text-slate-700">レシート撮影 (全体)</span>
+            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span class="text-xs font-bold text-slate-700">画像を取り込んで登録</span>
           </label>
 
           <button onclick="openManualModal('expense')" class="flex items-center justify-center space-x-2 py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-700 rounded-2xl card-shadow border-2 border-slate-200/90 active:scale-95 transition">
@@ -344,18 +340,18 @@
           </button>
         </div>
 
-        <!-- メンバー内訳を指定して撮影するボタン（背景白） -->
-        <label for="memberReceiptInput" class="flex-shrink-0 flex items-center justify-center space-x-1.5 py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 rounded-2xl card-shadow border-2 border-slate-200/90 active:scale-95 transition cursor-pointer text-xs font-bold">
-          <input type="file" id="memberReceiptInput" accept="image/*" multiple class="hidden" onchange="handleReceiptUpload(event, true)">
+        <!-- メンバー内訳を指定して登録するボタン（タップで先にメンバーを選択） -->
+        <button type="button" onclick="openMemberSelectForReceiptModal()" class="flex-shrink-0 flex items-center justify-center space-x-1.5 py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 rounded-2xl card-shadow border-2 border-slate-200/90 active:scale-95 transition text-xs font-bold">
           <span>👥</span>
-          <span>メンバー内訳を指定してレシート撮影</span>
-        </label>
+          <span>メンバー内訳を指定してレシート登録</span>
+        </button>
+        <input type="file" id="memberReceiptInput" accept="image/*" multiple class="hidden" onchange="handleReceiptUploadWithMember(event)">
 
         <!-- ==================== 収支の明細リスト（独立スクロール） ==================== -->
         <div class="flex-1 min-h-0 bg-white rounded-3xl p-3.5 card-shadow border-2 border-slate-200/90 flex flex-col overflow-hidden">
           
           <!-- リストヘッダー -->
-          <div id="listHeaderNormal" class="flex items-center justify-between pb-2.5 border-b border-slate-100 flex-shrink-0">
+          <div id="listHeaderNormal" class="flex items-center justify-between pb-2 border-b border-slate-100 flex-shrink-0">
             <h2 class="text-xs font-extrabold text-slate-800">収支の明細</h2>
             
             <div class="flex items-center space-x-1.5">
@@ -374,11 +370,15 @@
                   <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
 
-                <!-- 科目選択ドロップダウン -->
+                <!-- 科目選択ドロップダウン（全選択 ＆ 全解除ボタン） -->
                 <div id="categoryFilterDropdown" class="hidden absolute right-0 top-full mt-1.5 w-52 bg-white rounded-2xl shadow-xl p-2.5 z-40 border border-slate-100 text-xs max-h-72 overflow-y-auto custom-scrollbar">
                   <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100">
                     <span class="font-extrabold text-slate-700 text-[11px]">科目を絞り込み</span>
-                    <button type="button" onclick="resetCategoryFilter()" class="text-[10px] text-blue-600 font-bold hover:underline">全選択</button>
+                    <div class="flex items-center space-x-2">
+                      <button type="button" onclick="resetCategoryFilter()" class="text-[10px] text-blue-600 font-bold hover:underline">全選択</button>
+                      <span class="text-slate-300 text-[9px]">|</span>
+                      <button type="button" onclick="clearCategoryFilter()" class="text-[10px] text-rose-500 font-bold hover:underline">全解除</button>
+                    </div>
                   </div>
                   <div id="categoryCheckboxContainer" class="space-y-1.5 py-0.5"></div>
                 </div>
@@ -389,6 +389,19 @@
                 整理
               </button>
             </div>
+          </div>
+
+          <!-- 種別絞り込みバー（収支(すべて) / 支出 / 収入） -->
+          <div class="flex items-center space-x-1 p-1 bg-slate-100 rounded-2xl text-[11px] font-bold my-1.5 flex-shrink-0">
+            <button type="button" onclick="setTxTypeFilter('all')" id="btnFilterTypeAll" class="flex-1 py-1 rounded-xl bg-white text-blue-600 shadow-xs transition text-center">
+              収支 (すべて)
+            </button>
+            <button type="button" onclick="setTxTypeFilter('expense')" id="btnFilterTypeExpense" class="flex-1 py-1 rounded-xl text-slate-500 hover:text-slate-800 transition text-center">
+              支出のみ
+            </button>
+            <button type="button" onclick="setTxTypeFilter('income')" id="btnFilterTypeIncome" class="flex-1 py-1 rounded-xl text-slate-500 hover:text-slate-800 transition text-center">
+              収入のみ
+            </button>
           </div>
 
           <!-- リストヘッダー（整理・削除モード） -->
@@ -506,7 +519,7 @@
           </div>
         </div>
 
-        <!-- 円グラフ（左右スワイプ＆マウスドラッグ対応カード ＆ 内側に支出総額・凡例に金額と構成比%を表示） -->
+        <!-- 円グラフ（左右スワイプ＆マウスドラッグ対応カード ＆ 内側に支出総額・引き出し線ラベル表示） -->
         <div id="pieChartCardArea" class="bg-white rounded-3xl p-4 card-shadow border-2 border-slate-200/90 space-y-2.5 will-change-transform select-none cursor-grab active:cursor-grabbing">
           <div class="flex items-center justify-between pb-1 border-b border-slate-100">
             <div class="flex items-center space-x-1.5">
@@ -538,7 +551,7 @@
             </button>
           </div>
 
-          <div class="relative w-full h-64 flex items-center justify-center">
+          <div class="relative w-full h-72 flex items-center justify-center">
             <canvas id="pieChartCanvas"></canvas>
             <div id="pieEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-xs text-slate-400">
               この期間の支出データはありません
@@ -629,10 +642,10 @@
         <span class="text-[10px] font-semibold">推移グラフ</span>
       </button>
 
-      <!-- 3. 【中央】大型化した主役カメラボタン（円内にカメラアイコン ＆ 「撮影して入力」白文字を内包） -->
+      <!-- 3. 【中央】大型化した主役カメラボタン（capture="environment" でダイアログを出さず即カメラ起動） -->
       <div class="flex-1 flex justify-center -mt-6">
         <label for="bottomReceiptInput" class="w-16 h-16 rounded-full bg-gradient-to-tr from-[#1557b0] to-[#1a73e8] hover:brightness-105 text-white fab-shadow border-4 border-[#f8faff] flex flex-col items-center justify-center cursor-pointer active:scale-95 transition" aria-label="レシート撮影して入力">
-          <input type="file" id="bottomReceiptInput" accept="image/*" multiple class="hidden" onchange="handleReceiptUpload(event, false)">
+          <input type="file" id="bottomReceiptInput" accept="image/*" capture="environment" class="hidden" onchange="handleReceiptUpload(event, false)">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           <span class="text-[8px] font-extrabold text-white mt-0.5 leading-none tracking-tighter">撮影して入力</span>
         </label>
@@ -894,22 +907,35 @@
     </div>
   </div>
 
-  <!-- レシート登録確認・メンバー設定モーダル -->
-  <div id="receiptConfirmModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-3.5 animate-scale-up max-h-[85vh] flex flex-col">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-2 flex-shrink-0">
-        <div>
-          <h3 class="text-sm font-extrabold text-slate-800">レシート登録の確認</h3>
-          <p class="text-[10px] text-slate-400">対象メンバーを選択して登録を完了してください</p>
-        </div>
-        <button onclick="closeModal('receiptConfirmModal')" class="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
+  <!-- レシート撮影前 メンバー事前選択モーダル -->
+  <div id="memberSelectForReceiptModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-2xl space-y-3.5 animate-scale-up text-center">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <h4 class="text-sm font-extrabold text-slate-800">対象メンバーを選択</h4>
+        <button onclick="closeModal('memberSelectForReceiptModal')" class="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
+      </div>
+      <p class="text-[11px] text-slate-500">どのメンバーの支出として登録しますか？</p>
+
+      <div class="space-y-2 pt-1" id="receiptMemberSelectList">
+        <button type="button" onclick="chooseReceiptMember('')" class="w-full py-2.5 px-3 rounded-2xl bg-emerald-50 text-emerald-700 font-extrabold text-xs border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition flex items-center justify-center">
+          家族全体
+        </button>
+        <button type="button" onclick="chooseReceiptMember('桂')" class="w-full py-2.5 px-3 rounded-2xl bg-indigo-50 text-indigo-700 font-extrabold text-xs border border-indigo-200 hover:bg-indigo-100 active:scale-95 transition flex items-center justify-center">
+          桂
+        </button>
+        <button type="button" onclick="chooseReceiptMember('由美子')" class="w-full py-2.5 px-3 rounded-2xl bg-sky-50 text-sky-700 font-extrabold text-xs border border-sky-200 hover:bg-sky-100 active:scale-95 transition flex items-center justify-center">
+          由美子
+        </button>
+        <button type="button" onclick="chooseReceiptMember('竜馬')" class="w-full py-2.5 px-3 rounded-2xl bg-amber-50 text-amber-700 font-extrabold text-xs border border-amber-200 hover:bg-amber-100 active:scale-95 transition flex items-center justify-center">
+          竜馬
+        </button>
+        <button type="button" onclick="chooseReceiptMember('初菜')" class="w-full py-2.5 px-3 rounded-2xl bg-pink-50 text-pink-700 font-extrabold text-xs border border-pink-200 hover:bg-pink-100 active:scale-95 transition flex items-center justify-center">
+          初菜
+        </button>
       </div>
 
-      <div id="receiptConfirmList" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 py-1"></div>
-
-      <div class="border-t border-slate-100 pt-2 flex space-x-2 flex-shrink-0">
-        <button onclick="closeModal('receiptConfirmModal')" class="flex-1 py-2.5 rounded-2xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">キャンセル</button>
-        <button onclick="saveConfirmedReceipts()" class="flex-1 py-2.5 rounded-2xl bg-blue-600 text-xs font-bold text-white hover:bg-blue-700 active:scale-95 transition shadow-sm">一括登録する</button>
+      <div class="pt-1">
+        <button onclick="closeModal('memberSelectForReceiptModal')" class="w-full py-2 rounded-2xl border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-50">キャンセル</button>
       </div>
     </div>
   </div>
@@ -1167,14 +1193,14 @@
     let variableExpenseCategories = [...defaultVariableExpenseCategories];
     let incomeCategories = [...defaultIncomeCategories];
 
-    // ==================== 対象者（パステルカラー対応） ====================
+    // ==================== 対象者（絵文字アイコンなし・パステルカラー対応） ====================
     const membersList = ['桂', '由美子', '竜馬', '初菜'];
     const memberMeta = {
-      '家族全体': { icon: '👨‍👩‍👧‍👦', color: '#10B981', lightBg: 'bg-emerald-50', textCol: 'text-emerald-700', borderCol: 'border-emerald-200' },
-      '桂':     { icon: '👤', color: '#6366F1', lightBg: 'bg-indigo-50', textCol: 'text-indigo-700', borderCol: 'border-indigo-200' },
-      '由美子': { icon: '🌸', color: '#38BDF8', lightBg: 'bg-sky-50', textCol: 'text-sky-700', borderCol: 'border-sky-200' }, // パステル水色
-      '竜馬':   { icon: '⚡', color: '#F59E0B', lightBg: 'bg-amber-50', textCol: 'text-amber-700', borderCol: 'border-amber-200' },
-      '初菜':   { icon: '🍀', color: '#F472B6', lightBg: 'bg-pink-50', textCol: 'text-pink-600', borderCol: 'border-pink-200' }  // パステルピンク
+      '家族全体': { color: '#10B981', lightBg: 'bg-emerald-50', textCol: 'text-emerald-700', borderCol: 'border-emerald-200' },
+      '桂':     { color: '#6366F1', lightBg: 'bg-indigo-50', textCol: 'text-indigo-700', borderCol: 'border-indigo-200' },
+      '由美子': { color: '#38BDF8', lightBg: 'bg-sky-50', textCol: 'text-sky-700', borderCol: 'border-sky-200' },
+      '竜馬':   { color: '#F59E0B', lightBg: 'bg-amber-50', textCol: 'text-amber-700', borderCol: 'border-amber-200' },
+      '初菜':   { color: '#F472B6', lightBg: 'bg-pink-50', textCol: 'text-pink-600', borderCol: 'border-pink-200' }
     };
 
     // Chart.js凡例・プレーンテキスト用
@@ -1329,12 +1355,14 @@
     let deletedTxIds = [];
     let hiddenTitleSuggestions = [];
     let monthlyBudget = 200000;
+    let recentNewTxIds = new Set(); // 新規登録された取引（NEWバッジ＆最上部ピン留め用）
 
     let activeYear = new Date().getFullYear();
     let activeMonth = new Date().getMonth() + 1;
     let currentFilterMode = 'current_month';
     let customDateRange = { start: '', end: '' };
     
+    let currentTypeFilter = 'all'; // 'all' | 'expense' | 'income'
     let selectedCategoriesFilter = new Set();
     
     let currentTrendPeriod = '1m';
@@ -1358,11 +1386,13 @@
     let geminiApiKey = '';
 
     let activeReorderTab = 'variable';
+    let draggedModalCategory = null;
+    let touchModalDragEl = null;
 
     let isSelectionMode = false;
     let selectedTxIds = new Set();
     let pendingDuplicateTx = null;
-    let pendingReceiptsForConfirmation = [];
+    let selectedReceiptMemberTarget = '';
 
     let receiptAbortController = null;
     let isCardAnimating = false;
@@ -1568,36 +1598,31 @@
         recMember.innerHTML = '';
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
-        defaultOpt.textContent = '👨‍👩‍👧‍👦 家族全体 (指定なし)';
+        defaultOpt.textContent = '家族全体 (指定なし)';
         recMember.appendChild(defaultOpt);
 
         membersList.forEach(m => {
           const opt = document.createElement('option');
           opt.value = m;
-          const meta = memberMeta[m] || { icon: '👤' };
-          opt.textContent = `${meta.icon} ${m}`;
+          opt.textContent = m;
           recMember.appendChild(opt);
         });
       }
     }
 
-    // ==================== 手入力メンバー選択ボタン ====================
+    // ==================== 手入力メンバー選択ボタン（アイコンなし） ====================
     function setupManualMemberButtons() {
       const container = document.getElementById('manualMemberContainer');
       if (!container) return;
       container.innerHTML = '';
 
       membersList.forEach(m => {
-        const meta = memberMeta[m] || { icon: '👤' };
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.id = `btnMember_${m}`;
         btn.onclick = () => toggleManualMember(m);
-        btn.className = 'py-2 rounded-xl transition flex flex-col items-center justify-center text-center';
-        btn.innerHTML = `
-          <span class="text-sm leading-none mb-0.5">${meta.icon}</span>
-          <span class="text-[10px] font-bold leading-tight truncate w-full">${m}</span>
-        `;
+        btn.className = 'py-2 rounded-xl transition flex items-center justify-center text-center';
+        btn.innerHTML = `<span class="text-xs font-bold leading-tight truncate w-full">${m}</span>`;
         container.appendChild(btn);
       });
 
@@ -1617,11 +1642,11 @@
       const statusText = document.getElementById('manualMemberStatusText');
       if (statusText) {
         if (!selectedManualMember) {
-          statusText.textContent = '👨‍👩‍👧‍👦 家族全体';
+          statusText.textContent = '家族全体';
           statusText.className = 'text-[10px] font-bold text-emerald-600';
         } else {
           const meta = memberMeta[selectedManualMember];
-          statusText.textContent = `${meta?.icon || ''} ${selectedManualMember}`;
+          statusText.textContent = selectedManualMember;
           statusText.className = `text-[10px] font-bold ${meta?.textCol || 'text-indigo-600'}`;
         }
       }
@@ -1633,19 +1658,44 @@
         const meta = memberMeta[m];
 
         if (isSelected) {
-          btn.className = `py-2 rounded-xl bg-white ${meta.textCol} shadow-xs border ${meta.borderCol} transition flex flex-col items-center justify-center text-center font-black scale-[1.02]`;
+          btn.className = `py-2 rounded-xl bg-white ${meta.textCol} shadow-xs border ${meta.borderCol} transition flex items-center justify-center text-center font-black scale-[1.02]`;
         } else {
-          btn.className = 'py-2 rounded-xl text-slate-500 hover:text-slate-800 transition flex flex-col items-center justify-center text-center font-semibold bg-white/50 border border-transparent';
+          btn.className = 'py-2 rounded-xl text-slate-500 hover:text-slate-800 transition flex items-center justify-center text-center font-semibold bg-white/50 border border-transparent';
         }
       });
     }
 
+    // ==================== メンバー内訳指定レシート事前選択モーダル ====================
+    function openMemberSelectForReceiptModal() {
+      openModal('memberSelectForReceiptModal');
+    }
+
+    function chooseReceiptMember(member) {
+      selectedReceiptMemberTarget = member;
+      closeModal('memberSelectForReceiptModal');
+      const input = document.getElementById('memberReceiptInput');
+      if (input) input.click();
+    }
+
+    function handleReceiptUploadWithMember(event) {
+      handleReceiptUpload(event, false, selectedReceiptMemberTarget);
+    }
+
     // ==================== 科目絞り込み ====================
+    function getAllAvailableCategories() {
+      return [...fixedExpenseCategories, ...variableExpenseCategories, ...incomeCategories];
+    }
+
     function setupCategoryFilterDropdown() {
       const container = document.getElementById('categoryCheckboxContainer');
       if (!container) return;
 
       container.innerHTML = '';
+
+      // 初期状態は全選択
+      if (selectedCategoriesFilter.size === 0) {
+        getAllAvailableCategories().forEach(c => selectedCategoriesFilter.add(c));
+      }
 
       const groups = [
         { title: '変動費', list: variableExpenseCategories, badgeClass: 'bg-amber-50 text-amber-700' },
@@ -1663,7 +1713,7 @@
           const row = document.createElement('label');
           row.className = 'flex items-center space-x-2 p-1 px-2 hover:bg-slate-50 rounded-xl cursor-pointer select-none text-xs';
           
-          const isChecked = selectedCategoriesFilter.size === 0 || selectedCategoriesFilter.has(cat);
+          const isChecked = selectedCategoriesFilter.has(cat);
           const icon = getCategoryIcon(cat, 'w-4 h-4');
 
           row.innerHTML = `
@@ -1685,45 +1735,64 @@
 
     function onCategoryFilterCheckboxChange(checkbox) {
       const cat = checkbox.value;
-      const allCats = [...fixedExpenseCategories, ...variableExpenseCategories, ...incomeCategories];
-
-      if (selectedCategoriesFilter.size === 0) {
-        allCats.forEach(c => selectedCategoriesFilter.add(c));
-      }
-
       if (checkbox.checked) {
         selectedCategoriesFilter.add(cat);
       } else {
         selectedCategoriesFilter.delete(cat);
       }
-
-      if (selectedCategoriesFilter.size === allCats.length || selectedCategoriesFilter.size === 0) {
-        selectedCategoriesFilter.clear();
-      }
-
       updateCategoryFilterButtonLabel();
       renderTransactionsList();
     }
 
     function resetCategoryFilter() {
-      selectedCategoriesFilter.clear();
+      getAllAvailableCategories().forEach(c => selectedCategoriesFilter.add(c));
       const checkboxes = document.querySelectorAll('#categoryCheckboxContainer input[type="checkbox"]');
       checkboxes.forEach(cb => cb.checked = true);
       updateCategoryFilterButtonLabel();
       renderTransactionsList();
+      showToast('すべての科目を選択しました');
+    }
+
+    function clearCategoryFilter() {
+      selectedCategoriesFilter.clear();
+      const checkboxes = document.querySelectorAll('#categoryCheckboxContainer input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.checked = false);
+      updateCategoryFilterButtonLabel();
+      renderTransactionsList();
+      showToast('科目の選択をすべて解除しました');
     }
 
     function updateCategoryFilterButtonLabel() {
       const labelEl = document.getElementById('selectedCategoryLabel');
       if (!labelEl) return;
 
-      if (selectedCategoriesFilter.size === 0) {
+      const totalCats = getAllAvailableCategories().length;
+      if (selectedCategoriesFilter.size === totalCats) {
         labelEl.textContent = '全科目';
+      } else if (selectedCategoriesFilter.size === 0) {
+        labelEl.textContent = '未選択(0)';
       } else if (selectedCategoriesFilter.size === 1) {
         labelEl.textContent = Array.from(selectedCategoriesFilter)[0];
       } else {
-        labelEl.textContent = `${selectedCategoriesFilter.size}科目選択中`;
+        labelEl.textContent = `${selectedCategoriesFilter.size}科目`;
       }
+    }
+
+    // ==================== 収支の明細 種別絞り込み（収支 / 支出 / 収入） ====================
+    function setTxTypeFilter(type) {
+      currentTypeFilter = type;
+      const btnAll = document.getElementById('btnFilterTypeAll');
+      const btnExp = document.getElementById('btnFilterTypeExpense');
+      const btnInc = document.getElementById('btnFilterTypeIncome');
+
+      const activeClass = 'flex-1 py-1 rounded-xl bg-white text-blue-600 shadow-xs transition text-center font-black';
+      const inactiveClass = 'flex-1 py-1 rounded-xl text-slate-500 hover:text-slate-800 transition text-center font-bold';
+
+      if (btnAll) btnAll.className = (type === 'all' ? activeClass : inactiveClass);
+      if (btnExp) btnExp.className = (type === 'expense' ? activeClass : inactiveClass);
+      if (btnInc) btnInc.className = (type === 'income' ? activeClass : inactiveClass);
+
+      renderTransactionsList();
     }
 
     // ==================== 年単位選択プルダウン ====================
@@ -2394,18 +2463,19 @@
       const expEl = document.getElementById('expenseTotal');
       const fixedEl = document.getElementById('fixedExpenseTotal');
       const varEl = document.getElementById('variableExpenseTotal');
-      if (incEl) incEl.textContent = `+¥${periodIncome.toLocaleString()}`;
-      if (expEl) expEl.textContent = `-¥${periodExpense.toLocaleString()}`;
+      if (incEl) incEl.textContent = `¥${periodIncome.toLocaleString()}`;
+      if (expEl) expEl.textContent = `▲¥${periodExpense.toLocaleString()}`;
       if (fixedEl) fixedEl.textContent = `¥${fixedExpense.toLocaleString()}`;
       if (varEl) varEl.textContent = `¥${variableExpense.toLocaleString()}`;
 
       const periodNetEl = document.getElementById('periodNetTotal');
       if (periodNetEl) {
-        periodNetEl.textContent = periodNet.toLocaleString();
         if (periodNet < 0) {
+          periodNetEl.textContent = `▲${Math.abs(periodNet).toLocaleString()}`;
           periodNetEl.classList.add('text-rose-600');
           periodNetEl.classList.remove('text-slate-900');
         } else {
+          periodNetEl.textContent = periodNet.toLocaleString();
           periodNetEl.classList.remove('text-rose-600');
           periodNetEl.classList.add('text-slate-900');
         }
@@ -2413,10 +2483,11 @@
 
       const currentNetEl = document.getElementById('currentOverallNet');
       if (currentNetEl) {
-        currentNetEl.textContent = `¥${overallNet.toLocaleString()}`;
         if (overallNet < 0) {
+          currentNetEl.textContent = `▲¥${Math.abs(overallNet).toLocaleString()}`;
           currentNetEl.className = 'font-mono text-rose-600 font-bold';
         } else {
+          currentNetEl.textContent = `¥${overallNet.toLocaleString()}`;
           currentNetEl.className = 'font-mono text-slate-700 font-bold';
         }
       }
@@ -2463,10 +2534,10 @@
       if (budgetRemEl) {
         if (remaining >= 0) {
           budgetRemEl.textContent = `あと ¥${remaining.toLocaleString()}`;
-          budgetRemEl.className = 'text-[10px] font-bold font-mono text-slate-700';
+          budgetRemEl.className = 'text-[10px] font-black font-mono text-white drop-shadow-xs';
         } else {
           budgetRemEl.textContent = `超過 ¥${Math.abs(remaining).toLocaleString()}`;
-          budgetRemEl.className = 'text-[10px] font-black font-mono text-rose-600';
+          budgetRemEl.className = 'text-[10px] font-black font-mono text-amber-200 drop-shadow-xs';
         }
       }
 
@@ -2476,9 +2547,9 @@
         budgetBar.style.width = `${widthPct}%`;
 
         if (ratio >= 1.0) {
-          budgetBar.className = 'h-full bg-rose-500 rounded-full transition-all duration-500 ease-out';
+          budgetBar.className = 'h-full bg-amber-300 rounded-full transition-all duration-500 ease-out';
         } else {
-          budgetBar.className = 'h-full bg-blue-600 rounded-full transition-all duration-500 ease-out';
+          budgetBar.className = 'h-full bg-white rounded-full transition-all duration-500 ease-out';
         }
       }
 
@@ -2522,7 +2593,14 @@
       const emptyEl = document.getElementById('emptyListState');
       const sortOrderVal = document.getElementById('sortOrder') ? document.getElementById('sortOrder').value : 'date_desc';
 
-      if (selectedCategoriesFilter.size > 0) {
+      // 1. 種別絞り込み（収支 / 支出 / 収入）
+      if (currentTypeFilter !== 'all') {
+        filtered = filtered.filter(t => t.type === currentTypeFilter);
+      }
+
+      // 2. 科目絞り込み
+      const allCatsCount = getAllAvailableCategories().length;
+      if (selectedCategoriesFilter.size < allCatsCount) {
         filtered = filtered.filter(t => selectedCategoriesFilter.has(t.category));
       }
 
@@ -2564,11 +2642,12 @@
         summaryBox.className = 'bg-slate-50/90 rounded-2xl p-2.5 border border-slate-200/60 mb-2.5 space-y-1.5 shadow-2xs';
         summaryBox.innerHTML = `
           <div class="flex items-center justify-between text-[10px] font-extrabold text-slate-700">
-            <span>👥 メンバー別 支出構成</span>
+            <span>メンバー別 支出構成</span>
             <span class="text-slate-400 font-mono">計 ¥${totalExpense.toLocaleString()}</span>
           </div>
           <div class="grid grid-cols-2 gap-1.5" id="memberSummaryPills"></div>
         `;
+
         listEl.appendChild(summaryBox);
 
         const pillsContainer = summaryBox.querySelector('#memberSummaryPills');
@@ -2576,13 +2655,11 @@
           const txs = grouped[m] || [];
           const mTotal = txs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
           const pct = totalExpense > 0 ? Math.round((mTotal / totalExpense) * 100) : 0;
-          const meta = memberMeta[m] || { icon: '👤', textCol: 'text-slate-700', lightBg: 'bg-white' };
 
           const pill = document.createElement('div');
           pill.className = `p-1.5 px-2 rounded-xl bg-white border border-slate-200/70 shadow-2xs flex items-center justify-between text-[10px]`;
           pill.innerHTML = `
             <div class="flex items-center space-x-1 truncate pr-1">
-              <span>${meta.icon}</span>
               <span class="font-bold text-slate-700 truncate">${m}</span>
             </div>
             <div class="text-right flex-shrink-0 font-mono">
@@ -2600,13 +2677,11 @@
           txs.sort((a, b) => new Date(b.date) - new Date(a.date));
           const mTotal = txs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
           const pct = totalExpense > 0 ? Math.round((mTotal / totalExpense) * 100) : 0;
-          const meta = memberMeta[m] || { icon: '👤' };
 
           const groupHeader = document.createElement('div');
           groupHeader.className = 'pt-2 pb-1 flex items-center justify-between text-xs border-b border-slate-100 font-bold text-slate-700';
           groupHeader.innerHTML = `
             <div class="flex items-center space-x-1.5">
-              <span>${meta.icon}</span>
               <span>${m}</span>
               <span class="text-[10px] text-slate-400 font-semibold">(${txs.length}件)</span>
             </div>
@@ -2631,11 +2706,10 @@
           groupHeader.className = 'pt-2.5 pb-1 flex items-center justify-between text-xs border-b border-slate-100 font-bold text-emerald-700';
           groupHeader.innerHTML = `
             <div class="flex items-center space-x-1.5">
-              <span>💼</span>
               <span>収入</span>
               <span class="text-[10px] text-slate-400 font-semibold">(${incTxs.length}件)</span>
             </div>
-            <span class="font-mono font-black text-emerald-600 text-xs">+¥${incTotal.toLocaleString()}</span>
+            <span class="font-mono font-black text-emerald-600 text-xs">¥${incTotal.toLocaleString()}</span>
           `;
           listEl.appendChild(groupHeader);
 
@@ -2646,7 +2720,20 @@
         return;
       }
 
-      filtered.sort((a, b) => {
+      // 新規登録アイテム（NEW）を一時的に最上部にピン留めする処理
+      let newTxs = [];
+      let regularTxs = [];
+
+      filtered.forEach(t => {
+        if (recentNewTxIds.has(t.id)) {
+          newTxs.push(t);
+        } else {
+          regularTxs.push(t);
+        }
+      });
+
+      // 通常アイテムのソート
+      regularTxs.sort((a, b) => {
         if (sortOrderVal === 'date_desc') return new Date(b.date) - new Date(a.date);
         if (sortOrderVal === 'date_asc') return new Date(a.date) - new Date(b.date);
         if (sortOrderVal === 'amount_desc') return (Number(b.amount) || 0) - (Number(a.amount) || 0);
@@ -2654,18 +2741,25 @@
         return 0;
       });
 
-      filtered.forEach(t => {
+      // 新規アイテムを最上部に配置
+      const finalDisplayList = [...newTxs, ...regularTxs];
+
+      finalDisplayList.forEach(t => {
         renderSingleTransactionCard(t, listEl);
       });
     }
 
     function renderSingleTransactionCard(t, container) {
       const isSelected = selectedTxIds.has(t.id);
+      const isNewItem = recentNewTxIds.has(t.id);
+
       const card = document.createElement('div');
       card.className = `p-3 rounded-2xl border transition flex items-center justify-between cursor-pointer active:scale-[0.99] select-none ${
         isSelected 
           ? 'bg-blue-50/90 border-blue-300' 
-          : 'bg-slate-50/80 hover:bg-slate-100/90 border-slate-100/80 shadow-xs'
+          : isNewItem
+            ? 'bg-blue-50/70 border-blue-300 ring-2 ring-blue-400/20 shadow-xs'
+            : 'bg-slate-50/80 hover:bg-slate-100/90 border-slate-100/80 shadow-xs'
       }`;
 
       card.onclick = () => {
@@ -2690,16 +2784,19 @@
       const grp = getCategoryGroup(t.category);
       
       let groupBadge = '';
-      if (t.type === 'income') {
-        groupBadge = '<span class="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 rounded text-[9px] font-bold">収入</span>';
-      } else if (grp === 'fixed') {
-        groupBadge = '<span class="px-1.5 py-0.2 bg-indigo-50 text-indigo-700 rounded text-[9px] font-bold">固定費</span>';
-      } else {
-        groupBadge = '<span class="px-1.5 py-0.2 bg-amber-50 text-amber-700 rounded text-[9px] font-bold">変動費</span>';
+      if (t.type === 'expense') {
+        if (grp === 'fixed') {
+          groupBadge = '<span class="px-1.5 py-0.2 bg-indigo-50 text-indigo-700 rounded text-[9px] font-bold">固定費</span>';
+        } else {
+          groupBadge = '<span class="px-1.5 py-0.2 bg-amber-50 text-amber-700 rounded text-[9px] font-bold">変動費</span>';
+        }
       }
 
-      const amountPrefix = t.type === 'income' ? '+¥' : '-¥';
-      const amountColor = t.type === 'income' ? 'text-emerald-600' : 'text-slate-800';
+      // 金額の直前に配置する「収入」「支出」バッジ & 金額文字色（落ち着いたシックなトーン）
+      const typeBadgeHtml = t.type === 'income'
+        ? '<span class="px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-extrabold text-[9px] border border-emerald-200 mr-1.5 flex-shrink-0">収入</span>'
+        : '<span class="px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-700 font-extrabold text-[9px] border border-rose-200 mr-1.5 flex-shrink-0">支出</span>';
+      const amountColorClass = t.type === 'income' ? 'text-emerald-700' : 'text-rose-700';
 
       const memoSub = t.memo ? `<span class="text-[10px] text-slate-400 truncate block max-w-[140px]">${escapeHtml(t.memo)}</span>` : '';
       const displayDate = t.date ? t.date.slice(5).replace('-', '/') : '';
@@ -2707,8 +2804,12 @@
       let memberBadgeHtml = '';
       if (t.type === 'expense' && t.member && membersList.includes(t.member)) {
         const meta = memberMeta[t.member];
-        memberBadgeHtml = `<span class="px-1.5 py-0.2 rounded border ${meta.borderCol} ${meta.lightBg} ${meta.textCol} text-[9px] font-extrabold flex items-center space-x-0.5"><span>${meta.icon}</span><span>${t.member}</span></span>`;
+        memberBadgeHtml = `<span class="px-1.5 py-0.2 rounded border ${meta.borderCol} ${meta.lightBg} ${meta.textCol} text-[9px] font-extrabold flex items-center"><span>${t.member}</span></span>`;
       }
+
+      const newBadgeHtml = isNewItem 
+        ? '<span class="px-1.5 py-0.5 rounded-md bg-blue-600 text-white font-black text-[8px] tracking-tight shadow-xs animate-pulse mr-1.5 flex-shrink-0">NEW</span>'
+        : '';
 
       card.innerHTML = `
         <div class="flex items-center min-w-0 pr-2 space-x-2.5">
@@ -2717,9 +2818,10 @@
             ${iconElement}
           </div>
           <div class="min-w-0">
-            <div class="flex items-center space-x-1.5">
+            <div class="flex items-center space-x-1">
+              ${newBadgeHtml}
               <p class="text-xs font-bold text-slate-800 truncate">${escapeHtml(t.title || '未分類')}</p>
-              <span class="text-[10px] font-semibold text-slate-400">${displayDate}</span>
+              <span class="text-[10px] font-semibold text-slate-400 flex-shrink-0">${displayDate}</span>
             </div>
             <div class="flex items-center space-x-1 mt-0.5">
               ${groupBadge}
@@ -2729,8 +2831,9 @@
             </div>
           </div>
         </div>
-        <div class="text-right flex-shrink-0">
-          <span class="text-xs font-black font-mono ${amountColor}">${amountPrefix}${(Number(t.amount) || 0).toLocaleString()}</span>
+        <div class="text-right flex-shrink-0 flex items-center justify-end">
+          ${typeBadgeHtml}
+          <span class="text-xs font-black font-mono ${amountColorClass}">¥${(Number(t.amount) || 0).toLocaleString()}</span>
         </div>
       `;
       container.appendChild(card);
@@ -2804,8 +2907,7 @@
         }
         document.getElementById('detailMemberRow').classList.remove('hidden');
         const m = (t.member && membersList.includes(t.member)) ? t.member : '家族全体';
-        const meta = memberMeta[m] || memberMeta['家族全体'];
-        document.getElementById('detailMember').textContent = `${meta.icon} ${m}`;
+        document.getElementById('detailMember').textContent = m;
       }
 
       const detailDateFormatted = t.date ? t.date.replace(/-/g, '/') : '';
@@ -3316,11 +3418,14 @@
           target.memo = memo;
           target.member = member;
         }
+        // 編集完了によりNEWバッジを解除して通常配置へ
+        recentNewTxIds.delete(editingTxId);
         editingTxId = null;
         showToast('明細を更新しました');
       } else {
+        const newId = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
         const newTx = {
-          id: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+          id: newId,
           date,
           type: currentManualType,
           category,
@@ -3330,8 +3435,9 @@
           member,
           createdAt: new Date().toLocaleString('ja-JP')
         };
+        recentNewTxIds.add(newId);
         transactions.unshift(newTx);
-        showToast('記帳を完了しました');
+        showToast('記帳を完了しました (最上部に表示)');
       }
 
       saveStoredData();
@@ -3380,7 +3486,7 @@
     }
 
     // ==================== レシート撮影＆Gemini API超高速解析 ====================
-    async function handleReceiptUpload(event, isMemberSpecific = false) {
+    async function handleReceiptUpload(event, isMemberSpecific = false, assignedMember = '') {
       const files = Array.from(event.target.files || []);
       if (files.length === 0) return;
 
@@ -3396,7 +3502,6 @@
       let parsedItems = [];
 
       try {
-        // 複数枚ある場合も直列待機せず、Promise.all で一斉並列処理
         const processResults = await Promise.all(
           files.map(async (file) => {
             if (receiptAbortController.signal.aborted) return [];
@@ -3415,7 +3520,7 @@
             amount: Number(item.amount) || 0,
             title: item.storeName || '買い物',
             memo: item.itemsSummary || '',
-            member: '',
+            member: assignedMember || '',
             createdAt: new Date().toLocaleString('ja-JP')
           };
 
@@ -3438,20 +3543,16 @@
           }
         });
 
-        if (isMemberSpecific && parsedItems.length > 0) {
-          pendingReceiptsForConfirmation = parsedItems;
-          renderReceiptConfirmModal();
-          openModal('receiptConfirmModal');
-          return;
-        }
-
         parsedItems.forEach(tx => {
           unhideTitleSuggestion(tx.title);
+          recentNewTxIds.add(tx.id);
           transactions.unshift(tx);
         });
 
         saveStoredData();
         refreshDashboard();
+
+        const memberMsg = assignedMember ? ` (${assignedMember})` : '';
 
         if (duplicateList.length > 0 && totalParsed === 0 && duplicateList.length === 1) {
           pendingDuplicateTx = duplicateList[0];
@@ -3461,7 +3562,7 @@
           openModal('duplicateReceiptModal');
         } else if (totalParsed > 0) {
           const dupMsg = duplicateList.length > 0 ? ` (重複の可能性がある${duplicateList.length}件を除外)` : '';
-          showToast(`⚡高速解析完了: ${totalParsed}件を一括登録！${dupMsg}`);
+          showToast(`⚡高速解析完了: ${totalParsed}件を登録！${memberMsg}${dupMsg}`);
         } else if (duplicateList.length > 0) {
           showToast(`既に同じレシート（${duplicateList.length}件）が登録済みです`, true);
         } else {
@@ -3524,28 +3625,21 @@
           });
 
           if (!resp.ok) {
-            // thinkingConfig非対応モデルの場合のフォールバック
-            delete payload.generationConfig.thinkingConfig;
-            const retryResp = await fetch(endpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
-              signal: abortSignal
-            });
-            if (!retryResp.ok) {
-              const errJson = await retryResp.json().catch(() => ({}));
-              throw new Error(errJson.error?.message || `HTTP ${retryResp.status}`);
-            }
-            const resData = await retryResp.json();
-            const rawText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
-            return JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
+            const errJson = await resp.json().catch(() => ({}));
+            lastError = new Error(errJson.error?.message || `HTTP ${resp.status}`);
+            continue;
           }
 
           const resData = await resp.json();
-          const rawText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (!rawText) throw new Error('AIの解析結果が空でした');
+          const textCandidate = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!textCandidate) throw new Error('解析結果テキストが空です');
 
-          return JSON.parse(rawText.replace(/```json/g, '').replace(/```/g, '').trim());
+          let cleanText = textCandidate.trim();
+          if (cleanText.startsWith('```json')) cleanText = cleanText.slice(7);
+          if (cleanText.startsWith('```')) cleanText = cleanText.slice(3);
+          if (cleanText.endsWith('```')) cleanText = cleanText.slice(0, -3);
+
+          return JSON.parse(cleanText.trim());
         } catch (err) {
           if (err.name === 'AbortError') throw err;
           lastError = err;
@@ -3555,26 +3649,82 @@
       throw lastError || new Error('レシート解析に失敗しました');
     }
 
-    // ==================== 分析・推移グラフ ====================
+    function abortReceiptAndOpenManual() {
+      if (receiptAbortController) {
+        receiptAbortController.abort();
+      }
+      showOverlay(false);
+      openManualModal('expense');
+    }
+
+    function cancelDuplicateReceipt() {
+      pendingDuplicateTx = null;
+      closeModal('duplicateReceiptModal');
+      showToast('重複登録をキャンセルしました');
+    }
+
+    function forceSaveDuplicateReceipt() {
+      if (pendingDuplicateTx) {
+        unhideTitleSuggestion(pendingDuplicateTx.title);
+        recentNewTxIds.add(pendingDuplicateTx.id);
+        transactions.unshift(pendingDuplicateTx);
+        saveStoredData();
+        refreshDashboard();
+        showToast('登録を完了しました (最上部に表示)');
+        pendingDuplicateTx = null;
+      }
+      closeModal('duplicateReceiptModal');
+    }
+
+    function openCategoryReorderModal() {
+      activeReorderTab = 'variable';
+      switchReorderTab('variable');
+      openModal('categoryReorderModal');
+    }
+
+    function switchReorderTab(tab) {
+      activeReorderTab = tab;
+      const tabVar = document.getElementById('tabReorderVariable');
+      const tabFix = document.getElementById('tabReorderFixed');
+      const tabInc = document.getElementById('tabReorderIncome');
+
+      const activeClass = 'py-1.5 rounded-xl bg-white text-blue-600 shadow-xs transition';
+      const inactiveClass = 'py-1.5 rounded-xl text-slate-600 hover:text-slate-900 transition';
+
+      if (tabVar) tabVar.className = (tab === 'variable' ? activeClass : inactiveClass);
+      if (tabFix) tabFix.className = (tab === 'fixed' ? activeClass : inactiveClass);
+      if (tabInc) tabInc.className = (tab === 'income' ? activeClass : inactiveClass);
+
+      renderReorderList();
+    }
+
+    function getCurrentReorderList() {
+      if (activeReorderTab === 'fixed') return fixedExpenseCategories;
+      if (activeReorderTab === 'income') return incomeCategories;
+      return variableExpenseCategories;
+    }
+
     function setPieDimension(dim) {
       pieDimension = dim;
+      const btnMem = document.getElementById('btnPieDimMember');
       const btnCat = document.getElementById('btnPieDimCat');
-      const btnMember = document.getElementById('btnPieDimMember');
       const scopeArea = document.getElementById('pieScopeToggleArea');
-      const titleDisplay = document.getElementById('pieChartTitleDisplay');
+      const title = document.getElementById('pieChartTitleDisplay');
 
-      if (dim === 'category') {
-        if (btnCat) btnCat.className = 'px-2 py-0.5 rounded-lg bg-white text-blue-600 shadow-2xs transition';
-        if (btnMember) btnMember.className = 'px-2 py-0.5 rounded-lg text-slate-500 hover:text-slate-800 transition';
-        if (scopeArea) scopeArea.classList.remove('hidden');
-        if (titleDisplay) titleDisplay.textContent = '科目別 支出内訳';
-      } else {
-        if (btnMember) btnMember.className = 'px-2 py-0.5 rounded-lg bg-white text-blue-600 shadow-2xs transition';
-        if (btnCat) btnCat.className = 'px-2 py-0.5 rounded-lg text-slate-500 hover:text-slate-800 transition';
+      const activeClass = 'px-2 py-0.5 rounded-lg bg-white text-blue-600 shadow-2xs transition';
+      const inactiveClass = 'px-2 py-0.5 rounded-lg text-slate-500 hover:text-slate-800 transition';
+
+      if (dim === 'member') {
+        if (btnMem) btnMem.className = activeClass;
+        if (btnCat) btnCat.className = inactiveClass;
         if (scopeArea) scopeArea.classList.add('hidden');
-        if (titleDisplay) titleDisplay.textContent = 'メンバー別 支出内訳';
+        if (title) title.textContent = 'メンバー別 支出内訳';
+      } else {
+        if (btnCat) btnCat.className = activeClass;
+        if (btnMem) btnMem.className = inactiveClass;
+        if (scopeArea) scopeArea.classList.remove('hidden');
+        if (title) title.textContent = '科目別 支出内訳';
       }
-
       renderPieChart();
     }
 
@@ -3584,72 +3734,109 @@
       const btnVar = document.getElementById('btnPieScopeVariable');
       const btnFix = document.getElementById('btnPieScopeFixed');
 
-      [btnAll, btnVar, btnFix].forEach(b => {
-        if (!b) return;
-        b.className = 'px-2 py-0.5 rounded-lg text-slate-500 hover:text-slate-800 transition';
-      });
+      const activeClass = 'px-2 py-0.5 rounded-lg bg-white text-blue-600 shadow-2xs transition';
+      const inactiveClass = 'px-2 py-0.5 rounded-lg text-slate-500 hover:text-slate-800 transition';
 
-      if (scope === 'all' && btnAll) btnAll.className = 'px-2 py-0.5 rounded-lg bg-white text-blue-600 shadow-2xs transition';
-      if (scope === 'variable' && btnVar) btnVar.className = 'px-2 py-0.5 rounded-lg bg-white text-blue-600 shadow-2xs transition';
-      if (scope === 'fixed' && btnFix) btnFix.className = 'px-2 py-0.5 rounded-lg bg-white text-blue-600 shadow-2xs transition';
+      if (btnAll) btnAll.className = (scope === 'all' ? activeClass : inactiveClass);
+      if (btnVar) btnVar.className = (scope === 'variable' ? activeClass : inactiveClass);
+      if (btnFix) btnFix.className = (scope === 'fixed' ? activeClass : inactiveClass);
 
       renderPieChart();
     }
 
     function setAnalyticsGraphMode(mode) {
       currentTrendGraphMode = mode;
-      
       const btnDiff = document.getElementById('btnGraphModeDiff');
       const btnBoth = document.getElementById('btnGraphModeBoth');
-      const btnFixedVar = document.getElementById('btnGraphModeFixedVar');
+      const btnFV = document.getElementById('btnGraphModeFixedVar');
 
-      [btnDiff, btnBoth, btnFixedVar].forEach(btn => {
-        if (!btn) return;
-        btn.className = 'flex-1 py-1 rounded-xl text-slate-500 hover:text-slate-800 transition text-center';
-      });
+      const activeClass = 'flex-1 py-1 rounded-xl bg-white text-blue-600 shadow-xs transition text-center';
+      const inactiveClass = 'flex-1 py-1 rounded-xl text-slate-500 hover:text-slate-800 transition text-center';
 
-      if (mode === 'diff' && btnDiff) {
-        btnDiff.className = 'flex-1 py-1 rounded-xl bg-white text-blue-600 shadow-xs transition text-center';
-      } else if (mode === 'both' && btnBoth) {
-        btnBoth.className = 'flex-1 py-1 rounded-xl bg-white text-blue-600 shadow-xs transition text-center';
-      } else if (mode === 'fixed_variable' && btnFixedVar) {
-        btnFixedVar.className = 'flex-1 py-1 rounded-xl bg-white text-blue-600 shadow-xs transition text-center';
-      }
+      if (btnDiff) btnDiff.className = (mode === 'diff' ? activeClass : inactiveClass);
+      if (btnBoth) btnBoth.className = (mode === 'both' ? activeClass : inactiveClass);
+      if (btnFV) btnFV.className = (mode === 'fixed_variable' ? activeClass : inactiveClass);
 
       renderTrendChart();
     }
 
     function renderAnalyticsCharts() {
-      if (typeof Chart === 'undefined') return;
       renderPieChart();
       renderTrendChart();
     }
 
     function getAnalyticsFilteredTransactions() {
-      let filtered = transactions.filter(t => t.date);
-
+      const now = new Date();
       if (currentTrendPeriod === '1m') {
         const prefix = `${analyticsYear}-${String(analyticsMonth).padStart(2, '0')}`;
-        filtered = filtered.filter(t => t.date.startsWith(prefix));
+        return transactions.filter(t => t.date && t.date.startsWith(prefix));
       } else if (currentTrendPeriod === '3m') {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-        filtered = filtered.filter(t => new Date(t.date) >= start);
+        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+        return transactions.filter(t => {
+          if (!t.date) return false;
+          const d = new Date(t.date);
+          return d >= threeMonthsAgo && d <= now;
+        });
       } else if (currentTrendPeriod === '6m') {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-        filtered = filtered.filter(t => new Date(t.date) >= start);
+        const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+        return transactions.filter(t => {
+          if (!t.date) return false;
+          const d = new Date(t.date);
+          return d >= sixMonthsAgo && d <= now;
+        });
       } else if (currentTrendPeriod === '12m') {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), now.getMonth() - 11, 1);
-        filtered = filtered.filter(t => new Date(t.date) >= start);
-      } else if (currentTrendPeriod === 'year') {
-        filtered = filtered.filter(t => t.date.startsWith(`${currentTrendSelectedYear}-`));
+        const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+        return transactions.filter(t => {
+          if (!t.date) return false;
+          const d = new Date(t.date);
+          return d >= twelveMonthsAgo && d <= now;
+        });
+      } else if (currentTrendPeriod === 'all') {
+        return transactions;
       } else if (currentTrendPeriod === 'custom' && trendCustomDateRange.start && trendCustomDateRange.end) {
-        filtered = filtered.filter(t => t.date >= trendCustomDateRange.start && t.date <= trendCustomDateRange.end);
+        return transactions.filter(t => t.date && t.date >= trendCustomDateRange.start && t.date <= trendCustomDateRange.end);
+      }
+      return transactions;
+    }
+
+    // ==================== 当期のみなし総収入枠（確定収入 ＋ 当期内未到来の定期収入）の算出 ====================
+    function calculateEstimatedPeriodIncome() {
+      const filtered = getAnalyticsFilteredTransactions();
+      let actualIncome = 0;
+      filtered.forEach(t => {
+        if (t.type === 'income') actualIncome += Number(t.amount) || 0;
+      });
+
+      let pendingRecurringIncome = 0;
+      const now = new Date();
+      const curY = now.getFullYear();
+      const curM = now.getMonth() + 1;
+      const curD = now.getDate();
+
+      // 当月が表示対象の場合、今日以降に予定されている固定収入（給与等）を加算
+      if (currentTrendPeriod === '1m' && analyticsYear === curY && analyticsMonth === curM) {
+        recurringRules.forEach(rule => {
+          if (rule.type === 'income') {
+            const lastDay = new Date(curY, curM, 0).getDate();
+            const ruleDay = rule.day === 'last' ? lastDay : Math.min(Number(rule.day), lastDay);
+            if (ruleDay > curD) {
+              const alreadyLogged = transactions.some(t => {
+                const prefix = `${curY}-${String(curM).padStart(2, '0')}`;
+                return t.date && t.date.startsWith(prefix) && t.type === 'income' && t.title === rule.title;
+              });
+              if (!alreadyLogged) {
+                pendingRecurringIncome += Number(rule.amount) || 0;
+              }
+            }
+          }
+        });
       }
 
-      return filtered;
+      return {
+        actualIncome,
+        pendingRecurringIncome,
+        totalBudgetIncome: actualIncome + pendingRecurringIncome
+      };
     }
 
     function renderPieChart() {
@@ -3658,9 +3845,12 @@
       if (!pieCanvas) return;
 
       const allFiltered = getAnalyticsFilteredTransactions();
-      let filtered = allFiltered.filter(t => t.type === 'expense');
+      const allExpenseTxs = allFiltered.filter(t => t.type === 'expense');
+      const totalAllExpense = allExpenseTxs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
 
-      let legendLabels = [];
+      let filtered = [...allExpenseTxs];
+
+      let rawLabels = [];
       let data = [];
       let colors = [];
       let totalExpense = 0;
@@ -3684,15 +3874,13 @@
         displayKeys.forEach(k => {
           const amt = memberMap[k] || 0;
           if (amt > 0) {
-            const meta = memberMeta[k] || { icon: '👤', color: '#64748B' };
-            const pct = totalExpense > 0 ? Math.round((amt / totalExpense) * 100) : 0;
-            legendLabels.push(`${meta.icon} ${k}: ¥${amt.toLocaleString()} (${pct}%)`);
+            const meta = memberMeta[k] || { color: '#64748B' };
+            rawLabels.push(k);
             data.push(amt);
             colors.push(meta.color);
           }
         });
 
-        // 【グラフ左側に家族全体、右側に各メンバーを配置する角度計算】
         const familyAmt = memberMap['家族全体'] || 0;
         if (totalExpense > 0 && familyAmt > 0) {
           const familyAngleDeg = (familyAmt / totalExpense) * 360;
@@ -3711,18 +3899,13 @@
           catMap[t.category] = (catMap[t.category] || 0) + (Number(t.amount) || 0);
         });
 
-        const rawLabels = Object.keys(catMap);
-        data = Object.values(catMap);
+        // 金額順にソートして並べる
+        const sortedCats = Object.keys(catMap).sort((a, b) => catMap[b] - catMap[a]);
+        rawLabels = sortedCats;
+        data = sortedCats.map(c => catMap[c]);
         totalExpense = data.reduce((sum, val) => sum + val, 0);
 
-        legendLabels = rawLabels.map(cat => {
-          const icon = categoryIcons[cat] || '🏷️';
-          const amt = catMap[cat] || 0;
-          const pct = totalExpense > 0 ? Math.round((amt / totalExpense) * 100) : 0;
-          return `${icon} ${cat}: ¥${amt.toLocaleString()} (${pct}%)`;
-        });
-
-        const palette = ['#3B82F6', '#10B981', '#F59E0B', '#F43F5E', '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6', '#F97316', '#64748B'];
+        const palette = ['#3B82F6', '#10B981', '#F59E0B', '#F43F5E', '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6', '#F97316', '#64748B', '#06B6D4', '#84CC16'];
         colors = palette.slice(0, rawLabels.length);
         calculatedRotation = 0;
       }
@@ -3738,34 +3921,198 @@
       }
       if (emptyState) emptyState.classList.add('hidden');
 
-      const centerTotalPlugin = {
-        id: 'centerTotalPlugin',
-        beforeDraw(chart) {
-          const { ctx, chartArea } = chart;
+      // 中央の支出計 ＆ 収入ステータス判定 ＆ はみ出さないスマート引き出し線プラグイン
+      const centerAndCalloutPlugin = {
+        id: 'centerAndCalloutPlugin',
+        afterDraw(chart) {
+          const { ctx, chartArea, width: canvasW, height: canvasH } = chart;
           if (!chartArea) return;
           const centerX = (chartArea.left + chartArea.right) / 2;
           const centerY = (chartArea.top + chartArea.bottom) / 2;
 
           ctx.save();
+
+          // 1. 中央テキスト（タイトル ＆ 金額 ＆ 全体比）
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
 
           ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-          ctx.fillStyle = '#94a3b8';
+          ctx.fillStyle = '#64748b';
           
           let centerTitle = '支出総額';
           if (pieDimension === 'member') {
             centerTitle = 'メンバー支出計';
           } else if (pieExpenseScope === 'fixed') {
-            centerTitle = '固定費合計';
+            const scopePct = totalAllExpense > 0 ? Math.round((totalExpense / totalAllExpense) * 100) : 0;
+            centerTitle = `固定費計 (全体比 ${scopePct}%)`;
           } else if (pieExpenseScope === 'variable') {
-            centerTitle = '変動費合計';
+            const scopePct = totalAllExpense > 0 ? Math.round((totalExpense / totalAllExpense) * 100) : 0;
+            centerTitle = `変動費計 (全体比 ${scopePct}%)`;
           }
-          ctx.fillText(centerTitle, centerX, centerY - 9);
+          ctx.fillText(centerTitle, centerX, centerY - 15);
 
-          ctx.font = '900 14px monospace';
-          ctx.fillStyle = '#1e293b';
-          ctx.fillText(`¥${totalExpense.toLocaleString()}`, centerX, centerY + 8);
+          ctx.font = '900 15px monospace';
+          ctx.fillStyle = '#0f172a';
+          ctx.fillText(`¥${totalExpense.toLocaleString()}`, centerX, centerY + 1);
+
+          // 2. 収入範囲ステータス（みなし総収入枠との比較）
+          const { totalBudgetIncome } = calculateEstimatedPeriodIncome();
+          if (totalBudgetIncome > 0) {
+            const isWithinBudget = totalExpense <= totalBudgetIncome;
+            const diffAmt = Math.abs(totalBudgetIncome - totalExpense);
+
+            let statusText = '';
+            let bgFill = '';
+            let textFill = '';
+
+            if (isWithinBudget) {
+              statusText = `🟢 収入枠内 (残¥${diffAmt.toLocaleString()})`;
+              bgFill = '#ecfdf5';
+              textFill = '#047857';
+            } else {
+              statusText = `🔴 収入超過 (▲¥${diffAmt.toLocaleString()})`;
+              bgFill = '#fff1f2';
+              textFill = '#be123c';
+            }
+
+            ctx.font = 'bold 8.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            const metrics = ctx.measureText(statusText);
+            const pillW = metrics.width + 12;
+            const pillH = 16;
+            const pillX = centerX - (pillW / 2);
+            const pillY = centerY + 14;
+
+            ctx.beginPath();
+            ctx.roundRect(pillX, pillY, pillW, pillH, 8);
+            ctx.fillStyle = bgFill;
+            ctx.fill();
+            ctx.strokeStyle = isWithinBudget ? '#a7f3d0' : '#fecdd3';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.fillStyle = textFill;
+            ctx.fillText(statusText, centerX, pillY + (pillH / 2));
+          }
+
+          // 3. 各スライスの内部に構成比%、外部に折り返し＆カード内収束引き出し線を描画
+          const meta = chart.getDatasetMeta(0);
+          if (meta && meta.data) {
+            meta.data.forEach((element, idx) => {
+              const val = data[idx];
+              const pct = totalExpense > 0 ? Math.round((val / totalExpense) * 100) : 0;
+              const name = rawLabels[idx] || '';
+
+              const startAngle = element.startAngle;
+              const endAngle = element.endAngle;
+              const midAngle = (startAngle + endAngle) / 2;
+
+              // スライス内部に % を描画（5%以上の場合のみ）
+              if (pct >= 5) {
+                const sliceMidR = (element.innerRadius + element.outerRadius) / 2;
+                const pctX = centerX + Math.cos(midAngle) * sliceMidR;
+                const pctY = centerY + Math.sin(midAngle) * sliceMidR;
+
+                ctx.font = '900 9.5px monospace';
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${pct}%`, pctX, pctY);
+              }
+
+              // スライス外側への引き出し線 ＆ ラベル描画（3%以上）
+              if (pct >= 3) {
+                const rOuter = element.outerRadius;
+                const startX = centerX + Math.cos(midAngle) * rOuter;
+                const startY = centerY + Math.sin(midAngle) * rOuter;
+
+                const breakR = rOuter + 8;
+                const breakX = centerX + Math.cos(midAngle) * breakR;
+                const breakY = centerY + Math.sin(midAngle) * breakR;
+
+                const isRight = Math.cos(midAngle) >= 0;
+                
+                // 引き出し線の水平長さ（コンパクト化してはみ出し防止）
+                const lineExt = isRight ? 10 : -10;
+                const endX = breakX + lineExt;
+                const endY = breakY;
+
+                // 引き出し線描画
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(breakX, breakY);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+
+                // ラベルテキストの構築
+                // 固定費科目の場合は青文字ハイライト
+                const isFixedCategory = (pieDimension === 'category' && getCategoryGroup(name) === 'fixed');
+
+                let titleColor = '#334155';
+                if (isFixedCategory) {
+                  titleColor = '#2563eb'; // 固定費は視認性の高い鮮やかなブルー
+                } else if (pieDimension === 'member' && memberMeta[name]) {
+                  titleColor = memberMeta[name].color;
+                }
+
+                // 金額＆全体比文字列の生成
+                let subText = `¥${val.toLocaleString()}`;
+                if (pieDimension === 'category' && pieExpenseScope !== 'all' && totalAllExpense > 0) {
+                  const overallPct = Math.round((val / totalAllExpense) * 100);
+                  subText += ` (全体比${overallPct}%)`;
+                }
+
+                // 長い科目名の折り返し処理（はみ出し防止）
+                const maxLineChars = 7;
+                let titleLines = [];
+                if (name.length > maxLineChars) {
+                  titleLines.push(name.slice(0, maxLineChars));
+                  titleLines.push(name.slice(maxLineChars));
+                } else {
+                  titleLines.push(name);
+                }
+
+                ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+                // キャンバス端からのマージン制限（左右クランプ処理）
+                let labelX = endX + (isRight ? 3 : -3);
+                let align = isRight ? 'left' : 'right';
+
+                // 右端はみ出し防止
+                if (isRight) {
+                  const longestWidth = Math.max(...titleLines.map(t => ctx.measureText(t).width), ctx.measureText(subText).width);
+                  if (labelX + longestWidth > canvasW - 4) {
+                    labelX = canvasW - 4;
+                    align = 'right';
+                  }
+                } else {
+                  // 左端はみ出し防止
+                  const longestWidth = Math.max(...titleLines.map(t => ctx.measureText(t).width), ctx.measureText(subText).width);
+                  if (labelX - longestWidth < 4) {
+                    labelX = 4;
+                    align = 'left';
+                  }
+                }
+
+                ctx.textAlign = align;
+
+                // 科目名（1〜2行）を描画
+                ctx.fillStyle = titleColor;
+                if (titleLines.length === 1) {
+                  ctx.fillText(titleLines[0], labelX, endY - 6);
+                } else {
+                  ctx.fillText(titleLines[0], labelX, endY - 12);
+                  ctx.fillText(titleLines[1], labelX, endY - 3);
+                }
+
+                // 金額＆全体比を描画
+                ctx.font = '900 8.5px monospace';
+                ctx.fillStyle = isFixedCategory ? '#1d4ed8' : '#64748b';
+                ctx.fillText(subText, labelX, endY + 7);
+              }
+            });
+          }
 
           ctx.restore();
         }
@@ -3774,7 +4121,7 @@
       pieChartInstance = new Chart(pieCanvas.getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: legendLabels,
+          labels: rawLabels,
           datasets: [{
             data: data,
             backgroundColor: colors,
@@ -3782,32 +4129,38 @@
             borderColor: '#FFFFFF'
           }]
         },
-        plugins: [centerTotalPlugin],
+        plugins: [centerAndCalloutPlugin],
         options: {
           responsive: true,
           maintainAspectRatio: false,
           rotation: calculatedRotation,
+          layout: {
+            padding: {
+              top: 20,
+              bottom: 20,
+              left: 28,
+              right: 28
+            }
+          },
           plugins: {
             legend: {
-              position: 'bottom',
-              labels: { 
-                boxWidth: 10, 
-                padding: 6, 
-                font: { size: 9.5, weight: 'bold' },
-                color: '#475569'
-              }
+              display: false
             },
             tooltip: {
               callbacks: {
                 label: function(ctx) {
                   const val = ctx.parsed || 0;
                   const pct = totalExpense > 0 ? Math.round((val / totalExpense) * 100) : 0;
+                  if (pieDimension === 'category' && pieExpenseScope !== 'all' && totalAllExpense > 0) {
+                    const overallPct = ((val / totalAllExpense) * 100).toFixed(1);
+                    return ` ¥${val.toLocaleString()} (内訳比 ${pct}% / 支出全体比 ${overallPct}%)`;
+                  }
                   return ` ¥${val.toLocaleString()} (${pct}%)`;
                 }
               }
             }
           },
-          cutout: '64%'
+          cutout: '60%'
         }
       });
     }
