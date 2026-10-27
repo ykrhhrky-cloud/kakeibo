@@ -1353,7 +1353,8 @@
     let currentRecurringType = 'expense';
     let pieChartInstance = null;
     let trendChartInstance = null;
-    let gasEndpoint = 'https://script.google.com/macros/s/AKfycbyaooy0VOkF_2wFwFoR6iQ3ubKtrIAe1Zx6sxz12NpPxp5H99fEvjppZGDYiiYSQvX6/exec';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyaooy0VOkF_2wFwFoR6iQ3ubKtrIAe1Zx6sxz12NpPxp5H99fEvjppZGDYiiYSQvX6/exec';
+    let gasEndpoint = DEFAULT_GAS_URL;
     let geminiApiKey = '';
 
     let activeReorderTab = 'variable';
@@ -1474,7 +1475,7 @@
         }
 
         geminiApiKey = localStorage.getItem('kakeibo_gemini_key') || '';
-        gasEndpoint = localStorage.getItem('kakeibo_gas_url') || '';
+        gasEndpoint = localStorage.getItem('kakeibo_gas_url') || DEFAULT_GAS_URL;
 
         if (document.getElementById('geminiApiKey')) document.getElementById('geminiApiKey').value = geminiApiKey;
         if (document.getElementById('gasUrl')) document.getElementById('gasUrl').value = gasEndpoint;
