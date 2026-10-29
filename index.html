@@ -164,7 +164,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.15</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.16</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -4033,8 +4033,8 @@
         throw new Error('Gemini APIキーが未設定です。設定から入力してください');
       }
 
-      // Google推奨モデルのみを配備（提供終了した旧2.5系を完全撤廃）
-      const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
+      // お小遣いアプリで実績のある最速軽量モデルを筆頭に配備
+      const models = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
       let lastError = null;
       let lastErrorRaw = '';
 
@@ -4053,39 +4053,28 @@
         if (abortSignal && abortSignal.aborted) throw new DOMException('Aborted', 'AbortError');
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
+        // お小遣いアプリと同一のシンプル・最速パラメータ（思考パラメータなどの未対応オーバーヘッドを完全排除）
         const payload = {
           contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
           generationConfig: {
             temperature: 0.1,
-            maxOutputTokens: 1024,
-            responseMimeType: "application/json",
-            thinkingConfig: { thinkingBudget: 0 }
+            responseMimeType: "application/json"
           }
         };
 
         const timeoutController = new AbortController();
-        const timeoutId = setTimeout(() => timeoutController.abort(), 7500);
+        const timeoutId = setTimeout(() => timeoutController.abort(), 8500);
 
         const onAbort = () => timeoutController.abort();
         if (abortSignal) abortSignal.addEventListener('abort', onAbort, { once: true });
 
         try {
-          let resp = await fetch(endpoint, {
+          const resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
             signal: timeoutController.signal
           });
-
-          if (!resp.ok && resp.status === 400) {
-            delete payload.generationConfig.thinkingConfig;
-            resp = await fetch(endpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
-              signal: timeoutController.signal
-            });
-          }
 
           clearTimeout(timeoutId);
           if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
