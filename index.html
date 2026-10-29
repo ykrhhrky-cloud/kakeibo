@@ -3745,22 +3745,41 @@
       for (const model of models) {
         if (abortSignal && abortSignal.aborted) throw new DOMException('Aborted', 'AbortError');
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const payload = {
-          contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
-          generationConfig: {
+        
+        // 思考時間ゼロ設定で即座にJSONを返答させるペイロード（万一未対応の場合はフォールバック）
+        const createPayload = (withZeroThinking = true) => {
+          const genConfig = {
             temperature: 0.1,
             maxOutputTokens: 1024,
             responseMimeType: "application/json"
+          };
+          if (withZeroThinking) {
+            genConfig.thinkingConfig = { thinkingBudget: 0 };
           }
+          return {
+            contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
+            generationConfig: genConfig
+          };
         };
 
         try {
-          const resp = await fetch(endpoint, {
+          // まずは思考ゼロの超高速モードで送信
+          let resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(createPayload(true)),
             signal: abortSignal
           });
+
+          // 万一 thinkingConfig が原因でエラーになった場合は標準モードで即時再試行
+          if (!resp.ok && resp.status === 400) {
+            resp = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(createPayload(false)),
+              signal: abortSignal
+            });
+          }
 
           if (!resp.ok) {
             const errJson = await resp.json().catch(() => ({}));
