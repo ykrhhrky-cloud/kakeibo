@@ -22,35 +22,40 @@
       ctx.roundRect(0, 0, 192, 192, 44);
       ctx.fill();
 
+      // 白線の家計簿・帳簿ノートアイコンをくっきり描画
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 7.5;
+      ctx.lineWidth = 9;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
+      // ノート外枠
       ctx.beginPath();
-      ctx.roundRect(40, 28, 112, 136, 16);
+      ctx.roundRect(36, 26, 120, 140, 18);
       ctx.stroke();
 
+      // 背表紙ライン
       ctx.beginPath();
-      ctx.moveTo(68, 28);
-      ctx.lineTo(68, 164);
+      ctx.moveTo(66, 26);
+      ctx.lineTo(66, 166);
       ctx.stroke();
 
+      // 横罫線 3本
       ctx.beginPath();
-      ctx.moveTo(84, 72);
-      ctx.lineTo(132, 72);
-      ctx.moveTo(84, 102);
-      ctx.lineTo(132, 102);
-      ctx.moveTo(84, 132);
-      ctx.lineTo(118, 132);
+      ctx.moveTo(86, 68);
+      ctx.lineTo(134, 68);
+      ctx.moveTo(86, 98);
+      ctx.lineTo(134, 98);
+      ctx.moveTo(86, 128);
+      ctx.lineTo(120, 128);
       ctx.stroke();
 
+      // しおりリボン
       ctx.beginPath();
-      ctx.moveTo(96, 28);
+      ctx.moveTo(96, 26);
       ctx.lineTo(96, 52);
-      ctx.lineTo(104, 45);
-      ctx.lineTo(112, 52);
-      ctx.lineTo(112, 28);
+      ctx.lineTo(105, 44);
+      ctx.lineTo(114, 52);
+      ctx.lineTo(114, 26);
       ctx.closePath();
       ctx.fillStyle = '#ffffff';
       ctx.fill();
@@ -148,9 +153,9 @@
     <header style="padding-top: max(env(safe-area-inset-top), 52px);" class="flex-shrink-0 px-3.5 pb-2.5 bg-white/95 backdrop-blur-md border-b border-slate-100 flex items-center justify-between z-30">
       <div class="flex items-center space-x-2 min-w-0 flex-shrink-0">
         <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1557b0] to-[#1a73e8] flex items-center justify-center text-white shadow-md shadow-blue-500/25 flex-shrink-0">
-          <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <rect x="4" y="3" width="16" height="18" rx="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="8.5" y1="3" x2="8.5" y2="21" stroke-width="2"/>
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="4" y="3" width="16" height="18" rx="3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="8.5" y1="3" x2="8.5" y2="21" stroke-width="2.2"/>
             <line x1="12" y1="8" x2="17" y2="8" stroke-width="2" stroke-linecap="round"/>
             <line x1="12" y1="12" x2="17" y2="12" stroke-width="2" stroke-linecap="round"/>
             <line x1="12" y1="16" x2="15.5" y2="16" stroke-width="2" stroke-linecap="round"/>
@@ -159,7 +164,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.05</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.08</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -482,16 +487,18 @@
 
         <!-- 円グラフ（内訳軸：メンバー別 / 科目別 / 支払別） -->
         <div id="pieChartCardArea" class="bg-white rounded-3xl p-4 card-shadow border-2 border-slate-200/90 space-y-2.5 will-change-transform select-none cursor-grab active:cursor-grabbing">
-          <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-            <div class="flex items-center space-x-1.5">
+          <div class="flex items-center justify-between pb-1 border-b border-slate-100 flex-wrap gap-y-1">
+            <div class="flex items-center space-x-1.5 min-w-0">
               <span class="w-5 h-5 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center flex-shrink-0">
                 <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
               <h2 class="text-xs font-extrabold text-slate-800" id="pieChartTitleDisplay">メンバー別 支出内訳</h2>
+              <!-- 対象期間バッジ（円グラフ） -->
+              <span id="pieChartPeriodBadge" class="px-1.5 py-0.2 rounded-md bg-blue-50 text-blue-700 font-mono font-bold text-[9px] border border-blue-200/80 shadow-2xs truncate max-w-[120px]">当月</span>
             </div>
 
             <!-- 内訳軸切り替え -->
-            <div class="flex items-center space-x-1 p-0.5 bg-slate-100 rounded-xl text-[10px] font-bold">
+            <div class="flex items-center space-x-1 p-0.5 bg-slate-100 rounded-xl text-[10px] font-bold flex-shrink-0">
               <button type="button" onclick="setPieDimension('member')" id="btnPieDimMember" class="px-2 py-0.5 rounded-lg bg-white text-blue-600 shadow-2xs transition">
                 メンバー別
               </button>
@@ -536,8 +543,12 @@
         <!-- 収支推移グラフ -->
         <div class="bg-white rounded-3xl p-4 card-shadow border-2 border-slate-200/90 space-y-2.5">
           <div class="flex items-center justify-between">
-            <h2 class="text-xs font-bold text-slate-900">収支推移グラフ</h2>
-            <span class="text-[10px] text-slate-400 font-semibold" id="trendChartSubLabel">日別/月別推移</span>
+            <div class="flex items-center space-x-1.5 min-w-0">
+              <h2 class="text-xs font-bold text-slate-900">収支推移グラフ</h2>
+              <!-- 対象期間バッジ（推移グラフ） -->
+              <span id="trendChartPeriodBadge" class="px-1.5 py-0.2 rounded-md bg-blue-50 text-blue-700 font-mono font-bold text-[9px] border border-blue-200/80 shadow-2xs truncate max-w-[120px]">当月 (日別)</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-semibold flex-shrink-0" id="trendChartSubLabel">日別/月別推移</span>
           </div>
 
           <div class="flex items-center space-x-1.5 p-1 bg-slate-50 rounded-2xl border border-slate-100 text-[11px] font-bold">
@@ -3878,18 +3889,20 @@
         throw new Error('Gemini APIキーが未設定です。設定から入力してください');
       }
 
-      // お小遣いアプリで実績のある最速モデル構成
-      const models = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-2.5-flash'];
+      // Google推奨モデルのみを配備（提供終了した旧2.5系を完全撤廃）
+      const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
       let lastError = null;
       let lastErrorRaw = '';
 
-      // 現在登録されている支払い方法リストを候補としてAIに渡す
       const currentPayOptions = paymentMethods.map(p => p.name).join('/');
 
-      const promptText = `日本の家計簿レシート解析。JSONのみ返却。
-科目: 食費/日用品/備品・消耗品/外食（酒類なし）/外食（酒類あり）/交通費/医療費/衣服/美容/贈答・交際費/趣味・娯楽/旅行費/住宅設備費/学費関連/家族関連諸費用/水道光熱費/住宅ローン/その他ローン/通信費/サブスク/保険・積立/仕送り/税金/その他雑費/その他
+      const promptText = `あなたは日本の家計簿レシート解析アシスタントです。画像から情報を抽出し、指定のJSON形式のみで返答してください。Markdownのバッククォートは含めないでください。
+
+科目ルール:
+- 食費/日用品/備品・消耗品/外食（酒類なし）/外食（酒類あり）/交通費/医療費/衣服/美容/贈答・交際費/趣味・娯楽/旅行費/住宅設備費/学費関連/家族関連諸費用/水道光熱費/住宅ローン/その他ローン/通信費/サブスク/保険・積立/仕送り/税金/その他雑費/その他
 支払い方法候補: ${currentPayOptions || '現金/クレジットカード/楽天ペイ/PayPay'}/不明
-返却JSON:
+
+返却JSON構造:
 {"receipts":[{"storeName":"店舗名","date":"YYYY-MM-DD","amount":合計金額数値,"category":"科目名","paymentMethod":"推定支払い方法","itemsSummary":"購入品"}]}`;
 
       for (const model of models) {
@@ -3901,23 +3914,34 @@
           generationConfig: {
             temperature: 0.1,
             maxOutputTokens: 1024,
-            responseMimeType: "application/json"
+            responseMimeType: "application/json",
+            thinkingConfig: { thinkingBudget: 0 }
           }
         };
 
         const timeoutController = new AbortController();
-        const timeoutId = setTimeout(() => timeoutController.abort(), 20000);
+        const timeoutId = setTimeout(() => timeoutController.abort(), 7500);
 
         const onAbort = () => timeoutController.abort();
         if (abortSignal) abortSignal.addEventListener('abort', onAbort, { once: true });
 
         try {
-          const resp = await fetch(endpoint, {
+          let resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
             signal: timeoutController.signal
           });
+
+          if (!resp.ok && resp.status === 400) {
+            delete payload.generationConfig.thinkingConfig;
+            resp = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+              signal: timeoutController.signal
+            });
+          }
 
           clearTimeout(timeoutId);
           if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
@@ -4020,56 +4044,40 @@
     }
 
     function renderAnalyticsCharts() {
+      updateAnalyticsPeriodBadges();
       renderPieChart();
       renderTrendChart();
     }
 
-    function getAnalyticsFilteredTransactions() {
-      const now = new Date();
+    function getAnalyticsPeriodLabelString() {
       if (currentTrendPeriod === '1m') {
-        const prefix = `${analyticsYear}-${String(analyticsMonth).padStart(2, '0')}`;
-        return transactions.filter(t => t.date && t.date.startsWith(prefix));
+        return `${analyticsYear}年${analyticsMonth}月`;
       } else if (currentTrendPeriod === '3m') {
-        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-        return transactions.filter(t => t.date && new Date(t.date) >= threeMonthsAgo && new Date(t.date) <= now);
+        return '直近3ヶ月';
       } else if (currentTrendPeriod === '6m') {
-        const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-        return transactions.filter(t => t.date && new Date(t.date) >= sixMonthsAgo && new Date(t.date) <= now);
+        return '直近6ヶ月';
       } else if (currentTrendPeriod === '12m') {
-        const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
-        return transactions.filter(t => t.date && new Date(t.date) >= twelveMonthsAgo && new Date(t.date) <= now);
+        return '直近12ヶ月';
       } else if (currentTrendPeriod === 'all') {
-        return transactions;
+        return '全期間';
       } else if (currentTrendPeriod === 'custom' && trendCustomDateRange.start && trendCustomDateRange.end) {
-        return transactions.filter(t => t.date && t.date >= trendCustomDateRange.start && t.date <= trendCustomDateRange.end);
+        return `${trendCustomDateRange.start.slice(5).replace('-', '/')}〜${trendCustomDateRange.end.slice(5).replace('-', '/')}`;
       }
-      return transactions;
+      return `${analyticsYear}年${analyticsMonth}月`;
     }
 
-    function calculateEstimatedPeriodIncome() {
-      const filtered = getAnalyticsFilteredTransactions();
-      let actualIncome = 0;
-      filtered.forEach(t => { if (t.type === 'income') actualIncome += Number(t.amount) || 0; });
+    function updateAnalyticsPeriodBadges() {
+      const periodStr = getAnalyticsPeriodLabelString();
+      const pieBadge = document.getElementById('pieChartPeriodBadge');
+      const trendBadge = document.getElementById('trendChartPeriodBadge');
 
-      let pendingRecurringIncome = 0;
-      const now = new Date();
-      const curY = now.getFullYear();
-      const curM = now.getMonth() + 1;
-      const curD = now.getDate();
-      const currentYearMonth = `${curY}-${String(curM).padStart(2, '0')}`;
-
-      if (currentTrendPeriod === '1m' && analyticsYear === curY && analyticsMonth === curM) {
-        recurringRules.forEach(rule => {
-          if (rule.type === 'income') {
-            if (rule.startMonth && currentYearMonth < rule.startMonth) return;
-            if (rule.endMonth && currentYearMonth > rule.endMonth) return;
-            const lastDay = new Date(curY, curM, 0).getDate();
-            const ruleDay = rule.day === 'last' ? lastDay : Math.min(Number(rule.day), lastDay);
-            if (ruleDay > curD) pendingRecurringIncome += Number(rule.amount) || 0;
-          }
-        });
+      if (pieBadge) {
+        pieBadge.textContent = periodStr;
       }
-      return { actualIncome, pendingRecurringIncome, totalBudgetIncome: actualIncome + pendingRecurringIncome };
+      if (trendBadge) {
+        const modeSuffix = currentTrendPeriod === '1m' ? ' (日別)' : ' (月別)';
+        trendBadge.textContent = periodStr + (currentTrendPeriod === '1m' ? modeSuffix : '');
+      }
     }
 
     function renderPieChart() {
@@ -4077,266 +4085,121 @@
       const emptyState = document.getElementById('pieEmptyState');
       if (!pieCanvas) return;
 
-      const allFiltered = getAnalyticsFilteredTransactions();
-      const allExpenseTxs = allFiltered.filter(t => t.type === 'expense');
-      const totalAllExpense = allExpenseTxs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+      let filtered = transactions.filter(t => t.type === 'expense' && t.date);
 
-      let filtered = [...allExpenseTxs];
-      let rawLabels = [], data = [], colors = [], totalExpense = 0;
-
-      if (pieDimension === 'member') {
-        const memberMap = { '家族全体': 0 };
-        membersList.forEach(k => { memberMap[k] = 0; });
-        filtered.forEach(t => {
-          const m = (t.member && membersList.includes(t.member)) ? t.member : '家族全体';
-          memberMap[m] = (memberMap[m] || 0) + (Number(t.amount) || 0);
+      if (currentTrendPeriod === '1m') {
+        const prefix = `${analyticsYear}-${String(analyticsMonth).padStart(2, '0')}`;
+        filtered = filtered.filter(t => t.date.startsWith(prefix));
+      } else if (currentTrendPeriod === '3m') {
+        const endD = new Date(analyticsYear, analyticsMonth, 0);
+        const startD = new Date(analyticsYear, analyticsMonth - 3, 1);
+        filtered = filtered.filter(t => {
+          const d = new Date(t.date);
+          return d >= startD && d <= endD;
         });
-        totalExpense = Object.values(memberMap).reduce((s, v) => s + v, 0);
-        const sortedIndividual = [...membersList].sort((a, b) => (memberMap[b] || 0) - (memberMap[a] || 0));
-        ['家族全体', ...sortedIndividual].forEach(k => {
-          const amt = memberMap[k] || 0;
-          if (amt > 0) {
-            rawLabels.push(k);
-            data.push(amt);
-            colors.push(memberMeta[k]?.color || '#64748B');
-          }
+      } else if (currentTrendPeriod === '6m') {
+        const endD = new Date(analyticsYear, analyticsMonth, 0);
+        const startD = new Date(analyticsYear, analyticsMonth - 6, 1);
+        filtered = filtered.filter(t => {
+          const d = new Date(t.date);
+          return d >= startD && d <= endD;
         });
-      } else if (pieDimension === 'payment') {
-        const payMap = {};
-        paymentMethods.forEach(pm => { payMap[pm.name] = 0; });
-        payMap['その他/未指定'] = 0;
-        filtered.forEach(t => {
-          const pm = t.paymentMethod || 'その他/未指定';
-          payMap[pm] = (payMap[pm] || 0) + (Number(t.amount) || 0);
+      } else if (currentTrendPeriod === '12m') {
+        const endD = new Date(analyticsYear, analyticsMonth, 0);
+        const startD = new Date(analyticsYear, analyticsMonth - 12, 1);
+        filtered = filtered.filter(t => {
+          const d = new Date(t.date);
+          return d >= startD && d <= endD;
         });
-        const sortedPays = Object.keys(payMap).filter(k => payMap[k] > 0).sort((a, b) => payMap[b] - payMap[a]);
-        rawLabels = sortedPays;
-        data = sortedPays.map(k => payMap[k]);
-        totalExpense = data.reduce((sum, val) => sum + val, 0);
-        const palette = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#64748B'];
-        colors = palette.slice(0, rawLabels.length);
-      } else {
-        if (pieExpenseScope === 'fixed') filtered = filtered.filter(t => getCategoryGroup(t.category) === 'fixed');
-        else if (pieExpenseScope === 'variable') filtered = filtered.filter(t => getCategoryGroup(t.category) === 'variable');
-
-        const catMap = {};
-        filtered.forEach(t => { catMap[t.category] = (catMap[t.category] || 0) + (Number(t.amount) || 0); });
-        const sortedCats = Object.keys(catMap).sort((a, b) => catMap[b] - catMap[a]);
-        rawLabels = sortedCats;
-        data = sortedCats.map(c => catMap[c]);
-        totalExpense = data.reduce((sum, val) => sum + val, 0);
-        const palette = ['#3B82F6', '#10B981', '#F59E0B', '#F43F5E', '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6', '#F97316', '#64748B', '#06B6D4', '#84CC16'];
-        colors = palette.slice(0, rawLabels.length);
+      } else if (currentTrendPeriod === 'custom' && trendCustomDateRange.start && trendCustomDateRange.end) {
+        filtered = filtered.filter(t => t.date >= trendCustomDateRange.start && t.date <= trendCustomDateRange.end);
       }
 
-      if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null; }
+      if (pieDimension === 'category') {
+        if (pieExpenseScope === 'variable') {
+          filtered = filtered.filter(t => getCategoryGroup(t.category) === 'variable');
+        } else if (pieExpenseScope === 'fixed') {
+          filtered = filtered.filter(t => getCategoryGroup(t.category) === 'fixed');
+        }
+      }
 
-      if (data.length === 0 || totalExpense === 0) {
+      const map = {};
+      filtered.forEach(t => {
+        let key = 'その他';
+        if (pieDimension === 'member') {
+          key = (t.member && membersList.includes(t.member)) ? t.member : '家族全体';
+        } else if (pieDimension === 'category') {
+          key = t.category || 'その他';
+        } else if (pieDimension === 'payment') {
+          const pMeta = getPaymentMethodMeta(t.paymentMethod);
+          key = pMeta.name || '現金';
+        }
+        map[key] = (map[key] || 0) + (Number(t.amount) || 0);
+      });
+
+      const sortedEntries = Object.entries(map).sort((a, b) => b[1] - a[1]);
+      const labels = sortedEntries.map(e => e[0]);
+      const data = sortedEntries.map(e => e[1]);
+      const totalExpense = data.reduce((sum, v) => sum + v, 0);
+
+      const rankingBadge = document.getElementById('rankingItemCountBadge');
+      if (rankingBadge) rankingBadge.textContent = `(${sortedEntries.length}件)`;
+      const listContainer = document.getElementById('pieBreakdownListContainer');
+      if (listContainer) {
+        listContainer.innerHTML = '';
+        sortedEntries.forEach((entry, idx) => {
+          const keyName = entry[0];
+          const val = entry[1];
+          const pct = totalExpense > 0 ? Math.round((val / totalExpense) * 100) : 0;
+          const row = document.createElement('div');
+          row.className = 'p-2 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs';
+          row.innerHTML = `
+            <div class="flex items-center space-x-2 min-w-0 pr-2">
+              <span class="w-5 h-5 rounded-full bg-white border border-slate-200 text-[10px] font-black text-slate-500 flex items-center justify-center flex-shrink-0">${idx + 1}</span>
+              <span class="font-bold text-slate-800 truncate">${escapeHtml(keyName)}</span>
+              <span class="text-[10px] font-bold text-blue-600 font-mono">${pct}%</span>
+            </div>
+            <span class="font-black font-mono text-slate-900 flex-shrink-0">¥${val.toLocaleString()}</span>
+          `;
+          listContainer.appendChild(row);
+        });
+      }
+
+      if (pieChartInstance) {
+        pieChartInstance.destroy();
+        pieChartInstance = null;
+      }
+
+      if (labels.length === 0 || totalExpense === 0) {
         if (emptyState) emptyState.classList.remove('hidden');
-        renderPieBreakdownList([], [], [], 0, 0);
         return;
       }
       if (emptyState) emptyState.classList.add('hidden');
 
-      // 引き出し線ラベル（上位2段・下位1段スマート表示、文字幅クランプ制御、上下Y分散）
-      const centerAndCalloutPlugin = {
-        id: 'centerAndCalloutPlugin',
-        afterDraw(chart) {
-          const { ctx, chartArea, width: canvasW, height: canvasH } = chart;
+      const palette = ['#1a73e8', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#38BDF8', '#14B8A6', '#64748B', '#6366F1'];
+      let backgroundColors = [];
+      if (pieDimension === 'member') {
+        backgroundColors = labels.map(m => memberMeta[m]?.color || '#94A3B8');
+      } else {
+        backgroundColors = labels.map((_, i) => palette[i % palette.length]);
+      }
+
+      const centerPlugin = {
+        id: 'centerTotalPlugin',
+        beforeDraw(chart) {
+          const { ctx, chartArea } = chart;
           if (!chartArea) return;
           const centerX = (chartArea.left + chartArea.right) / 2;
           const centerY = (chartArea.top + chartArea.bottom) / 2;
-
           ctx.save();
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-
-          // 1. 中央テキスト（支出計）
-          ctx.font = 'bold 9px sans-serif';
+          ctx.font = 'bold 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
           ctx.fillStyle = '#64748b';
-
-          let centerTitle = '支出総額';
-          if (pieDimension === 'member') centerTitle = 'メンバー支出計';
-          else if (pieDimension === 'payment') centerTitle = '支払別 支出計';
-          else if (pieExpenseScope === 'fixed') centerTitle = '固定費計';
-          else if (pieExpenseScope === 'variable') centerTitle = '変動費計';
-
-          ctx.fillText(centerTitle, centerX, centerY - 15);
-
+          ctx.fillText('支出総額', centerX, centerY - 9);
           ctx.font = '900 15px monospace';
           ctx.fillStyle = '#0f172a';
-          ctx.fillText(`¥${totalExpense.toLocaleString()}`, centerX, centerY + 1);
-
-          // 収支ステータスバッジ
-          const { totalBudgetIncome } = calculateEstimatedPeriodIncome();
-          if (totalBudgetIncome > 0) {
-            const isWithinBudget = totalExpense <= totalBudgetIncome;
-            const diffAmt = Math.abs(totalBudgetIncome - totalExpense);
-            const statusText = isWithinBudget ? `🟢 収入枠内 (残¥${diffAmt.toLocaleString()})` : `🔴 収入超過 (▲¥${diffAmt.toLocaleString()})`;
-
-            ctx.font = 'bold 8.5px sans-serif';
-            const pillW = ctx.measureText(statusText).width + 12;
-            const pillH = 16;
-            ctx.beginPath();
-            ctx.roundRect(centerX - (pillW / 2), centerY + 14, pillW, pillH, 8);
-            ctx.fillStyle = isWithinBudget ? '#ecfdf5' : '#fff1f2';
-            ctx.fill();
-            ctx.fillStyle = isWithinBudget ? '#047857' : '#be123c';
-            ctx.fillText(statusText, centerX, centerY + 22);
-          }
-
-          // 2. 引き出し線ラベル
-          const meta = chart.getDatasetMeta(0);
-          if (meta && meta.data) {
-            const leftLabels = [];
-            const rightLabels = [];
-
-            meta.data.forEach((element, idx) => {
-              const val = data[idx];
-              const pct = totalExpense > 0 ? Math.round((val / totalExpense) * 100) : 0;
-              const name = rawLabels[idx] || '';
-
-              const midAngle = (element.startAngle + element.endAngle) / 2;
-
-              // スライス内 % 表示 (8%以上)
-              if (pct >= 8) {
-                const sliceMidR = (element.innerRadius + element.outerRadius) / 2;
-                const pctX = centerX + Math.cos(midAngle) * sliceMidR;
-                const pctY = centerY + Math.sin(midAngle) * sliceMidR;
-                ctx.font = '900 9.5px monospace';
-                ctx.fillStyle = '#ffffff';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(`${pct}%`, pctX, pctY);
-              }
-
-              // 引き出し線対象 (2%以上かつ上位9件まで)
-              if (pct >= 2 && idx < 9) {
-                const rOuter = element.outerRadius;
-                const startX = centerX + Math.cos(midAngle) * rOuter;
-                const startY = centerY + Math.sin(midAngle) * rOuter;
-                const breakR = rOuter + 7;
-                const breakX = centerX + Math.cos(midAngle) * breakR;
-                const breakY = centerY + Math.sin(midAngle) * breakR;
-                const isRight = Math.cos(midAngle) >= 0;
-
-                const isMajor = (pct >= 8 && idx < 4); // 上位は2段、下位は1段
-
-                const item = {
-                  idx, val, pct, name, isMajor,
-                  startX, startY, breakX, targetY: breakY, isRight
-                };
-                if (isRight) rightLabels.push(item);
-                else leftLabels.push(item);
-              }
-            });
-
-            // Y座標重なり回避
-            const adjustY = (list) => {
-              if (list.length <= 1) return;
-              list.sort((a, b) => a.targetY - b.targetY);
-              const minGap = 20;
-              const minY = 16;
-              const maxY = canvasH - 16;
-
-              for (let i = 0; i < list.length; i++) {
-                if (list[i].targetY < minY) list[i].targetY = minY;
-                if (i > 0 && (list[i].targetY - list[i - 1].targetY) < minGap) {
-                  list[i].targetY = list[i - 1].targetY + minGap;
-                }
-              }
-              for (let i = list.length - 1; i >= 0; i--) {
-                if (list[i].targetY > maxY) list[i].targetY = maxY;
-                if (i < list.length - 1 && (list[i + 1].targetY - list[i].targetY) < minGap) {
-                  list[i].targetY = list[i + 1].targetY - minGap;
-                }
-              }
-            };
-
-            adjustY(rightLabels);
-            adjustY(leftLabels);
-
-            const allLabels = [...rightLabels, ...leftLabels];
-            allLabels.forEach(item => {
-              const { val, pct, name, isMajor, startX, startY, breakX, targetY, isRight } = item;
-              const lineExt = isRight ? 8 : -8;
-              const endX = breakX + lineExt;
-
-              ctx.beginPath();
-              ctx.moveTo(startX, startY);
-              ctx.lineTo(breakX, targetY);
-              ctx.lineTo(endX, targetY);
-              ctx.strokeStyle = '#cbd5e1';
-              ctx.lineWidth = 1.2;
-              ctx.stroke();
-
-              const isFixed = (pieDimension === 'category' && getCategoryGroup(name) === 'fixed');
-              const titleColor = isFixed ? '#2563eb' : (pieDimension === 'member' && memberMeta[name] ? memberMeta[name].color : '#334155');
-
-              let displayName = name;
-              if (displayName.length > 6) displayName = displayName.slice(0, 5) + '..';
-
-              ctx.font = 'bold 9px sans-serif';
-              const nameWidth = ctx.measureText(displayName).width;
-
-              let subText = `¥${val.toLocaleString()} (${pct}%)`;
-              ctx.font = '900 8px monospace';
-              const subWidth = ctx.measureText(subText).width;
-
-              const maxWidth = isMajor ? Math.max(nameWidth, subWidth) : nameWidth;
-              const labelMargin = 4;
-              let labelX = endX + (isRight ? labelMargin : -labelMargin);
-              let align = isRight ? 'left' : 'right';
-
-              // 左右端完全クランプ（画面外はみ出し防止）
-              if (isRight && (labelX + maxWidth > canvasW - 4)) {
-                labelX = canvasW - 4;
-                align = 'right';
-              } else if (!isRight && (labelX - maxWidth < 4)) {
-                labelX = 4;
-                align = 'left';
-              }
-
-              // ==================== 半透明白ピル背景プレートの描画 ====================
-              // グラフのスライスと重なっても文字が確実に読めるように背景プレートを敷く
-              const padX = 5;
-              const padY = isMajor ? 12 : 7;
-              const pillW = maxWidth + (padX * 2);
-              const pillH = isMajor ? 24 : 15;
-              let pillBoxX = align === 'left' ? (labelX - padX) : (labelX - maxWidth - padX);
-              let pillBoxY = targetY - padY;
-
-              // 画面端クランプ後のpillBoxX微調整
-              pillBoxX = Math.max(2, Math.min(canvasW - pillW - 2, pillBoxX));
-
-              ctx.beginPath();
-              ctx.roundRect(pillBoxX, pillBoxY, pillW, pillH, 5);
-              ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-              ctx.fill();
-              ctx.strokeStyle = 'rgba(203, 213, 225, 0.85)';
-              ctx.lineWidth = 0.8;
-              ctx.stroke();
-
-              ctx.textAlign = align;
-
-              if (isMajor) {
-                // 2段表示（科目名 ＋ 金額比率）
-                ctx.font = 'bold 9px sans-serif';
-                ctx.fillStyle = titleColor;
-                ctx.fillText(displayName, labelX, targetY - 4);
-
-                ctx.font = '900 8px monospace';
-                ctx.fillStyle = isFixed ? '#1d4ed8' : '#64748b';
-                ctx.fillText(subText, labelX, targetY + 6);
-              } else {
-                // 1段表示（科目名のみスマート表示）
-                ctx.font = 'bold 9px sans-serif';
-                ctx.fillStyle = titleColor;
-                ctx.fillText(displayName, labelX, targetY + 1);
-              }
-            });
-          }
-
+          ctx.fillText(`¥${totalExpense.toLocaleString()}`, centerX, centerY + 8);
           ctx.restore();
         }
       };
@@ -4344,65 +4207,49 @@
       pieChartInstance = new Chart(pieCanvas.getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: rawLabels,
-          datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#FFFFFF' }]
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: backgroundColors,
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
         },
-        plugins: [centerAndCalloutPlugin],
+        plugins: [centerPlugin],
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          layout: {
-            padding: { top: 18, bottom: 18, left: 32, right: 32 }
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 10,
+                padding: 6,
+                font: { size: 10, weight: 'bold' },
+                color: '#475569',
+                generateLabels: function(chart) {
+                  const orig = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                  orig.forEach(item => {
+                    const val = data[item.index] || 0;
+                    const pct = totalExpense > 0 ? Math.round((val / totalExpense) * 100) : 0;
+                    item.text = `${item.text} (${pct}%)`;
+                  });
+                  return orig;
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  const val = ctx.parsed || 0;
+                  const pct = totalExpense > 0 ? Math.round((val / totalExpense) * 100) : 0;
+                  return ` ¥${val.toLocaleString()} (${pct}%)`;
+                }
+              }
+            }
           },
-          plugins: { legend: { display: false } },
-          cutout: '62%'
+          cutout: '68%'
         }
-      });
-
-      renderPieBreakdownList(rawLabels, data, colors, totalExpense, totalAllExpense);
-    }
-
-    function renderPieBreakdownList(labels, dataList, colorList, totalExpense, totalAllExpense) {
-      const container = document.getElementById('pieBreakdownListContainer');
-      const countBadge = document.getElementById('rankingItemCountBadge');
-      if (!container) return;
-      container.innerHTML = '';
-      if (countBadge) countBadge.textContent = `(${labels.length}件)`;
-
-      labels.forEach((name, i) => {
-        const val = dataList[i] || 0;
-        const color = colorList[i] || '#94a3b8';
-        const pct = totalExpense > 0 ? Math.round((val / totalExpense) * 100) : 0;
-        const isFixed = (pieDimension === 'category' && getCategoryGroup(name) === 'fixed');
-
-        let overallText = '';
-        if (pieDimension === 'category' && pieExpenseScope !== 'all' && totalAllExpense > 0) {
-          const overallPct = Math.round((val / totalAllExpense) * 100);
-          overallText = `<span class="text-[9px] text-slate-400 font-bold ml-1">(全体比 ${overallPct}%)</span>`;
-        }
-
-        const iconHtml = pieDimension === 'category' ? getCategoryIcon(name, 'w-3.5 h-3.5') : '';
-
-        const row = document.createElement('div');
-        row.className = 'p-1.5 px-2 rounded-xl bg-slate-50 border border-slate-100 flex flex-col space-y-1 text-xs';
-        row.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-1.5 min-w-0 pr-2">
-              <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${color};"></span>
-              ${iconHtml ? `<span class="flex-shrink-0">${iconHtml}</span>` : ''}
-              <span class="font-extrabold truncate ${isFixed ? 'text-blue-600' : 'text-slate-800'}">${escapeHtml(name)}</span>
-            </div>
-            <div class="text-right flex-shrink-0 font-mono">
-              <span class="font-black ${isFixed ? 'text-blue-700' : 'text-slate-900'}">¥${val.toLocaleString()}</span>
-              <span class="text-[10px] font-bold text-blue-600 ml-1.5">${pct}%</span>
-              ${overallText}
-            </div>
-          </div>
-          <div class="w-full bg-slate-200/80 h-1.5 rounded-full overflow-hidden">
-            <div class="h-full rounded-full transition-all duration-300" style="width: ${Math.min(pct, 100)}%; background-color: ${color};"></div>
-          </div>
-        `;
-        container.appendChild(row);
       });
     }
 
@@ -4411,46 +4258,182 @@
       const emptyState = document.getElementById('trendEmptyState');
       if (!trendCanvas) return;
 
-      const keys = [], labels = [];
-      const lastDay = new Date(analyticsYear, analyticsMonth, 0).getDate();
-      for (let d = 1; d <= lastDay; d++) {
-        const dStr = String(d).padStart(2, '0');
-        const mStr = String(analyticsMonth).padStart(2, '0');
-        keys.push(`${analyticsYear}-${mStr}-${dStr}`);
-        labels.push(`${d}日`);
+      let keys = [];
+      let labels = [];
+      let isDaily = false;
+
+      if (currentTrendPeriod === '1m') {
+        isDaily = true;
+        const lastDay = new Date(analyticsYear, analyticsMonth, 0).getDate();
+        for (let d = 1; d <= lastDay; d++) {
+          const mStr = String(analyticsMonth).padStart(2, '0');
+          const dStr = String(d).padStart(2, '0');
+          keys.push(`${analyticsYear}-${mStr}-${dStr}`);
+          labels.push(`${d}日`);
+        }
+      } else if (currentTrendPeriod === '3m') {
+        for (let i = 2; i >= 0; i--) {
+          const d = new Date(analyticsYear, analyticsMonth - 1 - i, 1);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          keys.push(`${y}-${m}`);
+          labels.push(`${d.getMonth() + 1}月`);
+        }
+      } else if (currentTrendPeriod === '6m') {
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date(analyticsYear, analyticsMonth - 1 - i, 1);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          keys.push(`${y}-${m}`);
+          labels.push(`${d.getMonth() + 1}月`);
+        }
+      } else if (currentTrendPeriod === '12m') {
+        for (let i = 11; i >= 0; i--) {
+          const d = new Date(analyticsYear, analyticsMonth - 1 - i, 1);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          keys.push(`${y}-${m}`);
+          labels.push(`${d.getMonth() + 1}月`);
+        }
+      } else if (currentTrendPeriod === 'all') {
+        let allDates = transactions.map(t => t.date).filter(Boolean).sort();
+        if (allDates.length === 0) allDates = [getTodayString()];
+        const first = new Date(allDates[0]);
+        const last = new Date(allDates[allDates.length - 1]);
+        let cur = new Date(first.getFullYear(), first.getMonth(), 1);
+        const endMonth = new Date(last.getFullYear(), last.getMonth(), 1);
+        while (cur <= endMonth) {
+          const y = cur.getFullYear();
+          const m = String(cur.getMonth() + 1).padStart(2, '0');
+          keys.push(`${y}-${m}`);
+          labels.push(`${y.toString().slice(2)}/${cur.getMonth() + 1}`);
+          cur.setMonth(cur.getMonth() + 1);
+        }
+      } else if (currentTrendPeriod === 'custom' && trendCustomDateRange.start && trendCustomDateRange.end) {
+        const s = new Date(trendCustomDateRange.start);
+        const e = new Date(trendCustomDateRange.end);
+        const diffDays = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+        if (diffDays <= 45) {
+          isDaily = true;
+          let cur = new Date(s);
+          while (cur <= e) {
+            const y = cur.getFullYear();
+            const m = String(cur.getMonth() + 1).padStart(2, '0');
+            const d = String(cur.getDate()).padStart(2, '0');
+            keys.push(`${y}-${m}-${d}`);
+            labels.push(`${cur.getMonth() + 1}/${cur.getDate()}`);
+            cur.setDate(cur.getDate() + 1);
+          }
+        } else {
+          let cur = new Date(s.getFullYear(), s.getMonth(), 1);
+          const endMonth = new Date(e.getFullYear(), e.getMonth(), 1);
+          while (cur <= endMonth) {
+            const y = cur.getFullYear();
+            const m = String(cur.getMonth() + 1).padStart(2, '0');
+            keys.push(`${y}-${m}`);
+            labels.push(`${cur.getMonth() + 1}月`);
+            cur.setMonth(cur.getMonth() + 1);
+          }
+        }
       }
 
-      const mapIncome = {}, mapExpense = {};
-      keys.forEach(k => { mapIncome[k] = 0; mapExpense[k] = 0; });
+      const mapIncome = {};
+      const mapExpense = {};
+      const mapFixed = {};
+      const mapVariable = {};
 
-      transactions.forEach(t => {
-        if (!t.date || mapExpense[t.date] === undefined) return;
-        const amt = Number(t.amount) || 0;
-        if (t.type === 'expense') mapExpense[t.date] += amt;
-        else if (t.type === 'income') mapIncome[t.date] += amt;
+      keys.forEach(k => {
+        mapIncome[k] = 0;
+        mapExpense[k] = 0;
+        mapFixed[k] = 0;
+        mapVariable[k] = 0;
       });
 
-      const diffValues = keys.map(k => mapIncome[k] - mapExpense[k]);
-      if (trendChartInstance) { trendChartInstance.destroy(); trendChartInstance = null; }
+      transactions.forEach(t => {
+        if (!t.date) return;
+        const key = isDaily ? t.date : t.date.slice(0, 7);
+        if (mapExpense[key] !== undefined) {
+          const amt = Number(t.amount) || 0;
+          if (t.type === 'expense') {
+            mapExpense[key] += amt;
+            if (getCategoryGroup(t.category) === 'fixed') mapFixed[key] += amt;
+            else mapVariable[key] += amt;
+          } else if (t.type === 'income') {
+            mapIncome[key] += amt;
+          }
+        }
+      });
+
+      const incomeVals = keys.map(k => mapIncome[k]);
+      const expenseVals = keys.map(k => mapExpense[k]);
+      const diffVals = keys.map(k => mapIncome[k] - mapExpense[k]);
+      const fixedVals = keys.map(k => mapFixed[k]);
+      const variableVals = keys.map(k => mapVariable[k]);
+
+      const hasAny = incomeVals.some(v => v > 0) || expenseVals.some(v => v > 0);
+
+      if (trendChartInstance) {
+        trendChartInstance.destroy();
+        trendChartInstance = null;
+      }
+
+      if (!hasAny) {
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+      if (emptyState) emptyState.classList.add('hidden');
+
+      let datasets = [];
+      if (currentTrendGraphMode === 'diff') {
+        datasets = [{
+          label: '純収支',
+          data: diffVals,
+          backgroundColor: diffVals.map(v => v >= 0 ? '#10B981' : '#EF4444'),
+          borderRadius: 4
+        }];
+      } else if (currentTrendGraphMode === 'both') {
+        datasets = [
+          { label: '収入', data: incomeVals, backgroundColor: '#10B981', borderRadius: 4 },
+          { label: '支出', data: expenseVals, backgroundColor: '#EF4444', borderRadius: 4 }
+        ];
+      } else if (currentTrendGraphMode === 'fixed_variable') {
+        datasets = [
+          { label: '変動費', data: variableVals, backgroundColor: '#F59E0B', borderRadius: 4 },
+          { label: '固定費', data: fixedVals, backgroundColor: '#6366F1', borderRadius: 4 }
+        ];
+      }
 
       trendChartInstance = new Chart(trendCanvas.getContext('2d'), {
         type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: '純収支',
-            data: diffValues,
-            backgroundColor: diffValues.map(v => v >= 0 ? 'rgba(16, 185, 129, 0.85)' : 'rgba(239, 68, 68, 0.85)'),
-            borderRadius: 5
-          }]
-        },
+        data: { labels: labels, datasets: datasets },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
           scales: {
-            y: { beginAtZero: true, ticks: { font: { size: 9 } } },
-            x: { ticks: { font: { size: 8 } } }
+            y: {
+              beginAtZero: true,
+              ticks: {
+                font: { size: 9 },
+                callback: (val) => (val === 0 ? '¥0' : (val > 0 ? '+¥' : '-¥') + Math.abs(val).toLocaleString())
+              },
+              grid: { color: '#F1F5F9' }
+            },
+            x: {
+              ticks: { font: { size: labels.length > 15 ? 8 : 9 }, maxRotation: 45 },
+              grid: { display: false }
+            }
+          },
+          plugins: {
+            legend: {
+              display: currentTrendGraphMode !== 'diff',
+              position: 'top',
+              labels: { boxWidth: 10, font: { size: 10 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ¥${(ctx.parsed.y || 0).toLocaleString()}`
+              }
+            }
           }
         }
       });
@@ -4458,111 +4441,110 @@
 
     function checkAndApplyRecurring() {
       const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth() + 1;
-      const currentDay = now.getDate();
-      const currentYearMonth = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
+      const curY = now.getFullYear();
+      const curM = now.getMonth() + 1;
+      const curD = now.getDate();
+      const curYM = `${curY}-${String(curM).padStart(2, '0')}`;
 
       let appliedCount = 0;
       recurringRules.forEach(rule => {
-        if (rule.startMonth && currentYearMonth < rule.startMonth) return;
-        if (rule.endMonth && currentYearMonth > rule.endMonth) return;
+        if (rule.startMonth && curYM < rule.startMonth) return;
+        if (rule.endMonth && curYM > rule.endMonth) return;
 
-        const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate();
-        const targetDayNum = rule.day === 'last' ? lastDayOfMonth : Math.min(Number(rule.day), lastDayOfMonth);
+        let targetDayNum;
+        const lastDay = new Date(curY, curM, 0).getDate();
+        if (rule.day === 'last') targetDayNum = lastDay;
+        else targetDayNum = Math.min(Number(rule.day) || 1, lastDay);
 
-        if (currentDay < targetDayNum) return;
+        if (curD < targetDayNum) return;
 
-        const dateStr = `${currentYearMonth}-${String(targetDayNum).padStart(2, '0')}`;
-        const exists = transactions.some(t => t.date === dateStr && t.title === rule.title && t.amount === rule.amount);
+        const dateStr = `${curYM}-${String(targetDayNum).padStart(2, '0')}`;
+        const exists = transactions.some(t => t.date === dateStr && t.title === rule.title && Number(t.amount) === Number(rule.amount));
         if (!exists) {
           transactions.unshift({
             id: `tx_rec_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
             date: dateStr,
-            type: rule.type,
-            category: rule.category,
-            amount: rule.amount,
-            title: rule.title,
-            member: rule.member || '',
-            paymentMethod: rule.paymentMethod || (rule.type === 'income' ? '口座入金' : '口座引落'),
+            type: rule.type || 'expense',
+            category: rule.category || 'その他',
+            amount: Number(rule.amount) || 0,
+            title: rule.title || '定期収支',
             memo: '毎月の定期収支 (自動登録)',
+            member: rule.member || '',
+            paymentMethod: rule.paymentMethod || '口座引落',
             createdAt: new Date().toLocaleString('ja-JP')
           });
           appliedCount++;
         }
       });
 
-      if (appliedCount > 0) saveStoredData();
+      if (appliedCount > 0) {
+        saveStoredData();
+      }
     }
 
     function openRecurringModal(ruleId = null) {
       editingRecurringId = ruleId;
       const titleEl = document.getElementById('recurringModalTitle');
-      const saveBtn = document.getElementById('btnSaveRecurring');
-      const deleteArea = document.getElementById('recModalDeleteArea');
-
+      const delArea = document.getElementById('recModalDeleteArea');
       const now = new Date();
-      const defaultStartMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      populatePaymentMethodDropdowns();
+      const curYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
       if (ruleId) {
         const rule = recurringRules.find(r => r.id === ruleId);
         if (!rule) return;
-        if (titleEl) titleEl.textContent = '定期収支の編集';
-        if (saveBtn) saveBtn.textContent = '変更を保存';
-        if (deleteArea) deleteArea.classList.remove('hidden');
-
-        setRecurringType(rule.type);
-        document.getElementById('recStartMonth').value = rule.startMonth || defaultStartMonth;
+        if (titleEl) titleEl.textContent = '定期ルールの編集';
+        setRecurringType(rule.type || 'expense');
+        document.getElementById('recStartMonth').value = rule.startMonth || curYM;
         document.getElementById('recEndMonth').value = rule.endMonth || '';
-        document.getElementById('recDay').value = rule.day || '1';
+        document.getElementById('recDay').value = rule.day || '25';
         document.getElementById('recTitle').value = rule.title || '';
         document.getElementById('recAmount').value = rule.amount || '';
         document.getElementById('recCategory').value = rule.category || '';
-        if (document.getElementById('recPaymentMethod')) document.getElementById('recPaymentMethod').value = rule.paymentMethod || (rule.type === 'income' ? '口座入金' : '口座引落');
-        if (document.getElementById('recMember')) document.getElementById('recMember').value = rule.member || '';
+        document.getElementById('recPaymentMethod').value = rule.paymentMethod || '';
+        document.getElementById('recMember').value = rule.member || '';
+        if (delArea) delArea.classList.remove('hidden');
       } else {
-        if (titleEl) titleEl.textContent = '定期収支・固定費の新規登録';
-        if (saveBtn) saveBtn.textContent = '保存する';
-        if (deleteArea) deleteArea.classList.add('hidden');
-
+        if (titleEl) titleEl.textContent = '定期収支の新規登録';
         setRecurringType('expense');
-        document.getElementById('recStartMonth').value = defaultStartMonth;
+        document.getElementById('recStartMonth').value = curYM;
         document.getElementById('recEndMonth').value = '';
+        document.getElementById('recDay').value = '25';
         document.getElementById('recTitle').value = '';
         document.getElementById('recAmount').value = '';
-        if (document.getElementById('recPaymentMethod')) document.getElementById('recPaymentMethod').value = '口座引落';
-        if (document.getElementById('recMember')) document.getElementById('recMember').value = '';
+        document.getElementById('recMember').value = '';
+        if (delArea) delArea.classList.add('hidden');
       }
       openModal('recurringModal');
     }
 
     function setRecurringType(type) {
       currentRecurringType = type;
-      const btnIncome = document.getElementById('btnRecTypeIncome');
-      const btnExpense = document.getElementById('btnRecTypeExpense');
-      const recMemberGroup = document.getElementById('recMemberGroup');
+      const btnExp = document.getElementById('btnRecTypeExpense');
+      const btnInc = document.getElementById('btnRecTypeIncome');
+      const memGrp = document.getElementById('recMemberGroup');
 
-      if (type === 'income') {
-        btnIncome.className = 'py-1.5 rounded-xl bg-white text-emerald-600 shadow-xs';
-        btnExpense.className = 'py-1.5 rounded-xl text-slate-600';
-        if (recMemberGroup) recMemberGroup.classList.add('hidden');
+      if (type === 'expense') {
+        if (btnExp) btnExp.className = 'py-1.5 rounded-xl bg-white text-rose-600 shadow-xs';
+        if (btnInc) btnInc.className = 'py-1.5 rounded-xl text-slate-600';
+        if (memGrp) memGrp.classList.remove('hidden');
       } else {
-        btnExpense.className = 'py-1.5 rounded-xl bg-white text-rose-600 shadow-xs';
-        btnIncome.className = 'py-1.5 rounded-xl text-slate-600';
-        if (recMemberGroup) recMemberGroup.classList.remove('hidden');
+        if (btnInc) btnInc.className = 'py-1.5 rounded-xl bg-white text-emerald-600 shadow-xs';
+        if (btnExp) btnExp.className = 'py-1.5 rounded-xl text-slate-600';
+        if (memGrp) memGrp.classList.add('hidden');
       }
 
-      populatePaymentMethodDropdowns();
       const select = document.getElementById('recCategory');
-      select.innerHTML = '';
-      const list = type === 'income' ? incomeCategories : [...fixedExpenseCategories, ...variableExpenseCategories];
-      list.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        select.appendChild(opt);
-      });
+      if (select) {
+        select.innerHTML = '';
+        const list = type === 'expense' ? [...fixedExpenseCategories, ...variableExpenseCategories] : incomeCategories;
+        list.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = c;
+          select.appendChild(opt);
+        });
+      }
+      populatePaymentMethodDropdowns();
     }
 
     function saveRecurringRule() {
@@ -4572,29 +4554,43 @@
       const title = document.getElementById('recTitle').value.trim();
       const amount = Number(document.getElementById('recAmount').value);
       const category = document.getElementById('recCategory').value;
-      const paymentMethod = document.getElementById('recPaymentMethod')?.value || (currentRecurringType === 'income' ? '口座入金' : '口座引落');
-      const member = currentRecurringType === 'expense' ? (document.getElementById('recMember')?.value || '') : '';
+      const paymentMethod = document.getElementById('recPaymentMethod').value;
+      const member = currentRecurringType === 'expense' ? document.getElementById('recMember').value : '';
 
       if (!title || isNaN(amount) || amount <= 0) {
-        showToast('項目名と有効な金額を入力してください', true);
+        showToast('タイトルと有効な金額を入力してください', true);
         return;
       }
 
       if (editingRecurringId) {
         const rule = recurringRules.find(r => r.id === editingRecurringId);
         if (rule) {
-          rule.startMonth = startMonth; rule.endMonth = endMonth; rule.day = day;
-          rule.type = currentRecurringType; rule.category = category; rule.amount = amount;
-          rule.title = title; rule.member = member; rule.paymentMethod = paymentMethod;
+          rule.startMonth = startMonth;
+          rule.endMonth = endMonth;
+          rule.day = day;
+          rule.type = currentRecurringType;
+          rule.category = category;
+          rule.amount = amount;
+          rule.title = title;
+          rule.paymentMethod = paymentMethod;
+          rule.member = member;
         }
         editingRecurringId = null;
         showToast('定期ルールを更新しました');
       } else {
         recurringRules.push({
-          id: `rec_${Date.now()}`, startMonth, endMonth, day, type: currentRecurringType,
-          category, amount, title, member, paymentMethod
+          id: `rec_${Date.now()}`,
+          startMonth,
+          endMonth,
+          day,
+          type: currentRecurringType,
+          category,
+          amount,
+          title,
+          paymentMethod,
+          member
         });
-        showToast('固定費ルールを保存しました');
+        showToast('定期ルールを保存しました');
       }
 
       saveStoredData();
@@ -4610,69 +4606,62 @@
       closeModal('recurringModal');
     }
 
-    function renderRecurringList() {
-      const listEl = document.getElementById('recurringList');
-      const emptyEl = document.getElementById('recurringEmpty');
-      listEl.innerHTML = '';
-
-      if (recurringRules.length === 0) {
-        emptyEl.classList.remove('hidden');
-        return;
-      }
-      emptyEl.classList.add('hidden');
-
-      recurringRules.forEach(rule => {
-        const card = document.createElement('div');
-        card.className = 'p-3 bg-slate-50/80 hover:bg-slate-100 rounded-2xl border border-slate-100 flex items-center justify-between text-xs cursor-pointer active:scale-[0.99] transition';
-        card.onclick = () => openRecurringModal(rule.id);
-
-        const color = rule.type === 'income' ? 'text-emerald-600' : 'text-rose-600';
-        const prefix = rule.type === 'income' ? '+¥' : '-¥';
-        const dayLabel = rule.day === 'last' ? '月末' : `${rule.day}日`;
-
-        let periodDisplay = '';
-        if (rule.startMonth) {
-          const s = rule.startMonth.replace('-', '/');
-          const e = rule.endMonth ? rule.endMonth.replace('-', '/') : '継続';
-          periodDisplay = `
-            <span class="inline-flex items-center space-x-1 px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200/60 rounded text-[9px] font-bold">
-              <svg class="w-2.5 h-2.5 text-blue-600 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/></svg>
-              <span>${s}〜${e}</span>
-            </span>
-          `;
-        }
-
-        const payBadge = rule.paymentMethod
-          ? `<span class="px-1.5 py-0.2 bg-slate-100 text-slate-600 border border-slate-200 rounded text-[9px] font-bold">${escapeHtml(rule.paymentMethod)}</span>`
-          : '';
-
-        card.innerHTML = `
-          <div class="min-w-0 pr-2">
-            <div class="flex items-center space-x-1 mb-1 flex-wrap gap-y-1">
-              <span class="px-1.5 py-0.2 bg-white border border-slate-200 rounded text-[9px] font-bold text-slate-700">${dayLabel}</span>
-              ${periodDisplay}
-              ${payBadge}
-              <span class="text-slate-500 font-semibold text-[10px] flex items-center space-x-1">
-                <span>${getCategoryIcon(rule.category, 'w-3.5 h-3.5')}</span>
-                <span>${rule.category}</span>
-              </span>
-            </div>
-            <p class="font-bold text-slate-800 text-xs truncate">${escapeHtml(rule.title)}</p>
-          </div>
-          <div class="flex items-center space-x-2 flex-shrink-0">
-            <span class="font-black font-mono ${color} text-sm">${prefix}${rule.amount.toLocaleString()}</span>
-            <span class="text-slate-300 text-xs font-bold">›</span>
-          </div>
-        `;
-        listEl.appendChild(card);
-      });
-    }
-
     function deleteRecurringRule(id) {
       recurringRules = recurringRules.filter(r => r.id !== id);
       saveStoredData();
       renderRecurringList();
       showToast('定期ルールを削除しました');
+    }
+
+    function renderRecurringList() {
+      const listEl = document.getElementById('recurringList');
+      const emptyEl = document.getElementById('recurringEmpty');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+
+      if (recurringRules.length === 0) {
+        if (emptyEl) emptyEl.classList.remove('hidden');
+        return;
+      }
+      if (emptyEl) emptyEl.classList.add('hidden');
+
+      recurringRules.forEach(rule => {
+        const card = document.createElement('div');
+        card.className = 'p-3 bg-slate-50/80 rounded-2xl border border-slate-100 flex items-center justify-between text-xs cursor-pointer hover:bg-slate-100/90 transition shadow-2xs';
+        card.onclick = () => openRecurringModal(rule.id);
+
+        const color = rule.type === 'income' ? 'text-emerald-700' : 'text-rose-700';
+        const prefix = rule.type === 'income' ? '+¥' : '-¥';
+        const dayLabel = rule.day === 'last' ? '月末' : `${rule.day}日`;
+        const iconSvg = getCategoryIcon(rule.category, 'w-4 h-4');
+
+        let periodSub = `${rule.startMonth || '開始'}`;
+        if (rule.endMonth) periodSub += `〜${rule.endMonth}`;
+        else periodSub += '〜継続';
+
+        card.innerHTML = `
+          <div class="flex items-center space-x-2.5 min-w-0 pr-2">
+            <div class="w-8 h-8 rounded-xl bg-white border border-slate-200/80 flex items-center justify-center flex-shrink-0 shadow-2xs">
+              ${iconSvg}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center space-x-1.5 mb-0.5">
+                <span class="px-1.5 py-0.2 bg-white border border-slate-200 rounded text-[9px] font-bold">${dayLabel}</span>
+                <span class="text-slate-400 font-semibold text-[10px]">${rule.category}</span>
+                <span class="text-[9px] font-mono text-slate-400">${periodSub}</span>
+              </div>
+              <p class="font-extrabold text-slate-800 truncate text-xs">${escapeHtml(rule.title)}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 flex-shrink-0">
+            <span class="font-black font-mono ${color} text-xs">${prefix}${Number(rule.amount).toLocaleString()}</span>
+            <button type="button" onclick="event.stopPropagation(); deleteRecurringRule('${rule.id}')" class="text-slate-400 hover:text-rose-600 p-1 transition" title="削除">
+              &times;
+            </button>
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
     }
 
     function openSyncMenuModal() {
@@ -4682,24 +4671,40 @@
     }
 
     async function exportToSheet() {
-      if (!gasEndpoint) { showToast('スプレッドシートURLを設定してください', true); return; }
       closeModal('syncModal');
       const syncBtn = document.getElementById('btnSync');
-      syncBtn.disabled = true;
+      const syncIcon = document.getElementById('syncIcon');
+      const syncText = document.getElementById('syncText');
+
+      if (syncBtn) syncBtn.disabled = true;
+      if (syncIcon) syncIcon.classList.add('animate-spin-custom');
+      if (syncText) syncText.textContent = '送信中...';
 
       try {
+        const payload = {
+          action: "syncAll",
+          transactions: transactions
+        };
         const resp = await fetch(gasEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: "syncAll", transactions })
+          body: JSON.stringify(payload)
         });
         const res = await resp.json();
-        if (res.status === 'success') showToast(`スプシへ送信完了: ${transactions.length}件を保存`);
-        else throw new Error(res.message);
+        if (res.status === 'success') {
+          deletedTxIds = [];
+          saveStoredData();
+          showToast(`スプシへ送信完了: ${transactions.length}件を保存`);
+        } else {
+          throw new Error(res.message || '送信に失敗しました');
+        }
       } catch (err) {
+        console.error(err);
         showToast(`送信エラー: ${err.message}`, true);
       } finally {
-        syncBtn.disabled = false;
+        if (syncBtn) syncBtn.disabled = false;
+        if (syncIcon) syncIcon.classList.remove('animate-spin-custom');
+        if (syncText) syncText.textContent = '同期メニュー';
       }
     }
 
