@@ -164,7 +164,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.20</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.21</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -750,20 +750,9 @@
     </div>
   </div>
 
-  <!-- 手入力＆編集モーダル -->
-  <div id="manualModal" onclick="if(event.target === this) closeModal('manualModal')" style="touch-action: pan-y; overscroll-behavior: contain;" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-x-hidden">
-    <div onclick="event.stopPropagation()" style="touch-action: pan-y;" class="bg-white w-full max-w-sm rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col max-h-[88dvh] animate-scale-up overflow-x-hidden">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 flex-shrink-0">
-        <h3 class="text-sm font-extrabold text-slate-800" id="manualModalTitle">手入力で記帳</h3>
-        <button type="button" onclick="closeModal('manualModal')" class="w-7 h-7 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 text-xl leading-none transition" aria-label="閉じる">&times;</button>
-      </div>
-
-      <div style="touch-action: pan-y;" class="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar pr-1 py-2 space-y-2.5">
-        <div id="manualTypeToggleArea" class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl text-xs font-bold">
-          <button type="button" onclick="setManualType('expense')" id="btnManualTypeExpense" class="py-2 rounded-xl bg-white text-rose-600 shadow-xs transition">支出</button>
   <!-- 手入力＆編集モーダル (完全スクロールなし・1枚固定収容) -->
-  <div id="manualModal" onclick="if(event.target === this) closeModal('manualModal')" style="touch-action: none; overscroll-behavior: none;" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 select-none overflow-hidden">
-    <div onclick="event.stopPropagation()" style="touch-action: none;" class="bg-white w-full max-w-sm rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col animate-scale-up overflow-hidden">
+  <div id="manualModal" onclick="if(event.target === this) closeModal('manualModal')" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 select-none overflow-hidden">
+    <div onclick="event.stopPropagation()" class="bg-white w-full max-w-sm rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col animate-scale-up overflow-hidden">
       <!-- ヘッダー -->
       <div class="flex items-center justify-between border-b border-slate-100 pb-2 flex-shrink-0">
         <h3 class="text-xs sm:text-sm font-extrabold text-slate-800" id="manualModalTitle">手入力で記帳</h3>
