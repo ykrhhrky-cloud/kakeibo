@@ -159,7 +159,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.04</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.05</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -3616,14 +3616,36 @@
 
             // 読み取った支払い方法の自動マッチング
             let detectedPayment = '';
-            const rawPay = String(item.paymentMethod || '').toLowerCase();
-            if (rawPay.includes('paypay') || rawPay.includes('ペイ')) {
-              const m = paymentMethods.find(p => p.name.includes('PayPay'));
+            const rawPay = String(item.paymentMethod || '').trim();
+            const rawPayLower = rawPay.toLowerCase();
+
+            // 1. 登録済み支払い方法の名称と直接照合（完全一致・部分一致）
+            // 例: 「楽天ペイ」「楽天pay」「PayPay」「楽天カード」等
+            const directMatch = paymentMethods.find(pm => {
+              const pmLower = pm.name.toLowerCase();
+              return rawPayLower === pmLower ||
+                     (rawPayLower && pmLower.includes(rawPayLower)) ||
+                     (rawPayLower && rawPayLower.includes(pmLower));
+            });
+
+            if (directMatch) {
+              detectedPayment = directMatch.name;
+            } else if (rawPayLower.includes('楽天') || rawPayLower.includes('rakuten')) {
+              // 楽天ペイまたは楽天カードの専用判定
+              const rPay = paymentMethods.find(p => p.name.includes('楽天ペイ') || p.name.toLowerCase().includes('楽天pay') || p.name.toLowerCase().includes('rakuten pay'));
+              const rCard = paymentMethods.find(p => p.name.includes('楽天カード'));
+              if (rawPayLower.includes('ペイ') || rawPayLower.includes('pay') || rawPayLower.includes('コード') || rawPayLower.includes('qr')) {
+                detectedPayment = rPay ? rPay.name : (rCard ? rCard.name : '');
+              } else {
+                detectedPayment = rCard ? rCard.name : (rPay ? rPay.name : '');
+              }
+            } else if (rawPayLower.includes('paypay') || rawPayLower.includes('ペイペイ')) {
+              const m = paymentMethods.find(p => p.name.toLowerCase().includes('paypay') || p.name.includes('ペイペイ'));
               if (m) detectedPayment = m.name;
-            } else if (rawPay.includes('カード') || rawPay.includes('credit') || rawPay.includes('visa') || rawPay.includes('master') || rawPay.includes('jcb')) {
+            } else if (rawPayLower.includes('カード') || rawPayLower.includes('credit') || rawPayLower.includes('visa') || rawPayLower.includes('master') || rawPayLower.includes('jcb')) {
               const m = paymentMethods.find(p => p.type === 'credit');
               if (m) detectedPayment = m.name;
-            } else if (rawPay.includes('現金') || rawPay.includes('cash')) {
+            } else if (rawPayLower.includes('現金') || rawPayLower.includes('cash')) {
               detectedPayment = '現金';
             }
 
@@ -3861,9 +3883,12 @@
       let lastError = null;
       let lastErrorRaw = '';
 
+      // 現在登録されている支払い方法リストを候補としてAIに渡す
+      const currentPayOptions = paymentMethods.map(p => p.name).join('/');
+
       const promptText = `日本の家計簿レシート解析。JSONのみ返却。
 科目: 食費/日用品/備品・消耗品/外食（酒類なし）/外食（酒類あり）/交通費/医療費/衣服/美容/贈答・交際費/趣味・娯楽/旅行費/住宅設備費/学費関連/家族関連諸費用/水道光熱費/住宅ローン/その他ローン/通信費/サブスク/保険・積立/仕送り/税金/その他雑費/その他
-支払い方法（推定）: 現金/クレジットカード/電子マネー/PayPay/不明
+支払い方法候補: ${currentPayOptions || '現金/クレジットカード/楽天ペイ/PayPay'}/不明
 返却JSON:
 {"receipts":[{"storeName":"店舗名","date":"YYYY-MM-DD","amount":合計金額数値,"category":"科目名","paymentMethod":"推定支払い方法","itemsSummary":"購入品"}]}`;
 
