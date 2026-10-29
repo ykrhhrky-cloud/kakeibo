@@ -164,7 +164,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.08</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.15</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -518,7 +518,7 @@
             <button type="button" onclick="setPieExpenseScope('fixed')" id="btnPieScopeFixed" class="px-2 py-0.5 rounded-lg text-slate-500 hover:text-slate-800 transition">固定費のみ</button>
           </div>
 
-          <div class="relative w-full h-80 flex items-center justify-center">
+          <div class="relative w-full h-72 flex items-center justify-center">
             <canvas id="pieChartCanvas"></canvas>
             <div id="pieEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-xs text-slate-400">
               この期間の支出データはありません
@@ -954,10 +954,35 @@
           <label class="block text-[11px] font-bold text-slate-600 mb-1">科目</label>
           <select id="recCategory" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2 text-xs font-semibold outline-none"></select>
         </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">支払い/入金方法</label>
-          <select id="recPaymentMethod" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2 text-xs font-semibold outline-none"></select>
+        <!-- 支払い/入金方法 アコーディオン選択 -->
+        <div class="relative">
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-[11px] font-bold text-slate-600" id="recPayMethodLabel">支払い方法</label>
+            <button type="button" onclick="openPaymentMethodManageModal()" class="text-[10px] text-blue-600 font-bold hover:underline flex items-center space-x-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>支払方法の追加・管理</span>
+            </button>
+          </div>
+
+          <button type="button" id="recPaymentDropdownTrigger" onclick="toggleRecPaymentDropdown()" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-xs font-bold flex items-center justify-between outline-none focus:border-blue-500 active:scale-[0.99] transition">
+            <div class="flex items-center space-x-2 truncate">
+              <span id="selectedRecPaymentIcon" class="flex-shrink-0"></span>
+              <span id="selectedRecPaymentType" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 flex-shrink-0">口座引落</span>
+              <span id="selectedRecPaymentName" class="text-slate-800 font-extrabold truncate text-xs">口座引落</span>
+            </div>
+            <svg id="recPaymentDropdownArrow" class="w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <div id="recPaymentDropdownMenu" class="hidden absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-50 p-2 max-h-60 overflow-y-auto custom-scrollbar animate-scale-up">
+            <div class="flex items-center justify-between px-1.5 pb-1.5 mb-1 border-b border-slate-100 text-[10px]">
+              <span class="font-bold text-slate-400">タップして展開・選択</span>
+              <button type="button" onclick="openPaymentMethodManageModal()" class="text-blue-600 hover:underline font-bold">追加・管理 ⚙️</button>
+            </div>
+            <div id="recPaymentDropdownList" class="space-y-1.5"></div>
+          </div>
+          <input type="hidden" id="recPaymentMethod" value="口座引落">
         </div>
+
         <div id="recMemberGroup">
           <label class="block text-[11px] font-bold text-slate-600 mb-1">対象者</label>
           <select id="recMember" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2 text-xs font-semibold outline-none"></select>
@@ -1313,10 +1338,10 @@
     let expandedPayTypes = new Set();
     let manualPayExpandedTypes = new Set();
     let confPayExpandedTypes = new Set();
+    let recPayExpandedTypes = new Set();
     let selectedManualPaymentMethod = '現金';
     let selectedReceiptPaymentMethod = '';
-
-    // 支払い方法のメタ情報判定ヘルパー
+    let selectedRecPaymentMethod = '口座引落';
     function getPaymentMethodMeta(name) {
       if (!name) return { type: 'other', typeLabel: 'その他', shortType: '他', name: '未指定' };
       const found = paymentMethods.find(pm => pm.name === name);
@@ -1619,6 +1644,12 @@
         if (confPayMenu && !confPayMenu.contains(e.target) && !confPayTrigger?.contains(e.target)) {
           closeReceiptPaymentDropdown();
         }
+
+        const recPayMenu = document.getElementById('recPaymentDropdownMenu');
+        const recPayTrigger = document.getElementById('recPaymentDropdownTrigger');
+        if (recPayMenu && !recPayMenu.contains(e.target) && !recPayTrigger?.contains(e.target)) {
+          closeRecPaymentDropdown();
+        }
       });
     });
 
@@ -1765,46 +1796,159 @@
     }
 
     function populatePaymentMethodDropdowns() {
-      const recSel = document.getElementById('recPaymentMethod');
-
-      const createOptions = (targetSelect, isIncome = false) => {
-        if (!targetSelect) return;
-        const currentVal = targetSelect.value;
-        targetSelect.innerHTML = '';
-
-        if (isIncome) {
-          const grp = document.createElement('optgroup');
-          grp.label = '入金方法';
-          ['口座入金', '現金', 'その他'].forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m;
-            opt.textContent = m;
-            grp.appendChild(opt);
-          });
-          targetSelect.appendChild(grp);
-        } else {
-          const types = ['credit', 'electronic', 'bank', 'cash', 'other'];
-          types.forEach(tKey => {
-            const items = paymentMethods.filter(pm => pm.type === tKey);
-            if (items.length > 0) {
-              const grp = document.createElement('optgroup');
-              grp.label = paymentTypeLabels[tKey] || tKey;
-              items.forEach(pm => {
-                const opt = document.createElement('option');
-                opt.value = pm.name;
-                opt.textContent = pm.name;
-                grp.appendChild(opt);
-              });
-              targetSelect.appendChild(grp);
-            }
-          });
-        }
-        if (currentVal) targetSelect.value = currentVal;
-      };
-
-      createOptions(recSel, currentRecurringType === 'income');
       updateManualPaymentTriggerUI();
       updateReceiptPaymentTriggerUI();
+      updateRecPaymentTriggerUI();
+    }
+
+    // ==================== 定期収支 支払い/入金方法 アコーディオン選択 ====================
+    function toggleRecPaymentDropdown() {
+      const menu = document.getElementById('recPaymentDropdownMenu');
+      const arrow = document.getElementById('recPaymentDropdownArrow');
+      if (menu) {
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+          recPayExpandedTypes.clear(); // 開くたびに初期状態（全閉）
+          renderRecPaymentDropdownList();
+          menu.classList.remove('hidden');
+          if (arrow) arrow.classList.add('rotate-180');
+        } else {
+          closeRecPaymentDropdown();
+        }
+      }
+    }
+
+    function closeRecPaymentDropdown() {
+      const menu = document.getElementById('recPaymentDropdownMenu');
+      const arrow = document.getElementById('recPaymentDropdownArrow');
+      if (menu) menu.classList.add('hidden');
+      if (arrow) arrow.classList.remove('rotate-180');
+    }
+
+    function chooseRecPaymentMethod(name) {
+      selectedRecPaymentMethod = name;
+      const hiddenInput = document.getElementById('recPaymentMethod');
+      if (hiddenInput) hiddenInput.value = name;
+      updateRecPaymentTriggerUI();
+      closeRecPaymentDropdown();
+    }
+
+    function toggleRecPaySection(tKey) {
+      if (recPayExpandedTypes.has(tKey)) recPayExpandedTypes.delete(tKey);
+      else recPayExpandedTypes.add(tKey);
+      renderRecPaymentDropdownList();
+    }
+
+    function renderRecPaymentDropdownList() {
+      const container = document.getElementById('recPaymentDropdownList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (currentRecurringType === 'income') {
+        const items = ['口座入金', '現金', 'その他'];
+        items.forEach(name => {
+          const isSelected = (selectedRecPaymentMethod === name);
+          const row = document.createElement('button');
+          row.type = 'button';
+          row.className = `w-full min-h-[42px] p-2.5 px-3 rounded-xl text-xs font-bold cursor-pointer transition flex items-center justify-between active:scale-[0.99] text-left ${isSelected ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' : 'hover:bg-slate-50 text-slate-700 bg-white border border-slate-100'}`;
+          row.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            chooseRecPaymentMethod(name);
+          };
+          row.innerHTML = `
+            <div class="flex items-center space-x-2">
+              ${getPaymentMethodIcon('bank', 'w-4 h-4')}
+              <span>${name}</span>
+            </div>
+            ${isSelected ? '<span class="text-emerald-600 text-xs font-black">✓</span>' : ''}
+          `;
+          container.appendChild(row);
+        });
+        return;
+      }
+
+      // 支出（固定費）の場合：口座引落を先頭にして利便性向上
+      const types = ['bank', 'credit', 'electronic', 'cash', 'other'];
+      types.forEach(tKey => {
+        const items = paymentMethods.filter(pm => pm.type === tKey);
+        if (items.length === 0) return;
+
+        const isExpanded = recPayExpandedTypes.has(tKey);
+        const iconSvg = getPaymentMethodIcon(tKey, 'w-4 h-4');
+        const typeLabel = paymentTypeLabels[tKey] || tKey;
+
+        const groupCard = document.createElement('div');
+        groupCard.className = 'border border-slate-200/90 rounded-2xl overflow-hidden bg-slate-50/80 shadow-2xs transition-all';
+
+        const grpHeader = document.createElement('button');
+        grpHeader.type = 'button';
+        grpHeader.className = 'w-full min-h-[44px] py-2.5 px-3 flex items-center justify-between cursor-pointer hover:bg-slate-100/80 select-none text-left active:bg-slate-100 transition';
+        grpHeader.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleRecPaySection(tKey);
+        };
+
+        grpHeader.innerHTML = `
+          <div class="flex items-center space-x-2 min-w-0 pr-1">
+            <span class="flex-shrink-0">${iconSvg}</span>
+            <span class="font-extrabold text-xs text-slate-800">${typeLabel}</span>
+            <span class="text-[10px] font-bold text-slate-400 font-mono">(${items.length})</span>
+          </div>
+          <div class="w-6 h-6 flex items-center justify-center flex-shrink-0 rounded-full bg-white/80 border border-slate-200/60 shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        `;
+        groupCard.appendChild(grpHeader);
+
+        if (isExpanded) {
+          const body = document.createElement('div');
+          body.className = 'p-2 pt-0.5 border-t border-slate-200/60 space-y-1.5 bg-white';
+          items.forEach(pm => {
+            const isSelected = (selectedRecPaymentMethod === pm.name);
+            const itemRow = document.createElement('button');
+            itemRow.type = 'button';
+            itemRow.className = `w-full min-h-[40px] p-2 px-2.5 rounded-xl text-xs font-bold cursor-pointer transition flex items-center justify-between text-left active:scale-[0.99] ${isSelected ? 'bg-blue-50 text-blue-700 border border-blue-200 font-extrabold' : 'hover:bg-slate-50 text-slate-700 bg-slate-50/40 border border-slate-100'}`;
+            itemRow.onclick = (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              chooseRecPaymentMethod(pm.name);
+            };
+            itemRow.innerHTML = `
+              <span class="truncate text-xs">${escapeHtml(pm.name)}</span>
+              ${isSelected ? '<span class="text-blue-600 font-black text-xs">✓</span>' : ''}
+            `;
+            body.appendChild(itemRow);
+          });
+          groupCard.appendChild(body);
+        }
+        container.appendChild(groupCard);
+      });
+    }
+
+    function updateRecPaymentTriggerUI() {
+      const iconEl = document.getElementById('selectedRecPaymentIcon');
+      const typeEl = document.getElementById('selectedRecPaymentType');
+      const nameEl = document.getElementById('selectedRecPaymentName');
+      if (!nameEl) return;
+
+      if (currentRecurringType === 'income') {
+        if (iconEl) iconEl.innerHTML = getPaymentMethodIcon('bank', 'w-4 h-4');
+        if (typeEl) {
+          typeEl.textContent = '入金';
+          typeEl.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 flex-shrink-0';
+        }
+        nameEl.textContent = selectedRecPaymentMethod || '口座入金';
+      } else {
+        const meta = getPaymentMethodMeta(selectedRecPaymentMethod || '口座引落');
+        if (iconEl) iconEl.innerHTML = getPaymentMethodIcon(meta.type, 'w-4 h-4');
+        if (typeEl) {
+          typeEl.textContent = meta.shortType;
+          typeEl.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 flex-shrink-0';
+        }
+        nameEl.textContent = meta.name || '口座引落';
+      }
     }
 
     // ==================== 手入力 支払い方法 アコーディオン選択 ====================
@@ -4086,14 +4230,20 @@
       if (!pieCanvas) return;
 
       let filtered = transactions.filter(t => t.type === 'expense' && t.date);
+      let filteredAllForPeriod = transactions.filter(t => t.date);
 
       if (currentTrendPeriod === '1m') {
         const prefix = `${analyticsYear}-${String(analyticsMonth).padStart(2, '0')}`;
         filtered = filtered.filter(t => t.date.startsWith(prefix));
+        filteredAllForPeriod = filteredAllForPeriod.filter(t => t.date.startsWith(prefix));
       } else if (currentTrendPeriod === '3m') {
         const endD = new Date(analyticsYear, analyticsMonth, 0);
         const startD = new Date(analyticsYear, analyticsMonth - 3, 1);
         filtered = filtered.filter(t => {
+          const d = new Date(t.date);
+          return d >= startD && d <= endD;
+        });
+        filteredAllForPeriod = filteredAllForPeriod.filter(t => {
           const d = new Date(t.date);
           return d >= startD && d <= endD;
         });
@@ -4104,6 +4254,10 @@
           const d = new Date(t.date);
           return d >= startD && d <= endD;
         });
+        filteredAllForPeriod = filteredAllForPeriod.filter(t => {
+          const d = new Date(t.date);
+          return d >= startD && d <= endD;
+        });
       } else if (currentTrendPeriod === '12m') {
         const endD = new Date(analyticsYear, analyticsMonth, 0);
         const startD = new Date(analyticsYear, analyticsMonth - 12, 1);
@@ -4111,9 +4265,22 @@
           const d = new Date(t.date);
           return d >= startD && d <= endD;
         });
+        filteredAllForPeriod = filteredAllForPeriod.filter(t => {
+          const d = new Date(t.date);
+          return d >= startD && d <= endD;
+        });
+      } else if (currentTrendPeriod === 'all') {
+        // 全期間は絞り込みなし
       } else if (currentTrendPeriod === 'custom' && trendCustomDateRange.start && trendCustomDateRange.end) {
         filtered = filtered.filter(t => t.date >= trendCustomDateRange.start && t.date <= trendCustomDateRange.end);
+        filteredAllForPeriod = filteredAllForPeriod.filter(t => t.date >= trendCustomDateRange.start && t.date <= trendCustomDateRange.end);
       }
+
+      // 同一期間の収入総額を算出
+      let totalIncomeForPeriod = 0;
+      filteredAllForPeriod.forEach(t => {
+        if (t.type === 'income') totalIncomeForPeriod += (Number(t.amount) || 0);
+      });
 
       if (pieDimension === 'category') {
         if (pieExpenseScope === 'variable') {
@@ -4138,7 +4305,7 @@
       });
 
       const sortedEntries = Object.entries(map).sort((a, b) => b[1] - a[1]);
-      const labels = sortedEntries.map(e => e[0]);
+      const rawLabels = sortedEntries.map(e => e[0]);
       const data = sortedEntries.map(e => e[1]);
       const totalExpense = data.reduce((sum, v) => sum + v, 0);
 
@@ -4153,11 +4320,24 @@
           const pct = totalExpense > 0 ? Math.round((val / totalExpense) * 100) : 0;
           const row = document.createElement('div');
           row.className = 'p-2 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs';
+
+          let itemIcon = '';
+          if (pieDimension === 'member') {
+            const meta = memberMeta[keyName] || memberMeta['家族全体'];
+            itemIcon = `<span class="w-5 h-5 rounded-full ${meta.lightBg} ${meta.borderCol} border ${meta.textCol} text-[9px] font-black flex items-center justify-center flex-shrink-0">${keyName.charAt(0)}</span>`;
+          } else if (pieDimension === 'category') {
+            itemIcon = getCategoryIcon(keyName, 'w-4 h-4');
+          } else if (pieDimension === 'payment') {
+            const pMeta = getPaymentMethodMeta(keyName);
+            itemIcon = getPaymentMethodIcon(pMeta.type, 'w-4 h-4');
+          }
+
           row.innerHTML = `
             <div class="flex items-center space-x-2 min-w-0 pr-2">
-              <span class="w-5 h-5 rounded-full bg-white border border-slate-200 text-[10px] font-black text-slate-500 flex items-center justify-center flex-shrink-0">${idx + 1}</span>
+              <span class="w-4 h-4 rounded-full bg-white border border-slate-200 text-[9px] font-black text-slate-500 flex items-center justify-center flex-shrink-0 font-mono">${idx + 1}</span>
+              <span class="flex-shrink-0 flex items-center justify-center">${itemIcon}</span>
               <span class="font-bold text-slate-800 truncate">${escapeHtml(keyName)}</span>
-              <span class="text-[10px] font-bold text-blue-600 font-mono">${pct}%</span>
+              <span class="text-[10px] font-bold text-blue-600 font-mono">(${pct}%)</span>
             </div>
             <span class="font-black font-mono text-slate-900 flex-shrink-0">¥${val.toLocaleString()}</span>
           `;
@@ -4170,7 +4350,7 @@
         pieChartInstance = null;
       }
 
-      if (labels.length === 0 || totalExpense === 0) {
+      if (rawLabels.length === 0 || totalExpense === 0) {
         if (emptyState) emptyState.classList.remove('hidden');
         return;
       }
@@ -4179,11 +4359,12 @@
       const palette = ['#1a73e8', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#38BDF8', '#14B8A6', '#64748B', '#6366F1'];
       let backgroundColors = [];
       if (pieDimension === 'member') {
-        backgroundColors = labels.map(m => memberMeta[m]?.color || '#94A3B8');
+        backgroundColors = rawLabels.map(m => memberMeta[m]?.color || '#94A3B8');
       } else {
-        backgroundColors = labels.map((_, i) => palette[i % palette.length]);
+        backgroundColors = rawLabels.map((_, i) => palette[i % palette.length]);
       }
 
+      // 中央の支出総額 ＆ 消化率・収入金額表示プラグイン
       const centerPlugin = {
         id: 'centerTotalPlugin',
         beforeDraw(chart) {
@@ -4194,12 +4375,160 @@
           ctx.save();
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.font = 'bold 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+          // 1行目: 支出総額 ラベル
+          ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
           ctx.fillStyle = '#64748b';
-          ctx.fillText('支出総額', centerX, centerY - 9);
+          ctx.fillText('支出総額', centerX, centerY - 18);
+
+          // 2行目: 支出金額（太字）
           ctx.font = '900 15px monospace';
           ctx.fillStyle = '#0f172a';
-          ctx.fillText(`¥${totalExpense.toLocaleString()}`, centerX, centerY + 8);
+          ctx.fillText(`¥${totalExpense.toLocaleString()}`, centerX, centerY - 3);
+
+          // 3行目: 消化率 (収入がある場合)
+          if (totalIncomeForPeriod > 0) {
+            const ratioPct = Math.round((totalExpense / totalIncomeForPeriod) * 100);
+            const isOver = ratioPct > 100;
+
+            ctx.font = 'bold 9.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.fillStyle = isOver ? '#ef4444' : '#2563eb';
+            ctx.fillText(`消化率 ${ratioPct}%`, centerX, centerY + 12);
+
+            // 4行目: 基準となった収入金額
+            ctx.font = 'bold 8.5px monospace';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText(`(収入 ¥${totalIncomeForPeriod.toLocaleString()})`, centerX, centerY + 23);
+          } else {
+            ctx.font = 'bold 8.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('収入データなし', centerX, centerY + 12);
+          }
+
+          ctx.restore();
+        }
+      };
+
+      // スライス内パーセント ＆ 引き出し線上下2段ラベル（見切れ防止クランプ付き）プラグイン
+      const pieLabelsPlugin = {
+        id: 'pieLabelsPlugin',
+        afterDraw(chart) {
+          const { ctx, chartArea } = chart;
+          if (!chartArea) return;
+          const meta = chart.getDatasetMeta(0);
+          if (!meta || !meta.data || meta.data.length === 0) return;
+
+          const total = meta.total || data.reduce((a, b) => a + b, 0);
+          if (total <= 0) return;
+
+          ctx.save();
+
+          meta.data.forEach((element, i) => {
+            const val = data[i] || 0;
+            const pct = Math.round((val / total) * 100);
+            const { startAngle, endAngle, outerRadius, innerRadius, x, y } = element;
+            const midAngle = startAngle + (endAngle - startAngle) / 2;
+            const cos = Math.cos(midAngle);
+            const sin = Math.sin(midAngle);
+
+            // 1. スライス内への「割合（%）」直接刻印（5%以上のスライス）
+            if (pct >= 5) {
+              const midR = innerRadius + (outerRadius - innerRadius) * 0.52;
+              const textX = x + cos * midR;
+              const textY = y + sin * midR;
+
+              ctx.font = '900 10px monospace';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillStyle = '#ffffff';
+              ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+              ctx.shadowBlur = 3;
+              ctx.fillText(`${pct}%`, textX, textY);
+              ctx.shadowColor = 'transparent';
+              ctx.shadowBlur = 0;
+            }
+
+            // 2. 引き出し線 ＋ 上下2段白ピルプレート（3%以上のスライス）
+            if (pct >= 3) {
+              const rawLabel = rawLabels[i];
+              const line1Text = rawLabel;
+              const line2Text = `¥${val.toLocaleString()}`;
+
+              const r1 = outerRadius * 0.94;
+              const r2 = outerRadius + 10;
+              const x1 = x + cos * r1;
+              const y1 = y + sin * r1;
+              const x2 = x + cos * r2;
+              const y2 = y + sin * r2;
+
+              const isRight = cos >= 0;
+              const x3 = x2 + (isRight ? 8 : -8);
+              const y3 = y2;
+
+              // ピル寸法計算
+              ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+              const w1 = ctx.measureText(line1Text).width;
+              ctx.font = '800 8.5px monospace';
+              const w2 = ctx.measureText(line2Text).width;
+
+              const paddingX = 6;
+              const pillWidth = Math.max(w1, w2) + paddingX * 2;
+              const pillHeight = 24;
+
+              let pillX = isRight ? x3 + 2 : x3 - pillWidth - 2;
+              let pillY = y3 - pillHeight / 2;
+
+              // 【見切れ防止クランプ制御（左右 X座標）】Canvas端から4px以内に収める
+              const minX = 4;
+              const maxX = chart.width - pillWidth - 4;
+              if (pillX < minX) pillX = minX;
+              if (pillX > maxX) pillX = maxX;
+
+              // 【見切れ防止クランプ制御（上下 Y座標）】Canvas端から4px以内に収める
+              const minY = 4;
+              const maxY = chart.height - pillHeight - 4;
+              if (pillY < minY) pillY = minY;
+              if (pillY > maxY) pillY = maxY;
+
+              // ピルの上下クランプに合わせて引き出し線の終点を自然に接続
+              const targetY = pillY + pillHeight / 2;
+
+              // 引き出し線描画
+              ctx.strokeStyle = '#94a3b8';
+              ctx.lineWidth = 1.2;
+              ctx.beginPath();
+              ctx.moveTo(x1, y1);
+              ctx.lineTo(x2, y2);
+              ctx.lineTo(x3, targetY);
+              ctx.stroke();
+
+              // 半透明白ピルプレート
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+              ctx.strokeStyle = 'rgba(203, 213, 225, 0.85)';
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              if (ctx.roundRect) {
+                ctx.roundRect(pillX, pillY, pillWidth, pillHeight, 6);
+              } else {
+                ctx.rect(pillX, pillY, pillWidth, pillHeight);
+              }
+              ctx.fill();
+              ctx.stroke();
+
+              // 上段：名称
+              ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+              ctx.fillStyle = '#0f172a';
+              ctx.textAlign = 'left';
+              ctx.textBaseline = 'top';
+              ctx.fillText(line1Text, pillX + paddingX, pillY + 3);
+
+              // 下段：金額
+              ctx.font = '800 8.5px monospace';
+              ctx.fillStyle = '#475569';
+              ctx.fillText(line2Text, pillX + paddingX, pillY + 13);
+            }
+          });
+
           ctx.restore();
         }
       };
@@ -4207,7 +4536,7 @@
       pieChartInstance = new Chart(pieCanvas.getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: labels,
+          labels: rawLabels,
           datasets: [{
             data: data,
             backgroundColor: backgroundColors,
@@ -4215,28 +4544,16 @@
             borderColor: '#FFFFFF'
           }]
         },
-        plugins: [centerPlugin],
+        plugins: [centerPlugin, pieLabelsPlugin],
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: { top: 16, bottom: 16, left: 16, right: 16 }
+          },
           plugins: {
             legend: {
-              position: 'bottom',
-              labels: {
-                boxWidth: 10,
-                padding: 6,
-                font: { size: 10, weight: 'bold' },
-                color: '#475569',
-                generateLabels: function(chart) {
-                  const orig = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                  orig.forEach(item => {
-                    const val = data[item.index] || 0;
-                    const pct = totalExpense > 0 ? Math.round((val / totalExpense) * 100) : 0;
-                    item.text = `${item.text} (${pct}%)`;
-                  });
-                  return orig;
-                }
-              }
+              display: false
             },
             tooltip: {
               callbacks: {
@@ -4386,7 +4703,7 @@
       let datasets = [];
       if (currentTrendGraphMode === 'diff') {
         datasets = [{
-          label: '純収支',
+          label: '収支 (差額)',
           data: diffVals,
           backgroundColor: diffVals.map(v => v >= 0 ? '#10B981' : '#EF4444'),
           borderRadius: 4
@@ -4419,19 +4736,31 @@
               grid: { color: '#F1F5F9' }
             },
             x: {
-              ticks: { font: { size: labels.length > 15 ? 8 : 9 }, maxRotation: 45 },
+              ticks: {
+                font: { size: labels.length > 15 ? 8 : 9 },
+                maxRotation: 45,
+                autoSkip: labels.length > 20,
+                maxTicksLimit: 16
+              },
               grid: { display: false }
             }
           },
           plugins: {
             legend: {
-              display: currentTrendGraphMode !== 'diff',
+              display: true,
               position: 'top',
-              labels: { boxWidth: 10, font: { size: 10 } }
+              labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } }
             },
             tooltip: {
               callbacks: {
-                label: (ctx) => ` ¥${(ctx.parsed.y || 0).toLocaleString()}`
+                label: function(ctx) {
+                  const val = ctx.parsed.y;
+                  const label = ctx.dataset.label || '';
+                  if (currentTrendGraphMode === 'diff') {
+                    return (val >= 0 ? `黒字: +¥${val.toLocaleString()}` : `赤字: -¥${Math.abs(val).toLocaleString()}`);
+                  }
+                  return `${label}: ¥${val.toLocaleString()}`;
+                }
               }
             }
           }
@@ -4500,7 +4829,7 @@
         document.getElementById('recTitle').value = rule.title || '';
         document.getElementById('recAmount').value = rule.amount || '';
         document.getElementById('recCategory').value = rule.category || '';
-        document.getElementById('recPaymentMethod').value = rule.paymentMethod || '';
+        chooseRecPaymentMethod(rule.paymentMethod || (rule.type === 'income' ? '口座入金' : '口座引落'));
         document.getElementById('recMember').value = rule.member || '';
         if (delArea) delArea.classList.remove('hidden');
       } else {
@@ -4511,6 +4840,7 @@
         document.getElementById('recDay').value = '25';
         document.getElementById('recTitle').value = '';
         document.getElementById('recAmount').value = '';
+        chooseRecPaymentMethod(currentRecurringType === 'income' ? '口座入金' : '口座引落');
         document.getElementById('recMember').value = '';
         if (delArea) delArea.classList.add('hidden');
       }
@@ -4522,15 +4852,18 @@
       const btnExp = document.getElementById('btnRecTypeExpense');
       const btnInc = document.getElementById('btnRecTypeIncome');
       const memGrp = document.getElementById('recMemberGroup');
+      const payLabel = document.getElementById('recPayMethodLabel');
 
       if (type === 'expense') {
         if (btnExp) btnExp.className = 'py-1.5 rounded-xl bg-white text-rose-600 shadow-xs';
         if (btnInc) btnInc.className = 'py-1.5 rounded-xl text-slate-600';
         if (memGrp) memGrp.classList.remove('hidden');
+        if (payLabel) payLabel.textContent = '支払い方法';
       } else {
         if (btnInc) btnInc.className = 'py-1.5 rounded-xl bg-white text-emerald-600 shadow-xs';
         if (btnExp) btnExp.className = 'py-1.5 rounded-xl text-slate-600';
         if (memGrp) memGrp.classList.add('hidden');
+        if (payLabel) payLabel.textContent = '入金方法';
       }
 
       const select = document.getElementById('recCategory');
@@ -4544,7 +4877,7 @@
           select.appendChild(opt);
         });
       }
-      populatePaymentMethodDropdowns();
+      chooseRecPaymentMethod(type === 'expense' ? '口座引落' : '口座入金');
     }
 
     function saveRecurringRule() {
