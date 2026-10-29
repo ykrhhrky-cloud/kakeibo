@@ -159,7 +159,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v2.5</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.03</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -1050,6 +1050,37 @@
   <!-- トースト通知 -->
   <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300">
     メッセージ
+  </div>
+
+  <!-- エラー詳細モーダル (手動で閉じるまで消えない・スクショ用) -->
+  <div id="errorDetailModal" class="hidden fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-3.5 animate-scale-up border border-rose-100 max-h-[85vh] flex flex-col">
+      <div class="flex items-center space-x-2 text-rose-600 border-b border-rose-100 pb-2.5 flex-shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="errorModalTitle" class="text-sm font-black text-slate-800 truncate">レシート解析エラー</h3>
+          <p class="text-[10px] text-slate-400">スクリーンショットを撮って確認できます</p>
+        </div>
+        <button type="button" onclick="closeModal('errorDetailModal')" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scrollbar space-y-2 text-xs">
+        <p id="errorModalMessage" class="font-bold text-slate-700 leading-relaxed"></p>
+        <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-2.5 space-y-1">
+          <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+            <span>エラー詳細 / API応答:</span>
+            <button type="button" onclick="copyErrorDetails()" class="text-blue-600 font-bold hover:underline">コピー</button>
+          </div>
+          <pre id="errorModalRaw" class="text-[10px] font-mono text-rose-700 whitespace-pre-wrap break-all max-h-48 overflow-y-auto bg-white p-2 rounded-xl border border-rose-100 select-all"></pre>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-slate-100 flex space-x-2 flex-shrink-0">
+        <button type="button" onclick="closeModal('errorDetailModal')" class="flex-1 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold active:scale-95 transition">閉じる</button>
+      </div>
+    </div>
   </div>
 
   <!-- 同期メニューモーダル -->
@@ -3611,7 +3642,8 @@
         showOverlay(false);
         if (err.name !== 'AbortError') {
           console.error(err);
-          showToast(`解析エラー: ${err.message}`, true);
+          const rawDetail = err.rawDetail || err.stack || err.toString();
+          showErrorModal('レシート解析エラー', err.message, rawDetail);
         }
       } finally {
         receiptAbortController = null;
@@ -3763,9 +3795,24 @@
         throw new Error('Gemini APIキーが未設定です。設定から入力してください');
       }
 
-      // レシートOCRに最適化されたモデル候補（安定・高速な3.8-flashを最優先に設定）
-      const models = ['gemini-3.8-flash', 'gemini-2.5-flash'];
+      // まず利用可能なモデルを動的検出（または優先モデル候補）
+      let models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+      try {
+        const listResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        if (listResp.ok) {
+          const listData = await listResp.json();
+          const detected = (listData.models || [])
+            .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+            .map(m => m.name.replace('models/', ''))
+            .filter(name => name.includes('flash'));
+          if (detected.length > 0) {
+            models = detected;
+          }
+        }
+      } catch (_) {}
+
       let lastError = null;
+      let lastErrorRaw = '';
 
       const promptText = `日本の家計簿レシート解析。JSONのみ返却。
 科目: 食費/日用品/備品・消耗品/外食（酒類なし）/外食（酒類あり）/交通費/医療費/衣服/美容/贈答・交際費/趣味・娯楽/旅行費/住宅設備費/学費関連/家族関連諸費用/水道光熱費/住宅ローン/その他ローン/通信費/サブスク/保険・積立/仕送り/税金/その他雑費/その他
@@ -3777,61 +3824,74 @@
         if (abortSignal && abortSignal.aborted) throw new DOMException('Aborted', 'AbortError');
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-        // 思考時間をゼロ（thinkingBudget: 0）にして最速レスポンスでJSONを生成
-        const genConfig = {
-          temperature: 0.1,
-          maxOutputTokens: 1024,
-          responseMimeType: "application/json",
-          thinkingConfig: { thinkingBudget: 0 }
-        };
-
-        const payload = {
-          contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
-          generationConfig: genConfig
-        };
-
-        // 1つのモデルで待たされ続けないようタイムアウト制御
-        const timeoutController = new AbortController();
-        const timeoutId = setTimeout(() => timeoutController.abort(), 9000);
-
-        // 外部の abortSignal と連動
-        const onAbort = () => timeoutController.abort();
-        if (abortSignal) abortSignal.addEventListener('abort', onAbort, { once: true });
-
-        try {
-          const resp = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: timeoutController.signal
-          });
-
-          clearTimeout(timeoutId);
-          if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
-
-          if (!resp.ok) {
-            const errJson = await resp.json().catch(() => ({}));
-            lastError = new Error(errJson.error?.message || `HTTP ${resp.status}`);
-            continue;
+        // 思考時間をゼロ（thinkingBudget: 0）を優先し、対応不可なら標準でフォールバック
+        const configsToTry = [
+          {
+            temperature: 0.1,
+            maxOutputTokens: 1024,
+            responseMimeType: "application/json",
+            thinkingConfig: { thinkingBudget: 0 }
+          },
+          {
+            temperature: 0.1,
+            maxOutputTokens: 1024,
+            responseMimeType: "application/json"
           }
+        ];
 
-          const resData = await resp.json();
-          const textCandidate = resData.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (!textCandidate) throw new Error('解析結果テキストが空です');
+        for (const genConfig of configsToTry) {
+          if (abortSignal && abortSignal.aborted) throw new DOMException('Aborted', 'AbortError');
 
-          // 頑健なJSON抽出
-          const jsonMatch = textCandidate.match(/\{[\s\S]*\}/);
-          if (!jsonMatch) throw new Error('解析結果からJSON形式を抽出できませんでした');
+          const payload = {
+            contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
+            generationConfig: genConfig
+          };
 
-          return JSON.parse(jsonMatch[0]);
-        } catch (err) {
-          clearTimeout(timeoutId);
-          if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
-          if (abortSignal && abortSignal.aborted) throw abortSignal.reason || new DOMException('Aborted', 'AbortError');
-          lastError = err;
+          const timeoutController = new AbortController();
+          const timeoutId = setTimeout(() => timeoutController.abort(), 28000);
+
+          const onAbort = () => timeoutController.abort();
+          if (abortSignal) abortSignal.addEventListener('abort', onAbort, { once: true });
+
+          try {
+            const resp = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+              signal: timeoutController.signal
+            });
+
+            clearTimeout(timeoutId);
+            if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
+
+            if (!resp.ok) {
+              const errJson = await resp.json().catch(() => ({}));
+              const errMsg = errJson.error?.message || `HTTP ${resp.status}`;
+              lastError = new Error(`[${model}] ${errMsg}`);
+              lastErrorRaw = JSON.stringify(errJson, null, 2);
+              continue;
+            }
+
+            const resData = await resp.json();
+            const textCandidate = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!textCandidate) throw new Error('解析結果テキストが空です');
+
+            const jsonMatch = textCandidate.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) throw new Error('解析結果からJSON形式を抽出できませんでした');
+
+            return JSON.parse(jsonMatch[0]);
+          } catch (err) {
+            clearTimeout(timeoutId);
+            if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
+            if (abortSignal && abortSignal.aborted) throw abortSignal.reason || new DOMException('Aborted', 'AbortError');
+            lastError = err;
+            lastErrorRaw = err.stack || err.toString();
+          }
         }
       }
-      throw lastError || new Error('レシート解析に失敗しました');
+      const finalErr = lastError || new Error('レシート解析に失敗しました');
+      finalErr.rawDetail = lastErrorRaw;
+      throw finalErr;
     }
 
     function abortReceiptAndOpenManual() {
@@ -4732,6 +4792,30 @@
         toast.style.opacity = '0';
         toast.style.transform = 'translate(-50%, 0px)';
       }, 2500);
+    }
+
+    function showErrorModal(title, message, raw = '') {
+      const modal = document.getElementById('errorDetailModal');
+      const titleEl = document.getElementById('errorModalTitle');
+      const msgEl = document.getElementById('errorModalMessage');
+      const rawEl = document.getElementById('errorModalRaw');
+      if (titleEl) titleEl.textContent = title || 'エラーが発生しました';
+      if (msgEl) msgEl.textContent = message || '';
+      if (rawEl) rawEl.textContent = typeof raw === 'object' ? JSON.stringify(raw, null, 2) : String(raw || '詳細情報なし');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function copyErrorDetails() {
+      const rawEl = document.getElementById('errorModalRaw');
+      if (!rawEl) return;
+      const text = rawEl.textContent;
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast('エラー詳細をコピーしました');
     }
 
     function getTodayString() {
