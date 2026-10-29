@@ -3918,7 +3918,7 @@
             ctx.fillText(statusText, centerX, pillY + (pillH / 2));
           }
 
-          // 3. スライス内 % と引き出し線
+          // 3. 各スライスの内部に構成比%、外部に重なり防止Y分散引き出し線を描画
           const meta = chart.getDatasetMeta(0);
           if (meta && meta.data) {
             const leftLabels = [];
@@ -3933,6 +3933,7 @@
               const endAngle = element.endAngle;
               const midAngle = (startAngle + endAngle) / 2;
 
+              // スライス内部に % を描画（7%以上の場合のみ）
               if (pct >= 7) {
                 const sliceMidR = (element.innerRadius + element.outerRadius) / 2;
                 const pctX = centerX + Math.cos(midAngle) * sliceMidR;
@@ -3945,12 +3946,13 @@
                 ctx.fillText(`${pct}%`, pctX, pctY);
               }
 
-              if (pct >= 5 && idx < 7) {
+              // スライス外側の引き出し線（左右の余白を保つため上位5件・6%以上に厳選）
+              if (pct >= 6 && idx < 5) {
                 const rOuter = element.outerRadius;
                 const startX = centerX + Math.cos(midAngle) * rOuter;
                 const startY = centerY + Math.sin(midAngle) * rOuter;
 
-                const breakR = rOuter + 8;
+                const breakR = rOuter + 7;
                 const breakX = centerX + Math.cos(midAngle) * breakR;
                 const breakY = centerY + Math.sin(midAngle) * breakR;
 
@@ -3973,6 +3975,7 @@
               }
             });
 
+            // Y座標の衝突回避（上下に均等分散して重なりを100%防止）
             const adjustY = (list) => {
               if (list.length <= 1) return;
               list.sort((a, b) => a.targetY - b.targetY);
@@ -4001,9 +4004,48 @@
             const allLabels = [...rightLabels, ...leftLabels];
             allLabels.forEach(item => {
               const { val, name, startX, startY, breakX, targetY, isRight } = item;
-              const lineExt = isRight ? 10 : -10;
-              const endX = breakX + lineExt;
+              
+              const isFixedCategory = (pieDimension === 'category' && getCategoryGroup(name) === 'fixed');
+              let titleColor = isFixedCategory ? '#2563eb' : (pieDimension === 'member' && memberMeta[name] ? memberMeta[name].color : '#334155');
 
+              let displayTitle = name;
+              if (displayTitle.length > 5) {
+                displayTitle = displayTitle.slice(0, 4) + '..';
+              }
+
+              let subText = `¥${val.toLocaleString()}`;
+              if (pieDimension === 'category' && pieExpenseScope !== 'all' && totalAllExpense > 0) {
+                const overallPct = Math.round((val / totalAllExpense) * 100);
+                subText += ` (${overallPct}%)`;
+              }
+
+              // 文字列の幅を計測して端の見切れを防止
+              ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+              const titleW = ctx.measureText(displayTitle).width;
+              ctx.font = '900 8.5px monospace';
+              const subW = ctx.measureText(subText).width;
+              const maxTextW = Math.max(titleW, subW);
+
+              let endX = breakX + (isRight ? 8 : -8);
+              let labelX = endX + (isRight ? 3 : -3);
+              let align = isRight ? 'left' : 'right';
+
+              // 画面左右端の厳格な保護（左端4px、右端canvasW-4pxの中に必ず収める）
+              if (isRight) {
+                if (labelX + maxTextW > canvasW - 4) {
+                  labelX = canvasW - 4;
+                  align = 'right';
+                  endX = Math.min(endX, labelX - maxTextW - 2);
+                }
+              } else {
+                if (labelX - maxTextW < 4) {
+                  labelX = 4;
+                  align = 'left';
+                  endX = Math.max(endX, labelX + maxTextW + 2);
+                }
+              }
+
+              // 引き出し線の描画
               ctx.beginPath();
               ctx.moveTo(startX, startY);
               ctx.lineTo(breakX, targetY);
@@ -4012,33 +4054,9 @@
               ctx.lineWidth = 1.2;
               ctx.stroke();
 
-              const isFixedCategory = (pieDimension === 'category' && getCategoryGroup(name) === 'fixed');
-              let titleColor = isFixedCategory ? '#2563eb' : (pieDimension === 'member' && memberMeta[name] ? memberMeta[name].color : '#334155');
-
-              let subText = `¥${val.toLocaleString()}`;
-              if (pieDimension === 'category' && pieExpenseScope !== 'all' && totalAllExpense > 0) {
-                const overallPct = Math.round((val / totalAllExpense) * 100);
-                subText += ` (${overallPct}%)`;
-              }
-
-              let displayTitle = name;
-              if (displayTitle.length > 6) {
-                displayTitle = displayTitle.slice(0, 5) + '..';
-              }
-
-              ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-              let labelX = endX + (isRight ? 3 : -3);
-              let align = isRight ? 'left' : 'right';
-
-              if (isRight && labelX > canvasW - 4) {
-                labelX = canvasW - 4;
-                align = 'right';
-              } else if (!isRight && labelX < 4) {
-                labelX = 4;
-                align = 'left';
-              }
-
+              // ラベル文字の描画
               ctx.textAlign = align;
+              ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
               ctx.fillStyle = titleColor;
               ctx.fillText(displayTitle, labelX, targetY - 4);
 
@@ -4070,10 +4088,10 @@
           rotation: calculatedRotation,
           layout: {
             padding: {
-              top: 18,
-              bottom: 18,
-              left: 28,
-              right: 28
+              top: 16,
+              bottom: 16,
+              left: 54,
+              right: 54
             }
           },
           plugins: {
