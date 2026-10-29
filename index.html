@@ -164,7 +164,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.16</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.17</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -1655,26 +1655,33 @@
 
     function loadStoredData() {
       try {
-        const txData = localStorage.getItem('kakeibo_tx_v1');
-        if (txData) {
-          transactions = JSON.parse(txData);
-          if (!Array.isArray(transactions) || transactions.length === 0) {
-            initializeSampleDataIfEmpty();
-          }
-        } else {
-          initializeSampleDataIfEmpty();
-        }
+        const isAppInitialized = localStorage.getItem('kakeibo_initialized_flag');
 
-        const recData = localStorage.getItem('kakeibo_recurring_v1');
-        if (recData) {
-          recurringRules = JSON.parse(recData);
-        } else {
-          // 初期サンプル固定費
+        if (!isAppInitialized) {
+          // アプリを世界で一番最初に開いた時だけサンプルデータを投入
+          initializeSampleDataIfEmpty();
           recurringRules = [
             { id: 'rec_sample_1', startMonth: '2026-01', endMonth: '', day: '25', type: 'income', category: '給与', amount: 480000, title: '役員報酬（給与）', member: '', paymentMethod: '口座入金' },
             { id: 'rec_sample_2', startMonth: '2026-01', endMonth: '', day: '27', type: 'expense', category: '住宅ローン', amount: 96000, title: '住宅ローン返済', member: '', paymentMethod: '口座引落' },
             { id: 'rec_sample_3', startMonth: '2026-01', endMonth: '', day: '26', type: 'expense', category: '水道光熱費', amount: 16800, title: '東京電力・水道局', member: '', paymentMethod: '口座引落' }
           ];
+          localStorage.setItem('kakeibo_initialized_flag', 'true');
+          saveStoredData();
+        } else {
+          // 2回目以降は、0件であっても勝手にサンプルデータを復活させない
+          const txData = localStorage.getItem('kakeibo_tx_v1');
+          if (txData) {
+            try { transactions = JSON.parse(txData); } catch (_) { transactions = []; }
+          } else {
+            transactions = [];
+          }
+
+          const recData = localStorage.getItem('kakeibo_recurring_v1');
+          if (recData) {
+            try { recurringRules = JSON.parse(recData); } catch (_) { recurringRules = []; }
+          } else {
+            recurringRules = [];
+          }
         }
 
         const delData = localStorage.getItem('kakeibo_deleted_tx_ids');
@@ -5117,11 +5124,26 @@
     function confirmResetAllData() {
       triggerDeleteConfirmation(['ALL_RESET'], '全家計簿データを完全に初期化します。よろしいですか？');
       document.getElementById('btnExecuteDelete').onclick = () => {
+        const savedApiKey = geminiApiKey;
+        const savedGasUrl = gasEndpoint;
+        const savedPay = paymentMethods;
+
         localStorage.clear();
-        transactions = []; recurringRules = [];
-        closeModal('deleteConfirmModal'); closeModal('settingsModal');
+        transactions = []; 
+        recurringRules = [];
+        // サンプルを入れないフラグを立てて完全な空状態で再スタート
+        localStorage.setItem('kakeibo_initialized_flag', 'true');
+        if (savedApiKey) localStorage.setItem('kakeibo_gemini_key', savedApiKey);
+        if (savedGasUrl) localStorage.setItem('kakeibo_gas_url', savedGasUrl);
+        if (savedPay) localStorage.setItem('kakeibo_payment_methods_v1', JSON.stringify(savedPay));
+
+        geminiApiKey = savedApiKey;
+        gasEndpoint = savedGasUrl;
+
+        closeModal('deleteConfirmModal'); 
+        closeModal('settingsModal');
         refreshDashboard();
-        showToast('家計簿データを初期化しました');
+        showToast('全データをまっさらに初期化しました');
       };
     }
 
