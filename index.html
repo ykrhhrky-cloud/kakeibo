@@ -3763,8 +3763,8 @@
         throw new Error('Gemini APIキーが未設定です。設定から入力してください');
       }
 
-      // レシートOCRに最適化されたモデル候補（超高速・安定モデルを優先）
-      const models = ['gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3.8-flash'];
+      // レシートOCRに最適化されたモデル候補（安定・高速な3.8-flashを最優先に設定）
+      const models = ['gemini-3.8-flash', 'gemini-2.5-flash'];
       let lastError = null;
 
       const promptText = `日本の家計簿レシート解析。JSONのみ返却。
@@ -3777,25 +3777,22 @@
         if (abortSignal && abortSignal.aborted) throw new DOMException('Aborted', 'AbortError');
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-        // モデルに応じた最適な設定（2.5系は思考ゼロ、1.5系は思考設定を除外して高速化）
-        const isThinkingSupported = model.includes('2.5') || model.includes('3.8');
+        // 思考時間をゼロ（thinkingBudget: 0）にして最速レスポンスでJSONを生成
         const genConfig = {
           temperature: 0.1,
           maxOutputTokens: 1024,
-          responseMimeType: "application/json"
+          responseMimeType: "application/json",
+          thinkingConfig: { thinkingBudget: 0 }
         };
-        if (isThinkingSupported) {
-          genConfig.thinkingConfig = { thinkingBudget: 0 };
-        }
 
         const payload = {
           contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
           generationConfig: genConfig
         };
 
-        // 1つのモデルで待たされ続けないよう、タイムアウト制御（8秒で次のモデルへ）
+        // 1つのモデルで待たされ続けないようタイムアウト制御
         const timeoutController = new AbortController();
-        const timeoutId = setTimeout(() => timeoutController.abort(), 8500);
+        const timeoutId = setTimeout(() => timeoutController.abort(), 9000);
 
         // 外部の abortSignal と連動
         const onAbort = () => timeoutController.abort();
