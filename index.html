@@ -1228,10 +1228,10 @@
       other: 'その他'
     };
 
-    // 展開中の支払い方法アコーディオンのセット
-    let expandedPayTypes = new Set(['credit']);
-    let manualPayExpandedTypes = new Set(['credit', 'electronic', 'bank', 'cash', 'other']);
-    let confPayExpandedTypes = new Set(['credit', 'electronic', 'bank', 'cash', 'other']);
+    // 展開中の支払い方法アコーディオンのセット（初期値はすべて閉じた状態）
+    let expandedPayTypes = new Set();
+    let manualPayExpandedTypes = new Set();
+    let confPayExpandedTypes = new Set();
     let selectedManualPaymentMethod = '現金';
     let selectedReceiptPaymentMethod = '';
 
@@ -1731,6 +1731,7 @@
       if (menu) {
         const isHidden = menu.classList.contains('hidden');
         if (isHidden) {
+          manualPayExpandedTypes.clear(); // 開くたびに初期状態（全閉）でスッキリ表示
           renderManualPaymentDropdownList();
           menu.classList.remove('hidden');
           if (arrow) arrow.classList.add('rotate-180');
@@ -1770,15 +1771,20 @@
         const items = ['口座入金', '現金', 'その他'];
         items.forEach(name => {
           const isSelected = (selectedManualPaymentMethod === name);
-          const row = document.createElement('div');
-          row.className = `p-2 px-2.5 rounded-xl text-xs font-bold cursor-pointer transition flex items-center justify-between ${isSelected ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' : 'hover:bg-slate-50 text-slate-700'}`;
-          row.onclick = () => chooseManualPaymentMethod(name);
+          const row = document.createElement('button');
+          row.type = 'button';
+          row.className = `w-full min-h-[42px] p-2.5 px-3 rounded-xl text-xs font-bold cursor-pointer transition flex items-center justify-between active:scale-[0.99] text-left ${isSelected ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' : 'hover:bg-slate-50 text-slate-700 bg-white border border-slate-100'}`;
+          row.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            chooseManualPaymentMethod(name);
+          };
           row.innerHTML = `
             <div class="flex items-center space-x-2">
-              ${getPaymentMethodIcon('bank', 'w-3.5 h-3.5')}
+              ${getPaymentMethodIcon('bank', 'w-4 h-4')}
               <span>${name}</span>
             </div>
-            ${isSelected ? '<span class="text-emerald-600 text-[10px]">✓</span>' : ''}
+            ${isSelected ? '<span class="text-emerald-600 text-xs font-black">✓</span>' : ''}
           `;
           container.appendChild(row);
         });
@@ -1791,40 +1797,50 @@
         if (items.length === 0) return;
 
         const isExpanded = manualPayExpandedTypes.has(tKey);
-        const iconSvg = getPaymentMethodIcon(tKey, 'w-3.5 h-3.5');
+        const iconSvg = getPaymentMethodIcon(tKey, 'w-4 h-4');
         const typeLabel = paymentTypeLabels[tKey] || tKey;
 
         const groupCard = document.createElement('div');
-        groupCard.className = 'border border-slate-200/70 rounded-xl overflow-hidden bg-slate-50/60';
+        groupCard.className = 'border border-slate-200/90 rounded-2xl overflow-hidden bg-slate-50/80 shadow-2xs transition-all';
 
-        const grpHeader = document.createElement('div');
-        grpHeader.className = 'p-2 px-2.5 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 select-none';
-        grpHeader.onclick = () => toggleManualPaySection(tKey);
+        // 見出しボタン：押しやすい44px以上のタッチターゲット
+        const grpHeader = document.createElement('button');
+        grpHeader.type = 'button';
+        grpHeader.className = 'w-full min-h-[44px] py-2.5 px-3 flex items-center justify-between cursor-pointer hover:bg-slate-100/80 select-none text-left active:bg-slate-100 transition';
+        grpHeader.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleManualPaySection(tKey);
+        };
 
         grpHeader.innerHTML = `
-          <div class="flex items-center space-x-1.5 min-w-0 pr-1">
+          <div class="flex items-center space-x-2 min-w-0 pr-1">
             <span class="flex-shrink-0">${iconSvg}</span>
-            <span class="font-extrabold text-[11px] text-slate-800">${typeLabel}</span>
-            <span class="text-[9.5px] font-bold text-slate-400 font-mono">(${items.length})</span>
+            <span class="font-extrabold text-xs text-slate-800">${typeLabel}</span>
+            <span class="text-[10px] font-bold text-slate-400 font-mono">(${items.length})</span>
           </div>
-          <svg class="w-3 h-3 text-slate-400 transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          <div class="w-6 h-6 flex items-center justify-center flex-shrink-0 rounded-full bg-white/80 border border-slate-200/60 shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          </div>
         `;
         groupCard.appendChild(grpHeader);
 
         if (isExpanded) {
           const body = document.createElement('div');
-          body.className = 'p-1.5 pt-0 border-t border-slate-200/40 space-y-1 bg-white';
+          body.className = 'p-2 pt-0.5 border-t border-slate-200/60 space-y-1.5 bg-white';
           items.forEach(pm => {
             const isSelected = (selectedManualPaymentMethod === pm.name);
-            const itemRow = document.createElement('div');
-            itemRow.className = `p-1.5 px-2 rounded-lg text-xs font-bold cursor-pointer transition flex items-center justify-between ${isSelected ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'hover:bg-slate-50 text-slate-700'}`;
+            const itemRow = document.createElement('button');
+            itemRow.type = 'button';
+            itemRow.className = `w-full min-h-[40px] p-2 px-2.5 rounded-xl text-xs font-bold cursor-pointer transition flex items-center justify-between text-left active:scale-[0.99] ${isSelected ? 'bg-blue-50 text-blue-700 border border-blue-200 font-extrabold' : 'hover:bg-slate-50 text-slate-700 bg-slate-50/40 border border-slate-100'}`;
             itemRow.onclick = (e) => {
+              e.preventDefault();
               e.stopPropagation();
               chooseManualPaymentMethod(pm.name);
             };
             itemRow.innerHTML = `
-              <span class="truncate text-[11px]">${escapeHtml(pm.name)}</span>
-              ${isSelected ? '<span class="text-blue-600 font-extrabold text-[10px]">✓</span>' : ''}
+              <span class="truncate text-xs">${escapeHtml(pm.name)}</span>
+              ${isSelected ? '<span class="text-blue-600 font-black text-xs">✓</span>' : ''}
             `;
             body.appendChild(itemRow);
           });
@@ -1865,6 +1881,7 @@
       if (menu) {
         const isHidden = menu.classList.contains('hidden');
         if (isHidden) {
+          confPayExpandedTypes.clear(); // 開くたびに初期状態（全閉）
           renderReceiptPaymentDropdownList();
           menu.classList.remove('hidden');
           if (arrow) arrow.classList.add('rotate-180');
@@ -1907,40 +1924,49 @@
         if (items.length === 0) return;
 
         const isExpanded = confPayExpandedTypes.has(tKey);
-        const iconSvg = getPaymentMethodIcon(tKey, 'w-3.5 h-3.5');
+        const iconSvg = getPaymentMethodIcon(tKey, 'w-4 h-4');
         const typeLabel = paymentTypeLabels[tKey] || tKey;
 
         const groupCard = document.createElement('div');
-        groupCard.className = 'border border-slate-200/70 rounded-xl overflow-hidden bg-slate-50/60';
+        groupCard.className = 'border border-slate-200/90 rounded-2xl overflow-hidden bg-slate-50/80 shadow-2xs transition-all';
 
-        const grpHeader = document.createElement('div');
-        grpHeader.className = 'p-2 px-2.5 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 select-none';
-        grpHeader.onclick = () => toggleConfPaySection(tKey);
+        const grpHeader = document.createElement('button');
+        grpHeader.type = 'button';
+        grpHeader.className = 'w-full min-h-[44px] py-2.5 px-3 flex items-center justify-between cursor-pointer hover:bg-slate-100/80 select-none text-left active:bg-slate-100 transition';
+        grpHeader.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleConfPaySection(tKey);
+        };
 
         grpHeader.innerHTML = `
-          <div class="flex items-center space-x-1.5 min-w-0 pr-1">
+          <div class="flex items-center space-x-2 min-w-0 pr-1">
             <span class="flex-shrink-0">${iconSvg}</span>
-            <span class="font-extrabold text-[10.5px] text-slate-800">${typeLabel}</span>
-            <span class="text-[9px] font-bold text-slate-400 font-mono">(${items.length})</span>
+            <span class="font-extrabold text-xs text-slate-800">${typeLabel}</span>
+            <span class="text-[10px] font-bold text-slate-400 font-mono">(${items.length})</span>
           </div>
-          <svg class="w-3 h-3 text-slate-400 transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          <div class="w-6 h-6 flex items-center justify-center flex-shrink-0 rounded-full bg-white/80 border border-slate-200/60 shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          </div>
         `;
         groupCard.appendChild(grpHeader);
 
         if (isExpanded) {
           const body = document.createElement('div');
-          body.className = 'p-1.5 pt-0 border-t border-slate-200/40 space-y-1 bg-white';
+          body.className = 'p-2 pt-0.5 border-t border-slate-200/60 space-y-1.5 bg-white';
           items.forEach(pm => {
             const isSelected = (selectedReceiptPaymentMethod === pm.name);
-            const itemRow = document.createElement('div');
-            itemRow.className = `p-1.5 px-2 rounded-lg text-xs font-bold cursor-pointer transition flex items-center justify-between ${isSelected ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'hover:bg-slate-50 text-slate-700'}`;
+            const itemRow = document.createElement('button');
+            itemRow.type = 'button';
+            itemRow.className = `w-full min-h-[40px] p-2 px-2.5 rounded-xl text-xs font-bold cursor-pointer transition flex items-center justify-between text-left active:scale-[0.99] ${isSelected ? 'bg-blue-50 text-blue-700 border border-blue-200 font-extrabold' : 'hover:bg-slate-50 text-slate-700 bg-slate-50/40 border border-slate-100'}`;
             itemRow.onclick = (e) => {
+              e.preventDefault();
               e.stopPropagation();
               chooseReceiptPaymentMethod(pm.name);
             };
             itemRow.innerHTML = `
-              <span class="truncate text-[10.5px]">${escapeHtml(pm.name)}</span>
-              ${isSelected ? '<span class="text-blue-600 font-extrabold text-[10px]">✓</span>' : ''}
+              <span class="truncate text-xs">${escapeHtml(pm.name)}</span>
+              ${isSelected ? '<span class="text-blue-600 font-black text-xs">✓</span>' : ''}
             `;
             body.appendChild(itemRow);
           });
@@ -2004,10 +2030,15 @@
         const card = document.createElement('div');
         card.className = 'bg-slate-50 border border-slate-200/80 rounded-2xl overflow-hidden transition-all duration-200 shadow-2xs';
 
-        // ヘッダー行（タップでアコーディオン開閉）
-        const header = document.createElement('div');
-        header.className = 'p-3 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 select-none transition';
-        header.onclick = () => togglePayTypeAccordion(tKey);
+        // ヘッダーボタン（44px基準）
+        const header = document.createElement('button');
+        header.type = 'button';
+        header.className = 'w-full min-h-[44px] p-3 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 select-none transition text-left';
+        header.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          togglePayTypeAccordion(tKey);
+        };
 
         header.innerHTML = `
           <div class="flex items-center space-x-2 min-w-0 pr-2">
@@ -2015,16 +2046,18 @@
             <span class="font-extrabold text-xs text-slate-800">${typeLabel}</span>
             <span class="text-[10px] font-bold text-slate-400 font-mono">(${items.length}件)</span>
           </div>
-          <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
-          </svg>
+          <div class="w-6 h-6 flex items-center justify-center flex-shrink-0 rounded-full bg-white/80 border border-slate-200/60 shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
         `;
         card.appendChild(header);
 
         // ボディ部（展開時のみ表示）
         if (isExpanded) {
           const body = document.createElement('div');
-          body.className = 'p-2.5 pt-0 border-t border-slate-200/50 space-y-2 animate-scale-up';
+          body.className = 'p-2.5 pt-0 border-t border-slate-200/50 space-y-2 animate-scale-up bg-white/60';
 
           // 登録済みアイテムリスト
           const listDiv = document.createElement('div');
