@@ -159,7 +159,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.03</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.04</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -685,6 +685,15 @@
           <span>支払い方法が不明です。選択してください</span>
         </div>
 
+        <!-- 重複検知アラートバッジ -->
+        <div id="confReceiptDuplicateAlert" class="hidden p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[10.5px] font-bold flex items-start space-x-1.5 animate-scale-up">
+          <span class="text-base leading-none">⚠️</span>
+          <div>
+            <span class="font-extrabold block">重複の可能性があります</span>
+            <span id="confReceiptDuplicateDesc" class="text-[9.5px] text-rose-600 font-medium">既に同じ日付・金額の明細が存在します</span>
+          </div>
+        </div>
+
         <div>
           <label class="block text-[10.5px] font-bold text-slate-600 mb-1">対象メンバー</label>
           <select id="confReceiptMember" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2 text-xs font-semibold outline-none focus:border-blue-500"></select>
@@ -697,8 +706,11 @@
       </div>
 
       <div class="flex space-x-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="skipReceiptItem()" id="btnSkipReceiptItem" class="hidden py-2.5 px-3 rounded-2xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-700 active:scale-95 transition">
+          スキップ
+        </button>
         <button type="button" onclick="retakeReceipt()" class="flex-1 py-2.5 rounded-2xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 active:scale-95 transition flex items-center justify-center space-x-1">
-          <span>📷 撮影し直す</span>
+          <span>📷 撮り直す</span>
         </button>
         <button type="button" onclick="confirmSaveReceiptTransaction()" id="btnConfirmReceiptSubmit" class="flex-1 py-2.5 rounded-2xl bg-blue-600 text-xs font-bold text-white hover:bg-blue-700 active:scale-95 transition shadow-sm flex items-center justify-center space-x-1">
           <span id="btnConfirmReceiptText">✅ この内容で登録</span>
@@ -3615,14 +3627,29 @@
               detectedPayment = '現金';
             }
 
+            const parsedDate = item.date || getTodayString();
+            const parsedAmount = Number(item.amount) || 0;
+            const parsedTitle = item.storeName || '買い物';
+
+            // 重複チェック（登録済み明細との照合）
+            const dupMatch = transactions.find(t => {
+              if (t.type !== 'expense') return false;
+              if (t.date !== parsedDate) return false;
+              if (Number(t.amount) !== parsedAmount) return false;
+              if (!t.title || !parsedTitle) return true;
+              return t.title === parsedTitle || t.title.includes(parsedTitle) || parsedTitle.includes(t.title);
+            });
+
             pendingReceiptQueue.push({
-              date: item.date || getTodayString(),
-              amount: Number(item.amount) || 0,
-              title: item.storeName || '買い物',
+              date: parsedDate,
+              amount: parsedAmount,
+              title: parsedTitle,
               category: item.category || '食費',
               memo: item.itemsSummary || '',
               member: assignedMember || '',
-              paymentMethod: detectedPayment
+              paymentMethod: detectedPayment,
+              isDuplicate: !!dupMatch,
+              duplicateTarget: dupMatch || null
             });
           });
         }
@@ -3703,6 +3730,26 @@
       updateReceiptPaymentTriggerUI();
       onReceiptPaymentChange(selectedReceiptPaymentMethod);
 
+      // 重複検知アラートバッジの表示制御
+      const dupAlert = document.getElementById('confReceiptDuplicateAlert');
+      const dupDesc = document.getElementById('confReceiptDuplicateDesc');
+      const skipBtn = document.getElementById('btnSkipReceiptItem');
+
+      if (tx.isDuplicate && tx.duplicateTarget) {
+        if (dupAlert) dupAlert.classList.remove('hidden');
+        if (dupDesc) {
+          const dDate = tx.duplicateTarget.date ? tx.duplicateTarget.date.replace(/-/g, '/') : '';
+          dupDesc.textContent = `既存明細「${tx.duplicateTarget.title}」(¥${Number(tx.duplicateTarget.amount).toLocaleString()} / ${dDate}) と重複している可能性があります`;
+        }
+        if (skipBtn) skipBtn.classList.remove('hidden');
+      } else {
+        if (dupAlert) dupAlert.classList.add('hidden');
+        if (skipBtn) {
+          if (pendingReceiptQueue.length > 1) skipBtn.classList.remove('hidden');
+          else skipBtn.classList.add('hidden');
+        }
+      }
+
       const memSel = document.getElementById('confReceiptMember');
       memSel.innerHTML = '';
       const defOpt = document.createElement('option');
@@ -3725,6 +3772,20 @@
       }
 
       openModal('receiptConfirmModal');
+    }
+
+    function skipReceiptItem() {
+      if (pendingReceiptQueue.length === 0) return;
+      showToast('レシートの登録をスキップしました');
+      currentReceiptQueueIndex++;
+      if (currentReceiptQueueIndex < pendingReceiptQueue.length) {
+        showReceiptQueueItem(currentReceiptQueueIndex);
+      } else {
+        closeModal('receiptConfirmModal');
+        pendingReceiptQueue = [];
+        currentReceiptQueueIndex = 0;
+        refreshDashboard();
+      }
     }
 
     function onReceiptPaymentChange(val) {
@@ -3795,22 +3856,8 @@
         throw new Error('Gemini APIキーが未設定です。設定から入力してください');
       }
 
-      // まず利用可能なモデルを動的検出（または優先モデル候補）
-      let models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-      try {
-        const listResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-        if (listResp.ok) {
-          const listData = await listResp.json();
-          const detected = (listData.models || [])
-            .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
-            .map(m => m.name.replace('models/', ''))
-            .filter(name => name.includes('flash'));
-          if (detected.length > 0) {
-            models = detected;
-          }
-        }
-      } catch (_) {}
-
+      // お小遣いアプリで実績のある最速モデル構成
+      const models = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-2.5-flash'];
       let lastError = null;
       let lastErrorRaw = '';
 
@@ -3824,69 +3871,55 @@
         if (abortSignal && abortSignal.aborted) throw new DOMException('Aborted', 'AbortError');
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-        // 思考時間をゼロ（thinkingBudget: 0）を優先し、対応不可なら標準でフォールバック
-        const configsToTry = [
-          {
-            temperature: 0.1,
-            maxOutputTokens: 1024,
-            responseMimeType: "application/json",
-            thinkingConfig: { thinkingBudget: 0 }
-          },
-          {
+        const payload = {
+          contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
+          generationConfig: {
             temperature: 0.1,
             maxOutputTokens: 1024,
             responseMimeType: "application/json"
           }
-        ];
+        };
 
-        for (const genConfig of configsToTry) {
-          if (abortSignal && abortSignal.aborted) throw new DOMException('Aborted', 'AbortError');
+        const timeoutController = new AbortController();
+        const timeoutId = setTimeout(() => timeoutController.abort(), 20000);
 
-          const payload = {
-            contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
-            generationConfig: genConfig
-          };
+        const onAbort = () => timeoutController.abort();
+        if (abortSignal) abortSignal.addEventListener('abort', onAbort, { once: true });
 
-          const timeoutController = new AbortController();
-          const timeoutId = setTimeout(() => timeoutController.abort(), 28000);
+        try {
+          const resp = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: timeoutController.signal
+          });
 
-          const onAbort = () => timeoutController.abort();
-          if (abortSignal) abortSignal.addEventListener('abort', onAbort, { once: true });
+          clearTimeout(timeoutId);
+          if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
 
-          try {
-            const resp = await fetch(endpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
-              signal: timeoutController.signal
-            });
-
-            clearTimeout(timeoutId);
-            if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
-
-            if (!resp.ok) {
-              const errJson = await resp.json().catch(() => ({}));
-              const errMsg = errJson.error?.message || `HTTP ${resp.status}`;
-              lastError = new Error(`[${model}] ${errMsg}`);
-              lastErrorRaw = JSON.stringify(errJson, null, 2);
-              continue;
-            }
-
-            const resData = await resp.json();
-            const textCandidate = resData.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!textCandidate) throw new Error('解析結果テキストが空です');
-
-            const jsonMatch = textCandidate.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error('解析結果からJSON形式を抽出できませんでした');
-
-            return JSON.parse(jsonMatch[0]);
-          } catch (err) {
-            clearTimeout(timeoutId);
-            if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
-            if (abortSignal && abortSignal.aborted) throw abortSignal.reason || new DOMException('Aborted', 'AbortError');
-            lastError = err;
-            lastErrorRaw = err.stack || err.toString();
+          if (!resp.ok) {
+            const errJson = await resp.json().catch(() => ({}));
+            const errMsg = errJson.error?.message || `HTTP ${resp.status}`;
+            lastError = new Error(`[${model}] ${errMsg}`);
+            lastErrorRaw = JSON.stringify(errJson, null, 2);
+            continue;
           }
+
+          const resData = await resp.json();
+          const textCandidate = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!textCandidate) throw new Error('解析結果テキストが空です');
+
+          const cleanJson = textCandidate.replace(/```json/g, '').replace(/```/g, '').trim();
+          const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+          if (!jsonMatch) throw new Error('解析結果からJSON形式を抽出できませんでした');
+
+          return JSON.parse(jsonMatch[0]);
+        } catch (err) {
+          clearTimeout(timeoutId);
+          if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
+          if (abortSignal && abortSignal.aborted) throw abortSignal.reason || new DOMException('Aborted', 'AbortError');
+          lastError = err;
+          lastErrorRaw = err.stack || err.toString();
         }
       }
       const finalErr = lastError || new Error('レシート解析に失敗しました');
