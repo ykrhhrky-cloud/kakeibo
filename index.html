@@ -553,7 +553,7 @@
             </button>
           </div>
 
-          <div class="relative w-full h-72 flex items-center justify-center">
+          <div class="relative w-full h-[300px] flex items-center justify-center">
             <canvas id="pieChartCanvas"></canvas>
             <div id="pieEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-xs text-slate-400">
               この期間の支出データはありません
@@ -3933,30 +3933,32 @@
               const endAngle = element.endAngle;
               const midAngle = (startAngle + endAngle) / 2;
 
-              // スライス内部に % を描画（7%以上の場合のみ）
-              if (pct >= 7) {
+              // スライス内部に % を描画（6%以上の場合のみ）
+              if (pct >= 6) {
                 const sliceMidR = (element.innerRadius + element.outerRadius) / 2;
                 const pctX = centerX + Math.cos(midAngle) * sliceMidR;
                 const pctY = centerY + Math.sin(midAngle) * sliceMidR;
 
-                ctx.font = '900 9.5px monospace';
+                ctx.font = '900 9px monospace';
                 ctx.fillStyle = '#ffffff';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(`${pct}%`, pctX, pctY);
               }
 
-              // スライス外側の引き出し線（左右の余白を保つため上位5件・6%以上に厳選）
-              if (pct >= 6 && idx < 5) {
+              // スライス外側の引き出し線（極小の1%未満を除き、最大10件まで幅広く表示）
+              if (pct >= 1 && idx < 10) {
                 const rOuter = element.outerRadius;
                 const startX = centerX + Math.cos(midAngle) * rOuter;
                 const startY = centerY + Math.sin(midAngle) * rOuter;
 
-                const breakR = rOuter + 7;
+                const breakR = rOuter + 6;
                 const breakX = centerX + Math.cos(midAngle) * breakR;
                 const breakY = centerY + Math.sin(midAngle) * breakR;
 
                 const isRight = Math.cos(midAngle) >= 0;
+                // 上位主要項目（上位3件以内または8%以上）は金額付きの詳細表示、それ以降は科目名のみのコンパクト表示
+                const isDetailed = (idx < 3) || (pct >= 8);
 
                 const labelItem = {
                   idx,
@@ -3967,7 +3969,8 @@
                   startY,
                   breakX,
                   targetY: breakY,
-                  isRight
+                  isRight,
+                  isDetailed
                 };
 
                 if (isRight) rightLabels.push(labelItem);
@@ -3979,21 +3982,26 @@
             const adjustY = (list) => {
               if (list.length <= 1) return;
               list.sort((a, b) => a.targetY - b.targetY);
-              const minGap = 24;
-              const minY = 16;
-              const maxY = canvasH - 16;
+              const minY = 14;
+              const maxY = canvasH - 14;
 
               for (let i = 0; i < list.length; i++) {
                 if (list[i].targetY < minY) list[i].targetY = minY;
-                if (i > 0 && (list[i].targetY - list[i - 1].targetY) < minGap) {
-                  list[i].targetY = list[i - 1].targetY + minGap;
+                if (i > 0) {
+                  const requiredGap = (list[i - 1].isDetailed || list[i].isDetailed) ? 20 : 15;
+                  if ((list[i].targetY - list[i - 1].targetY) < requiredGap) {
+                    list[i].targetY = list[i - 1].targetY + requiredGap;
+                  }
                 }
               }
 
               for (let i = list.length - 1; i >= 0; i--) {
                 if (list[i].targetY > maxY) list[i].targetY = maxY;
-                if (i < list.length - 1 && (list[i + 1].targetY - list[i].targetY) < minGap) {
-                  list[i].targetY = list[i + 1].targetY - minGap;
+                if (i < list.length - 1) {
+                  const requiredGap = (list[i].isDetailed || list[i + 1].isDetailed) ? 20 : 15;
+                  if ((list[i + 1].targetY - list[i].targetY) < requiredGap) {
+                    list[i].targetY = list[i + 1].targetY - requiredGap;
+                  }
                 }
               }
             };
@@ -4003,10 +4011,10 @@
 
             const allLabels = [...rightLabels, ...leftLabels];
             allLabels.forEach(item => {
-              const { val, name, startX, startY, breakX, targetY, isRight } = item;
+              const { val, name, startX, startY, breakX, targetY, isRight, isDetailed } = item;
               
               const isFixedCategory = (pieDimension === 'category' && getCategoryGroup(name) === 'fixed');
-              let titleColor = isFixedCategory ? '#2563eb' : (pieDimension === 'member' && memberMeta[name] ? memberMeta[name].color : '#334155');
+              let titleColor = isFixedCategory ? '#2563eb' : (pieDimension === 'member' && memberMeta[name] ? memberMeta[name].color : (isDetailed ? '#334155' : '#64748b'));
 
               let displayTitle = name;
               if (displayTitle.length > 5) {
@@ -4019,15 +4027,20 @@
                 subText += ` (${overallPct}%)`;
               }
 
-              // 文字列の幅を計測して端の見切れを防止
-              ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+              ctx.font = isDetailed 
+                ? 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                : '600 8.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
               const titleW = ctx.measureText(displayTitle).width;
-              ctx.font = '900 8.5px monospace';
-              const subW = ctx.measureText(subText).width;
-              const maxTextW = Math.max(titleW, subW);
+              
+              let maxTextW = titleW;
+              if (isDetailed) {
+                ctx.font = '900 8.5px monospace';
+                const subW = ctx.measureText(subText).width;
+                maxTextW = Math.max(titleW, subW);
+              }
 
-              let endX = breakX + (isRight ? 8 : -8);
-              let labelX = endX + (isRight ? 3 : -3);
+              let endX = breakX + (isRight ? 6 : -6);
+              let labelX = endX + (isRight ? 2.5 : -2.5);
               let align = isRight ? 'left' : 'right';
 
               // 画面左右端の厳格な保護（左端4px、右端canvasW-4pxの中に必ず収める）
@@ -4050,19 +4063,28 @@
               ctx.moveTo(startX, startY);
               ctx.lineTo(breakX, targetY);
               ctx.lineTo(endX, targetY);
-              ctx.strokeStyle = '#cbd5e1';
-              ctx.lineWidth = 1.2;
+              ctx.strokeStyle = isDetailed ? '#cbd5e1' : '#e2e8f0';
+              ctx.lineWidth = isDetailed ? 1.1 : 0.9;
               ctx.stroke();
 
               // ラベル文字の描画
               ctx.textAlign = align;
-              ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-              ctx.fillStyle = titleColor;
-              ctx.fillText(displayTitle, labelX, targetY - 4);
+              ctx.textBaseline = 'middle';
 
-              ctx.font = '900 8.5px monospace';
-              ctx.fillStyle = isFixedCategory ? '#1d4ed8' : '#64748b';
-              ctx.fillText(subText, labelX, targetY + 7);
+              if (isDetailed) {
+                ctx.font = 'bold 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                ctx.fillStyle = titleColor;
+                ctx.fillText(displayTitle, labelX, targetY - 4);
+
+                ctx.font = '900 8.5px monospace';
+                ctx.fillStyle = isFixedCategory ? '#1d4ed8' : '#64748b';
+                ctx.fillText(subText, labelX, targetY + 6);
+              } else {
+                // 下位項目：科目名のみをコンパクトに中央揃えで描画
+                ctx.font = 'bold 8.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+                ctx.fillStyle = titleColor;
+                ctx.fillText(displayTitle, labelX, targetY);
+              }
             });
           }
 
@@ -4088,10 +4110,10 @@
           rotation: calculatedRotation,
           layout: {
             padding: {
-              top: 16,
-              bottom: 16,
-              left: 54,
-              right: 54
+              top: 14,
+              bottom: 14,
+              left: 48,
+              right: 48
             }
           },
           plugins: {
