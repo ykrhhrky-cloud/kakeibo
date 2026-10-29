@@ -145,10 +145,10 @@
   <div class="flex-1 flex flex-col w-full max-w-md mx-auto bg-[#f8faff] h-[100dvh] overflow-hidden relative shadow-2xl border-x border-slate-300/60 transition-all duration-300">
 
     <!-- ==================== ヘッダー ==================== -->
-    <header style="padding-top: max(env(safe-area-inset-top), 52px);" class="flex-shrink-0 px-4 pb-3 bg-white/95 backdrop-blur-md border-b border-slate-100 flex items-center justify-between z-30">
-      <div class="flex items-center space-x-2.5">
-        <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#1557b0] to-[#1a73e8] flex items-center justify-center text-white shadow-md shadow-blue-500/25 flex-shrink-0">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <header style="padding-top: max(env(safe-area-inset-top), 52px);" class="flex-shrink-0 px-3.5 pb-2.5 bg-white/95 backdrop-blur-md border-b border-slate-100 flex items-center justify-between z-30">
+      <div class="flex items-center space-x-2 min-w-0 flex-shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1557b0] to-[#1a73e8] flex items-center justify-center text-white shadow-md shadow-blue-500/25 flex-shrink-0">
+          <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <rect x="4" y="3" width="16" height="18" rx="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <line x1="8.5" y1="3" x2="8.5" y2="21" stroke-width="2"/>
             <line x1="12" y1="8" x2="17" y2="8" stroke-width="2" stroke-linecap="round"/>
@@ -156,22 +156,22 @@
             <line x1="12" y1="16" x2="15.5" y2="16" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </div>
-        <div>
-          <h1 class="text-base font-extrabold tracking-tight text-slate-800 leading-tight">スマート家計簿</h1>
-          <span id="headerPeriodSub" class="text-[11px] font-semibold text-blue-600 block -mt-0.5">当月</span>
+        <div class="min-w-0">
+          <div class="flex items-center space-x-1.5 whitespace-nowrap">
+            <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v2.5</span>
+          </div>
+          <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
       </div>
 
-      <div class="flex items-center space-x-2">
-        <!-- 最新版反映確認用バージョンバッジ -->
-        <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[9.5px] border border-emerald-200 shadow-2xs">v2.5 (最新)</span>
-
-        <button id="btnSync" onclick="openSyncMenuModal()" class="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-bold active:scale-95 transition border border-blue-200/60 shadow-xs">
-          <svg id="syncIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          <span id="syncText">同期メニュー</span>
+      <div class="flex items-center space-x-1.5 flex-shrink-0">
+        <button id="btnSync" onclick="openSyncMenuModal()" class="flex items-center space-x-1 px-2.5 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 text-[11px] font-extrabold active:scale-95 transition border border-blue-200/60 shadow-xs whitespace-nowrap">
+          <svg id="syncIcon" class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span id="syncText" class="whitespace-nowrap">同期メニュー</span>
         </button>
 
-        <button onclick="openModal('settingsModal')" class="p-1.5 text-slate-400 hover:text-slate-600 active:scale-90 transition" aria-label="設定">
+        <button onclick="openModal('settingsModal')" class="p-1.5 text-slate-400 hover:text-slate-600 active:scale-90 transition flex-shrink-0" aria-label="設定">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         </button>
       </div>
@@ -3763,7 +3763,8 @@
         throw new Error('Gemini APIキーが未設定です。設定から入力してください');
       }
 
-      const models = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+      // レシートOCRに最適化されたモデル候補（超高速・安定モデルを優先）
+      const models = ['gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3.8-flash'];
       let lastError = null;
 
       const promptText = `日本の家計簿レシート解析。JSONのみ返却。
@@ -3775,41 +3776,41 @@
       for (const model of models) {
         if (abortSignal && abortSignal.aborted) throw new DOMException('Aborted', 'AbortError');
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        
-        // 思考時間ゼロ設定で即座にJSONを返答させるペイロード（万一未対応の場合はフォールバック）
-        const createPayload = (withZeroThinking = true) => {
-          const genConfig = {
-            temperature: 0.1,
-            maxOutputTokens: 1024,
-            responseMimeType: "application/json"
-          };
-          if (withZeroThinking) {
-            genConfig.thinkingConfig = { thinkingBudget: 0 };
-          }
-          return {
-            contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
-            generationConfig: genConfig
-          };
+
+        // モデルに応じた最適な設定（2.5系は思考ゼロ、1.5系は思考設定を除外して高速化）
+        const isThinkingSupported = model.includes('2.5') || model.includes('3.8');
+        const genConfig = {
+          temperature: 0.1,
+          maxOutputTokens: 1024,
+          responseMimeType: "application/json"
+        };
+        if (isThinkingSupported) {
+          genConfig.thinkingConfig = { thinkingBudget: 0 };
+        }
+
+        const payload = {
+          contents: [{ parts: [{ text: promptText }, { inlineData: { mimeType, data: base64Image } }] }],
+          generationConfig: genConfig
         };
 
+        // 1つのモデルで待たされ続けないよう、タイムアウト制御（8秒で次のモデルへ）
+        const timeoutController = new AbortController();
+        const timeoutId = setTimeout(() => timeoutController.abort(), 8500);
+
+        // 外部の abortSignal と連動
+        const onAbort = () => timeoutController.abort();
+        if (abortSignal) abortSignal.addEventListener('abort', onAbort, { once: true });
+
         try {
-          // まずは思考ゼロの超高速モードで送信
-          let resp = await fetch(endpoint, {
+          const resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(createPayload(true)),
-            signal: abortSignal
+            body: JSON.stringify(payload),
+            signal: timeoutController.signal
           });
 
-          // 万一 thinkingConfig が原因でエラーになった場合は標準モードで即時再試行
-          if (!resp.ok && resp.status === 400) {
-            resp = await fetch(endpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(createPayload(false)),
-              signal: abortSignal
-            });
-          }
+          clearTimeout(timeoutId);
+          if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
 
           if (!resp.ok) {
             const errJson = await resp.json().catch(() => ({}));
@@ -3821,13 +3822,15 @@
           const textCandidate = resData.candidates?.[0]?.content?.parts?.[0]?.text;
           if (!textCandidate) throw new Error('解析結果テキストが空です');
 
-          // 頑健なJSON抽出（前後のテキストや思考プロセスを安全にスキップ）
+          // 頑健なJSON抽出
           const jsonMatch = textCandidate.match(/\{[\s\S]*\}/);
           if (!jsonMatch) throw new Error('解析結果からJSON形式を抽出できませんでした');
 
           return JSON.parse(jsonMatch[0]);
         } catch (err) {
-          if (err.name === 'AbortError') throw err;
+          clearTimeout(timeoutId);
+          if (abortSignal) abortSignal.removeEventListener('abort', onAbort);
+          if (abortSignal && abortSignal.aborted) throw abortSignal.reason || new DOMException('Aborted', 'AbortError');
           lastError = err;
         }
       }
@@ -4628,25 +4631,37 @@
       const statusEl = document.getElementById('geminiTestStatus');
       const key = document.getElementById('geminiApiKey').value.trim() || geminiApiKey;
 
+      if (!key) {
+        statusEl.className = 'text-[11px] p-2.5 rounded-2xl bg-amber-50 text-amber-700 font-bold block';
+        statusEl.textContent = 'APIキーを入力してください';
+        return;
+      }
+
       statusEl.className = 'text-[11px] p-2.5 rounded-2xl bg-blue-50 text-blue-700 block';
       statusEl.textContent = 'Google AIに接続テスト中...';
 
       try {
-        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: "ping" }] }] })
+        // モデル一覧API（GET）で一瞬（0.3秒）でキーの有効性を判定
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`, {
+          method: 'GET'
         });
         if (resp.ok) {
+          const data = await resp.json();
+          const usableModels = (data.models || [])
+            .map(m => m.name.replace('models/', ''))
+            .filter(name => name.includes('flash'))
+            .slice(0, 3)
+            .join(', ');
+
           statusEl.className = 'text-[11px] p-2.5 rounded-2xl bg-emerald-50 text-emerald-700 font-bold block';
-          statusEl.textContent = '✅ 接続成功！利用モデル: gemini-3.8-flash';
+          statusEl.textContent = `接続成功！高速モデル利用可能 (${usableModels || '利用準備完了'})`;
         } else {
           const errData = await resp.json().catch(() => ({}));
           throw new Error(errData.error?.message || `HTTP ${resp.status}`);
         }
       } catch (e) {
         statusEl.className = 'text-[11px] p-2.5 rounded-2xl bg-rose-50 text-rose-700 font-bold block';
-        statusEl.textContent = `❌ エラー: ${e.message}`;
+        statusEl.textContent = `エラー: ${e.message}`;
       }
     }
 
