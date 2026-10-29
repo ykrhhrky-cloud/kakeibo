@@ -1370,7 +1370,7 @@
     let deletedTxIds = [];
     let hiddenTitleSuggestions = [];
     let monthlyBudget = 200000;
-    let recentNewTxIds = new Set(); // 新規登録された取引（NEWバッジ＆最上部ピン留め用）
+    let recentNewTxMap = new Map(); // id -> timestamp（10分間保持）
 
     let activeYear = new Date().getFullYear();
     let activeMonth = new Date().getMonth() + 1;
@@ -1413,6 +1413,16 @@
     let isCardAnimating = false;
     let isBudgetExpanded = false;
     let isRankingExpanded = false;
+
+    function isTxNew(id) {
+      if (!recentNewTxMap.has(id)) return false;
+      const t = recentNewTxMap.get(id);
+      if (Date.now() - t > 10 * 60 * 1000) {
+        recentNewTxMap.delete(id);
+        return false;
+      }
+      return true;
+    }
 
     function toggleBudgetCollapse() {
       isBudgetExpanded = !isBudgetExpanded;
@@ -1491,6 +1501,13 @@
           initializeSampleDataIfEmpty();
         }
 
+        const newTxData = localStorage.getItem('kakeibo_new_tx_map');
+        if (newTxData) {
+          try {
+            recentNewTxMap = new Map(JSON.parse(newTxData));
+          } catch (_) {}
+        }
+
         const recData = localStorage.getItem('kakeibo_recurring_v1');
         if (recData) recurringRules = JSON.parse(recData);
 
@@ -1513,7 +1530,6 @@
             ];
           }
           if (Array.isArray(parsed.variable)) {
-            // 旧「衣服・美容」のマイグレーション
             const migratedVar = [];
             parsed.variable.forEach(c => {
               if (c === '衣服・美容') {
@@ -1548,6 +1564,7 @@
     function saveStoredData() {
       try {
         localStorage.setItem('kakeibo_tx_v1', JSON.stringify(transactions));
+        localStorage.setItem('kakeibo_new_tx_map', JSON.stringify(Array.from(recentNewTxMap.entries())));
         localStorage.setItem('kakeibo_recurring_v1', JSON.stringify(recurringRules));
         localStorage.setItem('kakeibo_deleted_tx_ids', JSON.stringify(deletedTxIds));
         localStorage.setItem('kakeibo_hidden_title_suggestions', JSON.stringify(hiddenTitleSuggestions));
@@ -1641,7 +1658,7 @@
       }
     }
 
-    // ==================== 手入力メンバー選択ボタン（アイコンなし） ====================
+    // ==================== 手入力メンバー選択ボタン ====================
     function setupManualMemberButtons() {
       const container = document.getElementById('manualMemberContainer');
       if (!container) return;
@@ -1723,7 +1740,6 @@
 
       container.innerHTML = '';
 
-      // 初期状態は全選択
       if (selectedCategoriesFilter.size === 0) {
         getAllAvailableCategories().forEach(c => selectedCategoriesFilter.add(c));
       }
@@ -1809,7 +1825,7 @@
       }
     }
 
-    // ==================== 収支の明細 種別絞り込み（収支 / 支出 / 収入） ====================
+    // ==================== 収支の明細 種別絞り込み ====================
     function setTxTypeFilter(type) {
       currentTypeFilter = type;
       const btnAll = document.getElementById('btnFilterTypeAll');
@@ -1826,7 +1842,7 @@
       renderTransactionsList();
     }
 
-    // ==================== 年単位選択プルダウン ====================
+    // ==================== 年・月指定プルダウン ====================
     function setupTrendYearDropdown() {
       const sel = document.getElementById('trendYearSelect');
       if (!sel) return;
@@ -1908,7 +1924,7 @@
       renderAnalyticsCharts();
     }
 
-    // ==================== 年月一覧プルダウンリスト（ホーム画面） ====================
+    // ==================== 年月一覧プルダウンリスト ====================
     function setupYearMonthDropdownList() {
       const container = document.getElementById('yearMonthListContainer');
       if (!container) return;
@@ -1918,7 +1934,6 @@
       const curY = now.getFullYear();
       const curM = now.getMonth() + 1;
 
-      // 直近18ヶ月分の年月リストを生成
       for (let i = 0; i < 18; i++) {
         const d = new Date(curY, curM - 1 - i, 1);
         const y = d.getFullYear();
@@ -1954,7 +1969,7 @@
       showToast(`${year}年${month}月の明細を表示`);
     }
 
-    // ==================== 推移グラフ 円グラフカードの左右スワイプ切り替え（タッチ＆マウス対応） ====================
+    // ==================== スワイプ操作（円グラフ＆サマリカード） ====================
     let isPieAnimating = false;
     function setupPieChartSwipeGesture() {
       const card = document.getElementById('pieChartCardArea');
@@ -1965,7 +1980,6 @@
       let diffX = 0;
       let isDragging = false;
 
-      // タッチイベント
       card.addEventListener('touchstart', (e) => {
         if (isPieAnimating) return;
         startX = e.touches[0].clientX;
@@ -1987,40 +2001,6 @@
       }, { passive: true });
 
       card.addEventListener('touchend', () => {
-        if (isPieAnimating) return;
-        const threshold = 45;
-
-        if (diffX > threshold) {
-          triggerPieCardSlideAnimation(-1);
-        } else if (diffX < -threshold) {
-          triggerPieCardSlideAnimation(1);
-        } else {
-          card.style.transition = 'transform 0.22s ease-out, opacity 0.22s ease-out';
-          card.style.transform = 'translateX(0px)';
-          card.style.opacity = '1';
-        }
-      });
-
-      // マウスドラッグ対応（PCプレビュー用）
-      card.addEventListener('mousedown', (e) => {
-        if (isPieAnimating) return;
-        isDragging = true;
-        startX = e.clientX;
-        diffX = 0;
-        card.style.transition = 'none';
-      });
-
-      window.addEventListener('mousemove', (e) => {
-        if (!isDragging || isPieAnimating) return;
-        diffX = e.clientX - startX;
-        const clampedX = Math.max(-120, Math.min(120, diffX * 0.8));
-        card.style.transform = `translateX(${clampedX}px)`;
-        card.style.opacity = `${Math.max(0.7, 1 - Math.abs(clampedX) / 320)}`;
-      });
-
-      window.addEventListener('mouseup', () => {
-        if (!isDragging) return;
-        isDragging = false;
         if (isPieAnimating) return;
         const threshold = 45;
 
@@ -2155,7 +2135,6 @@
       if (labelDisplay) labelDisplay.textContent = text;
     }
 
-    // ==================== サマリカードのスワイプ＆アニメーション（タッチ＆マウス対応） ====================
     function setupSwipeGesture() {
       const card = document.getElementById('swipeCardArea');
       if (!card) return;
@@ -2163,9 +2142,7 @@
       let startX = 0;
       let startY = 0;
       let diffX = 0;
-      let isDragging = false;
 
-      // タッチイベント
       card.addEventListener('touchstart', (e) => {
         if (isCardAnimating) return;
         startX = e.touches[0].clientX;
@@ -2187,40 +2164,6 @@
       }, { passive: true });
 
       card.addEventListener('touchend', () => {
-        if (isCardAnimating) return;
-        const threshold = 55;
-
-        if (diffX > threshold) {
-          triggerCardSlideAnimation(-1);
-        } else if (diffX < -threshold) {
-          triggerCardSlideAnimation(1);
-        } else {
-          card.style.transition = 'transform 0.24s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.24s ease-out';
-          card.style.transform = 'translateX(0px)';
-          card.style.opacity = '1';
-        }
-      });
-
-      // マウスドラッグ対応（PCプレビュー用）
-      card.addEventListener('mousedown', (e) => {
-        if (isCardAnimating) return;
-        isDragging = true;
-        startX = e.clientX;
-        diffX = 0;
-        card.style.transition = 'none';
-      });
-
-      window.addEventListener('mousemove', (e) => {
-        if (!isDragging || isCardAnimating) return;
-        diffX = e.clientX - startX;
-        const clampedX = Math.max(-140, Math.min(140, diffX * 0.85));
-        card.style.transform = `translateX(${clampedX}px)`;
-        card.style.opacity = `${Math.max(0.7, 1 - Math.abs(clampedX) / 300)}`;
-      });
-
-      window.addEventListener('mouseup', () => {
-        if (!isDragging) return;
-        isDragging = false;
         if (isCardAnimating) return;
         const threshold = 55;
 
@@ -2344,7 +2287,6 @@
       const isCurrentMonth = (currentFilterMode === 'current_month') || 
         (currentFilterMode === 'month' && activeYear === now.getFullYear() && activeMonth === (now.getMonth() + 1));
 
-      // 常時配置された「当月」ボタンのスタイルハイライト
       if (btnBack) {
         if (isCurrentMonth) {
           btnBack.className = 'px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-black active:scale-95 transition flex items-center space-x-0.5 border border-blue-200';
@@ -2532,7 +2474,6 @@
       renderAnalyticsCharts();
     }
 
-    // ==================== 予算メーターの更新 ====================
     function updateBudgetMeter(currentExpense) {
       const budgetRemEl = document.getElementById('budgetRemainingDisplay');
       const budgetBar = document.getElementById('budgetProgressBar');
@@ -2561,7 +2502,6 @@
       const ratio = effectiveBudget > 0 ? (currentExpense / effectiveBudget) : 0;
       const percent = Math.min(Math.round(ratio * 100), 999);
 
-      // 展開時の残り表示
       if (budgetRemEl) {
         if (remaining >= 0) {
           budgetRemEl.textContent = `あと ¥${remaining.toLocaleString()}`;
@@ -2572,7 +2512,6 @@
         }
       }
 
-      // バーの色
       if (budgetBar) {
         const widthPct = Math.min(percent, 100);
         budgetBar.style.width = `${widthPct}%`;
@@ -2624,12 +2563,10 @@
       const emptyEl = document.getElementById('emptyListState');
       const sortOrderVal = document.getElementById('sortOrder') ? document.getElementById('sortOrder').value : 'date_desc';
 
-      // 1. 種別絞り込み（収支 / 支出 / 収入）
       if (currentTypeFilter !== 'all') {
         filtered = filtered.filter(t => t.type === currentTypeFilter);
       }
 
-      // 2. 科目絞り込み
       const allCatsCount = getAllAvailableCategories().length;
       if (selectedCategoriesFilter.size < allCatsCount) {
         filtered = filtered.filter(t => selectedCategoriesFilter.has(t.category));
@@ -2661,7 +2598,6 @@
           }
         });
 
-        // 家族全体を先頭（左）にし、右側（以降）に支出金額が高い順に個人メンバーをソート
         const sortedIndividualMembers = [...membersList].sort((a, b) => {
           const sumA = (grouped[a] || []).reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
           const sumB = (grouped[b] || []).reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
@@ -2678,7 +2614,6 @@
           </div>
           <div class="grid grid-cols-2 gap-1.5" id="memberSummaryPills"></div>
         `;
-
         listEl.appendChild(summaryBox);
 
         const pillsContainer = summaryBox.querySelector('#memberSummaryPills');
@@ -2751,19 +2686,18 @@
         return;
       }
 
-      // 新規登録アイテム（NEW）を一時的に最上部にピン留めする処理
+      // 新規アイテムの最上部ピン留め（10分間保持）
       let newTxs = [];
       let regularTxs = [];
 
       filtered.forEach(t => {
-        if (recentNewTxIds.has(t.id)) {
+        if (isTxNew(t.id)) {
           newTxs.push(t);
         } else {
           regularTxs.push(t);
         }
       });
 
-      // 通常アイテムのソート
       regularTxs.sort((a, b) => {
         if (sortOrderVal === 'date_desc') return new Date(b.date) - new Date(a.date);
         if (sortOrderVal === 'date_asc') return new Date(a.date) - new Date(b.date);
@@ -2772,7 +2706,6 @@
         return 0;
       });
 
-      // 新規アイテムを最上部に配置
       const finalDisplayList = [...newTxs, ...regularTxs];
 
       finalDisplayList.forEach(t => {
@@ -2782,7 +2715,7 @@
 
     function renderSingleTransactionCard(t, container) {
       const isSelected = selectedTxIds.has(t.id);
-      const isNewItem = recentNewTxIds.has(t.id);
+      const isNewItem = isTxNew(t.id);
 
       const card = document.createElement('div');
       card.className = `p-2 px-2.5 rounded-xl border transition flex items-center justify-between cursor-pointer active:scale-[0.99] select-none ${
@@ -2823,7 +2756,6 @@
         }
       }
 
-      // 金額の直前に配置する「収入」「支出」バッジ & 金額文字色
       const typeBadgeHtml = t.type === 'income'
         ? '<span class="px-1 py-0.2 rounded bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200 mr-1 flex-shrink-0">収入</span>'
         : '<span class="px-1 py-0.2 rounded bg-rose-50 text-rose-700 font-extrabold text-[8.5px] border border-rose-200 mr-1 flex-shrink-0">支出</span>';
@@ -2999,6 +2931,7 @@
       btn.onclick = () => {
         ids.forEach(id => {
           transactions = transactions.filter(t => t.id !== id);
+          recentNewTxMap.delete(id);
           if (!deletedTxIds.includes(id)) {
             deletedTxIds.push(id);
           }
@@ -3247,43 +3180,6 @@
           }
         });
 
-        const handle = card.querySelector('.reorder-drag-handle');
-        if (handle) {
-          handle.addEventListener('touchstart', () => {
-            touchModalDragEl = card;
-            card.classList.add('opacity-50', 'bg-blue-100/60');
-          }, { passive: true });
-
-          handle.addEventListener('touchmove', (e) => {
-            if (!touchModalDragEl) return;
-            const touch = e.touches[0];
-            const target = document.elementFromPoint(touch.clientX, touch.clientY);
-            const targetCard = target ? target.closest('.reorder-card') : null;
-
-            document.querySelectorAll('.reorder-card').forEach(el => el.classList.remove('border-blue-500'));
-            if (targetCard && targetCard !== touchModalDragEl) {
-              targetCard.classList.add('border-blue-500');
-            }
-          }, { passive: true });
-
-          handle.addEventListener('touchend', (e) => {
-            if (!touchModalDragEl) return;
-            const touch = e.changedTouches[0];
-            const target = document.elementFromPoint(touch.clientX, touch.clientY);
-            const targetCard = target ? target.closest('.reorder-card') : null;
-
-            touchModalDragEl.classList.remove('opacity-50', 'bg-blue-100/60');
-            document.querySelectorAll('.reorder-card').forEach(el => el.classList.remove('border-blue-500'));
-
-            if (targetCard && targetCard !== touchModalDragEl) {
-              const fromCat = touchModalDragEl.dataset.category;
-              const toCat = targetCard.dataset.category;
-              swapCategoryPositions(fromCat, toCat);
-            }
-            touchModalDragEl = null;
-          });
-        }
-
         container.appendChild(card);
       });
     }
@@ -3449,8 +3345,7 @@
           target.memo = memo;
           target.member = member;
         }
-        // 編集完了によりNEWバッジを解除して通常配置へ
-        recentNewTxIds.delete(editingTxId);
+        recentNewTxMap.delete(editingTxId);
         editingTxId = null;
         showToast('明細を更新しました');
       } else {
@@ -3466,7 +3361,7 @@
           member,
           createdAt: new Date().toLocaleString('ja-JP')
         };
-        recentNewTxIds.add(newId);
+        recentNewTxMap.set(newId, Date.now());
         transactions.unshift(newTx);
         showToast('記帳を完了しました (最上部に表示)');
       }
@@ -3476,9 +3371,8 @@
       refreshDashboard();
     }
 
-    // ==================== 超高速・画像リサイズ＆圧縮処理 ====================
-    // 960px・quality 0.65 に落とすことで、ファイルサイズを約1/10（100〜150KB）に軽量化しアップロード時間を劇的短縮
-    async function compressAndResizeImage(file, maxDimension = 960, quality = 0.65) {
+    // ==================== 超高速・画像圧縮＆リサイズ ====================
+    async function compressAndResizeImage(file, maxDimension = 760, quality = 0.58) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -3524,8 +3418,8 @@
       showOverlay(true);
       const loadingTitle = document.getElementById('receiptLoadingTitle');
       const loadingDesc = document.getElementById('receiptLoadingDesc');
-      if (loadingTitle) loadingTitle.textContent = 'レシートを爆速AI解析中...';
-      if (loadingDesc) loadingDesc.textContent = files.length > 1 ? `${files.length}枚を並列処理しています...` : '文字情報を高速抽出しています';
+      if (loadingTitle) loadingTitle.textContent = 'レシートを自動解析中...';
+      if (loadingDesc) loadingDesc.textContent = files.length > 1 ? `${files.length}枚を並列処理しています...` : '金額・店舗名・科目を高精度に読み取っています';
 
       receiptAbortController = new AbortController();
       let totalParsed = 0;
@@ -3576,7 +3470,7 @@
 
         parsedItems.forEach(tx => {
           unhideTitleSuggestion(tx.title);
-          recentNewTxIds.add(tx.id);
+          recentNewTxMap.set(tx.id, Date.now());
           transactions.unshift(tx);
         });
 
@@ -3593,7 +3487,7 @@
           openModal('duplicateReceiptModal');
         } else if (totalParsed > 0) {
           const dupMsg = duplicateList.length > 0 ? ` (重複の可能性がある${duplicateList.length}件を除外)` : '';
-          showToast(`⚡高速解析完了: ${totalParsed}件を登録！${memberMsg}${dupMsg}`);
+          showToast(`⚡解析完了: ${totalParsed}件を登録！${memberMsg}${dupMsg}`);
         } else if (duplicateList.length > 0) {
           showToast(`既に同じレシート（${duplicateList.length}件）が登録済みです`, true);
         } else {
@@ -3629,7 +3523,6 @@
 
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         
-        // 思考時間（thinking）をゼロにして即答させる設定（思考待ち時間を全カット）
         const payload = {
           contents: [{
             parts: [
@@ -3697,7 +3590,7 @@
     function forceSaveDuplicateReceipt() {
       if (pendingDuplicateTx) {
         unhideTitleSuggestion(pendingDuplicateTx.title);
-        recentNewTxIds.add(pendingDuplicateTx.id);
+        recentNewTxMap.set(pendingDuplicateTx.id, Date.now());
         transactions.unshift(pendingDuplicateTx);
         saveStoredData();
         refreshDashboard();
@@ -3830,7 +3723,6 @@
       return transactions;
     }
 
-    // ==================== 当期のみなし総収入枠（確定収入 ＋ 当期内未到来の定期収入）の算出 ====================
     function calculateEstimatedPeriodIncome() {
       const filtered = getAnalyticsFilteredTransactions();
       let actualIncome = 0;
@@ -3844,7 +3736,6 @@
       const curM = now.getMonth() + 1;
       const curD = now.getDate();
 
-      // 当月が表示対象の場合、今日以降に予定されている固定収入（給与等）を加算
       if (currentTrendPeriod === '1m' && analyticsYear === curY && analyticsMonth === curM) {
         recurringRules.forEach(rule => {
           if (rule.type === 'income') {
@@ -3898,7 +3789,6 @@
 
         totalExpense = Object.values(memberMap).reduce((s, v) => s + v, 0);
 
-        // 家族全体を先頭、その後に個人メンバーを支出額順にソート
         const sortedIndividual = [...membersList].sort((a, b) => (memberMap[b] || 0) - (memberMap[a] || 0));
         const displayKeys = ['家族全体', ...sortedIndividual];
 
@@ -3930,7 +3820,6 @@
           catMap[t.category] = (catMap[t.category] || 0) + (Number(t.amount) || 0);
         });
 
-        // 金額順にソートして並べる
         const sortedCats = Object.keys(catMap).sort((a, b) => catMap[b] - catMap[a]);
         rawLabels = sortedCats;
         data = sortedCats.map(c => catMap[c]);
@@ -3957,7 +3846,6 @@
       }
       if (emptyState) emptyState.classList.add('hidden');
 
-      // 中央の支出計 ＆ 収入ステータス判定 ＆ 重なり防止Y分散引き出し線プラグイン
       const centerAndCalloutPlugin = {
         id: 'centerAndCalloutPlugin',
         afterDraw(chart) {
@@ -3968,7 +3856,7 @@
 
           ctx.save();
 
-          // 1. 中央テキスト（タイトル ＆ 金額 ＆ 全体比）
+          // 1. 中央テキスト
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
 
@@ -3991,7 +3879,7 @@
           ctx.fillStyle = '#0f172a';
           ctx.fillText(`¥${totalExpense.toLocaleString()}`, centerX, centerY + 1);
 
-          // 2. 収入範囲ステータス（みなし総収入枠との比較）
+          // 2. 収入範囲ステータス
           const { totalBudgetIncome } = calculateEstimatedPeriodIncome();
           if (totalBudgetIncome > 0) {
             const isWithinBudget = totalExpense <= totalBudgetIncome;
@@ -4030,7 +3918,7 @@
             ctx.fillText(statusText, centerX, pillY + (pillH / 2));
           }
 
-          // 3. 各スライスの内部に構成比%、外部に重なり防止Y分散引き出し線を描画
+          // 3. スライス内 % と引き出し線
           const meta = chart.getDatasetMeta(0);
           if (meta && meta.data) {
             const leftLabels = [];
@@ -4045,7 +3933,6 @@
               const endAngle = element.endAngle;
               const midAngle = (startAngle + endAngle) / 2;
 
-              // スライス内部に % を描画（7%以上の場合のみ）
               if (pct >= 7) {
                 const sliceMidR = (element.innerRadius + element.outerRadius) / 2;
                 const pctX = centerX + Math.cos(midAngle) * sliceMidR;
@@ -4058,7 +3945,6 @@
                 ctx.fillText(`${pct}%`, pctX, pctY);
               }
 
-              // スライス外側の引き出し線（5%以上かつ上位7件までに厳選し過密を防止）
               if (pct >= 5 && idx < 7) {
                 const rOuter = element.outerRadius;
                 const startX = centerX + Math.cos(midAngle) * rOuter;
@@ -4087,7 +3973,6 @@
               }
             });
 
-            // Y座標の衝突回避（上下に均等分散して重なりを100%防止）
             const adjustY = (list) => {
               if (list.length <= 1) return;
               list.sort((a, b) => a.targetY - b.targetY);
@@ -4119,7 +4004,6 @@
               const lineExt = isRight ? 10 : -10;
               const endX = breakX + lineExt;
 
-              // 引き出し線描画
               ctx.beginPath();
               ctx.moveTo(startX, startY);
               ctx.lineTo(breakX, targetY);
@@ -4146,7 +4030,6 @@
               let labelX = endX + (isRight ? 3 : -3);
               let align = isRight ? 'left' : 'right';
 
-              // Canvas端でのクランプ
               if (isRight && labelX > canvasW - 4) {
                 labelX = canvasW - 4;
                 align = 'right';
@@ -4218,7 +4101,6 @@
       renderPieBreakdownList(rawLabels, data, colors, totalExpense, totalAllExpense);
     }
 
-    // ==================== グラフ直下の内訳ブレイクダウン一覧描画 ====================
     function renderPieBreakdownList(labels, dataList, colorList, totalExpense, totalAllExpense) {
       const container = document.getElementById('pieBreakdownListContainer');
       const countBadge = document.getElementById('rankingItemCountBadge');
@@ -4318,14 +4200,6 @@
           const m = String(d.getMonth() + 1).padStart(2, '0');
           keys.push(`${y}-${m}`);
           labels.push(`${d.getMonth() + 1}月`);
-        }
-      } else if (currentTrendPeriod === 'year') {
-        const y = currentTrendSelectedYear;
-        if (subLabel) subLabel.textContent = `${y}年 月別推移`;
-        for (let m = 1; m <= 12; m++) {
-          const mStr = String(m).padStart(2, '0');
-          keys.push(`${y}-${mStr}`);
-          labels.push(`${m}月`);
         }
       } else if (currentTrendPeriod === 'all') {
         if (subLabel) subLabel.textContent = '全期間 月別推移';
@@ -4871,6 +4745,7 @@
         deletedTxIds = [];
         hiddenTitleSuggestions = [];
         monthlyBudget = 200000;
+        recentNewTxMap.clear();
         closeModal('deleteConfirmModal');
         closeModal('settingsModal');
         refreshDashboard();
