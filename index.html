@@ -164,7 +164,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.21</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.23</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -750,102 +750,107 @@
     </div>
   </div>
 
-  <!-- 手入力＆編集モーダル (完全スクロールなし・1枚固定収容) -->
-  <div id="manualModal" onclick="if(event.target === this) closeModal('manualModal')" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 select-none overflow-hidden">
-    <div onclick="event.stopPropagation()" class="bg-white w-full max-w-sm rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col animate-scale-up overflow-hidden">
+  <!-- 手入力＆編集モーダル（見た目復元 ＆ 左右ブレ完全防止） -->
+  <div id="manualModal" onclick="if(event.target === this) closeModal('manualModal')" style="touch-action: none; overscroll-behavior: contain;" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 select-none overflow-hidden">
+    <div onclick="event.stopPropagation()" class="bg-white w-full max-w-sm rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col animate-scale-up overflow-visible relative">
       <!-- ヘッダー -->
       <div class="flex items-center justify-between border-b border-slate-100 pb-2 flex-shrink-0">
-        <h3 class="text-xs sm:text-sm font-extrabold text-slate-800" id="manualModalTitle">手入力で記帳</h3>
-        <button type="button" onclick="closeModal('manualModal')" class="w-6 h-6 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 text-lg leading-none transition" aria-label="閉じる">&times;</button>
+        <h3 class="text-sm font-extrabold text-slate-800" id="manualModalTitle">手入力で記帳</h3>
+        <button type="button" onclick="closeModal('manualModal')" class="w-7 h-7 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 text-xl leading-none transition" aria-label="閉じる">&times;</button>
       </div>
 
-      <!-- フォーム本体 (縦横スクロール完全排除・2列グリッド最適化) -->
-      <div class="py-2 space-y-1.5 flex-shrink-0 overflow-hidden">
+      <!-- フォーム本体（スクロールバー完全排除・1枚固定収容） -->
+      <div class="py-2 space-y-2 overflow-visible">
         <!-- 収支切替スイッチ -->
         <div id="manualTypeToggleArea" class="grid grid-cols-2 gap-1.5 p-0.5 bg-slate-100 rounded-xl text-xs font-bold">
-          <button type="button" onclick="setManualType('expense')" id="btnManualTypeExpense" class="py-1 rounded-lg bg-white text-rose-600 shadow-xs transition">支出</button>
-          <button type="button" onclick="setManualType('income')" id="btnManualTypeIncome" class="py-1 rounded-lg text-slate-600 transition">収入</button>
+          <button type="button" onclick="setManualType('expense')" id="btnManualTypeExpense" class="py-1.5 rounded-lg bg-white text-rose-600 shadow-xs transition">支出</button>
+          <button type="button" onclick="setManualType('income')" id="btnManualTypeIncome" class="py-1.5 rounded-lg text-slate-600 transition">収入</button>
         </div>
 
-        <!-- 1行目: 日付 & 金額 -->
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] font-bold text-slate-500 mb-0.5">日付</label>
-            <input type="date" id="manualDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs font-semibold outline-none focus:border-blue-500">
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-slate-500 mb-0.5">金額 (円)</label>
-            <input type="number" id="manualAmount" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-sm font-black font-mono outline-none focus:border-blue-500">
-          </div>
-        </div>
-
-        <!-- 2行目: 科目 & 支払い方法 -->
-        <div class="grid grid-cols-2 gap-2">
-          <!-- 科目選択 -->
-          <div class="relative">
-            <div class="flex items-center justify-between mb-0.5">
-              <label class="block text-[10px] font-bold text-slate-500">科目</label>
-              <button type="button" onclick="openCategoryReorderModal()" class="text-[9px] text-blue-600 font-bold hover:underline">順序⚙️</button>
-            </div>
-            <button type="button" id="categoryDropdownTrigger" onclick="toggleCategoryDropdown()" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl px-2 py-1 text-xs font-bold flex items-center justify-between outline-none">
-              <div class="flex items-center space-x-1 truncate">
-                <span id="selectedCategoryIcon" class="flex-shrink-0"></span>
-                <span id="selectedCategoryName" class="text-slate-800 font-extrabold truncate text-xs">食費</span>
-              </div>
-              <svg id="categoryDropdownArrow" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div id="categoryDropdownMenu" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-1.5 max-h-48 overflow-y-auto custom-scrollbar">
-              <div id="categoryDropdownList" class="space-y-0.5"></div>
-            </div>
-            <select id="manualCategory" class="hidden"></select>
-          </div>
-
-          <!-- 支払い方法選択 -->
-          <div class="relative">
-            <div class="flex items-center justify-between mb-0.5">
-              <label class="block text-[10px] font-bold text-slate-500" id="manualPayMethodLabel">支払い方法</label>
-              <button type="button" onclick="openPaymentMethodManageModal()" class="text-[9px] text-blue-600 font-bold hover:underline">管理⚙️</button>
-            </div>
-            <button type="button" id="manualPaymentDropdownTrigger" onclick="toggleManualPaymentDropdown()" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl px-2 py-1 text-xs font-bold flex items-center justify-between outline-none">
-              <div class="flex items-center space-x-1 truncate">
-                <span id="selectedManualPaymentIcon" class="flex-shrink-0"></span>
-                <span id="selectedManualPaymentName" class="text-slate-800 font-extrabold truncate text-xs">現金</span>
-              </div>
-              <svg id="manualPaymentDropdownArrow" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div id="manualPaymentDropdownMenu" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-1.5 max-h-48 overflow-y-auto custom-scrollbar">
-              <div id="manualPaymentDropdownList" class="space-y-1"></div>
-            </div>
-            <input type="hidden" id="manualPaymentMethod" value="現金">
-          </div>
-        </div>
-
-        <!-- 3行目: 内容 / 店舗名 -->
-        <div id="manualTitleGroup">
-          <label class="block text-[10px] font-bold text-slate-500 mb-0.5">内容 / 店舗名</label>
-          <input type="text" id="manualTitle" list="titleSuggestions" placeholder="例: スーパー、電気代、ランチ" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs font-semibold outline-none focus:border-blue-500">
-          <datalist id="titleSuggestions"></datalist>
-          <div id="quickTitleChips" class="flex flex-wrap gap-1 mt-1 max-h-[26px] overflow-hidden"></div>
-        </div>
-
-        <!-- 4行目: メモ -->
         <div>
-          <label class="block text-[10px] font-bold text-slate-500 mb-0.5">メモ (任意)</label>
-          <input type="text" id="manualMemo" placeholder="特記事項があれば入力" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs font-semibold outline-none focus:border-blue-500">
+          <label class="block text-[10px] font-bold text-slate-600 mb-0.5">日付</label>
+          <input type="date" id="manualDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold outline-none focus:border-blue-500">
         </div>
 
-        <!-- 5行目: 対象メンバー -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 mb-0.5">金額 (円)</label>
+          <input type="number" id="manualAmount" placeholder="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-black font-mono outline-none focus:border-blue-500">
+        </div>
+
+        <!-- 科目選択 -->
+        <div class="relative">
+          <div class="flex items-center justify-between mb-0.5">
+            <label class="block text-[10px] font-bold text-slate-600">科目</label>
+            <button type="button" onclick="openCategoryReorderModal()" class="text-[9.5px] text-blue-600 font-bold hover:underline">並び順⚙️</button>
+          </div>
+          <button type="button" id="categoryDropdownTrigger" onclick="toggleCategoryDropdown()" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center justify-between outline-none focus:border-blue-500 active:scale-[0.99] transition">
+            <div class="flex items-center space-x-1.5 truncate">
+              <span id="selectedCategoryIcon" class="flex-shrink-0"></span>
+              <span id="selectedCategoryBadge" class="text-[8.5px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-600 flex-shrink-0">変動費</span>
+              <span id="selectedCategoryName" class="text-slate-800 font-extrabold truncate text-xs">食費</span>
+            </div>
+            <svg id="categoryDropdownArrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <div id="categoryDropdownMenu" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[70] p-1.5 max-h-48 overflow-y-auto custom-scrollbar animate-scale-up">
+            <div id="categoryDropdownList" class="space-y-0.5"></div>
+          </div>
+          <select id="manualCategory" class="hidden"></select>
+        </div>
+
+        <!-- 支払い方法 アコーディオン選択 -->
+        <div class="relative">
+          <div class="flex items-center justify-between mb-0.5">
+            <label class="block text-[10px] font-bold text-slate-600" id="manualPayMethodLabel">支払い方法</label>
+            <button type="button" onclick="openPaymentMethodManageModal()" class="text-[9.5px] text-blue-600 font-bold hover:underline flex items-center space-x-0.5">
+              <span>管理⚙️</span>
+            </button>
+          </div>
+          <button type="button" id="manualPaymentDropdownTrigger" onclick="toggleManualPaymentDropdown()" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center justify-between outline-none focus:border-blue-500 active:scale-[0.99] transition">
+            <div class="flex items-center space-x-1.5 truncate">
+              <span id="selectedManualPaymentIcon" class="flex-shrink-0"></span>
+              <span id="selectedManualPaymentType" class="text-[8.5px] font-bold px-1 py-0.2 rounded bg-slate-100 text-slate-700 flex-shrink-0">現金</span>
+              <span id="selectedManualPaymentName" class="text-slate-800 font-extrabold truncate text-xs">現金</span>
+            </div>
+            <svg id="manualPaymentDropdownArrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <div id="manualPaymentDropdownMenu" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[70] p-1.5 max-h-48 overflow-y-auto custom-scrollbar animate-scale-up">
+            <div class="flex items-center justify-between px-1 pb-1 mb-1 border-b border-slate-100 text-[9px]">
+              <span class="font-bold text-slate-400">タップして展開・選択</span>
+              <button type="button" onclick="openPaymentMethodManageModal()" class="text-blue-600 hover:underline font-bold">管理⚙️</button>
+            </div>
+            <div id="manualPaymentDropdownList" class="space-y-1.5"></div>
+          </div>
+          <input type="hidden" id="manualPaymentMethod" value="現金">
+        </div>
+
+        <!-- 内容 / 店舗名 -->
+        <div id="manualTitleGroup">
+          <label class="block text-[10px] font-bold text-slate-600 mb-0.5">内容 / 店舗名</label>
+          <input type="text" id="manualTitle" list="titleSuggestions" placeholder="例: スーパー、電気代、ランチ" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold outline-none focus:border-blue-500">
+          <datalist id="titleSuggestions"></datalist>
+          <div id="quickTitleChips" class="flex flex-wrap gap-1 mt-1 max-h-[36px] overflow-hidden"></div>
+        </div>
+
+        <!-- メモ (任意) -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 mb-0.5">メモ (任意)</label>
+          <input type="text" id="manualMemo" placeholder="特記事項があれば入力" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1 text-xs font-semibold outline-none focus:border-blue-500">
+        </div>
+
+        <!-- 対象メンバー -->
         <div id="manualMemberGroup">
           <div class="flex items-center justify-between mb-0.5">
-            <label class="block text-[10px] font-bold text-slate-500">対象メンバー</label>
+            <label class="block text-[10px] font-bold text-slate-600">対象メンバー</label>
             <span id="manualMemberStatusText" class="text-[9.5px] font-bold text-amber-600">家族全体</span>
           </div>
           <div class="grid grid-cols-4 gap-1 p-0.5 bg-slate-100 rounded-xl text-[10px] font-bold" id="manualMemberContainer"></div>
         </div>
       </div>
 
-      <!-- 下部ボタン (常時1画面に固定) -->
-      <div class="flex space-x-2 pt-2 border-t border-slate-100 flex-shrink-0 mt-0.5">
+      <!-- 下部ボタン（常時固定） -->
+      <div class="flex space-x-2 pt-2 border-t border-slate-100 flex-shrink-0">
         <button type="button" onclick="closeModal('manualModal')" class="flex-1 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 active:scale-95 transition text-center cursor-pointer">キャンセル</button>
         <button type="button" onclick="saveManualTransaction()" id="btnSaveManual" class="flex-1 py-2 rounded-xl bg-blue-600 text-xs font-bold text-white hover:bg-blue-700 active:scale-95 transition shadow-sm text-center cursor-pointer">登録する</button>
       </div>
@@ -906,87 +911,91 @@
     </div>
   </div>
 
-  <!-- 定期登録・編集モーダル (完全スクロールなし・1枚固定収容) -->
-  <div id="recurringModal" onclick="if(event.target === this) closeModal('recurringModal')" style="touch-action: none; overscroll-behavior: none;" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 select-none overflow-hidden">
-    <div onclick="event.stopPropagation()" style="touch-action: none;" class="bg-white w-full max-w-sm rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col animate-scale-up overflow-hidden">
+  <!-- 定期登録・編集モーダル（見た目復元 ＆ 左右ブレ完全防止） -->
+  <div id="recurringModal" onclick="if(event.target === this) closeModal('recurringModal')" style="touch-action: none; overscroll-behavior: contain;" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 select-none overflow-hidden">
+    <div onclick="event.stopPropagation()" class="bg-white w-full max-w-sm rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col animate-scale-up overflow-visible relative">
       <!-- ヘッダー -->
       <div class="flex items-center justify-between border-b border-slate-100 pb-2 flex-shrink-0">
-        <h3 class="text-xs sm:text-sm font-bold text-slate-800" id="recurringModalTitle">定期収支の登録</h3>
-        <button type="button" onclick="closeModal('recurringModal')" class="w-6 h-6 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 text-lg leading-none transition" aria-label="閉じる">&times;</button>
+        <h3 class="text-sm font-bold text-slate-800" id="recurringModalTitle">定期収支の新規登録</h3>
+        <button type="button" onclick="closeModal('recurringModal')" class="w-7 h-7 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 text-xl leading-none transition" aria-label="閉じる">&times;</button>
       </div>
 
-      <!-- フォーム本体 (スクロールなし) -->
-      <div class="py-2 space-y-1.5 flex-shrink-0 overflow-hidden">
+      <!-- フォーム本体（スクロールバー完全排除・1枚固定収容） -->
+      <div class="py-2 space-y-2 overflow-visible">
         <div class="grid grid-cols-2 gap-1.5 p-0.5 bg-slate-100 rounded-xl text-xs font-bold">
-          <button type="button" onclick="setRecurringType('expense')" id="btnRecTypeExpense" class="py-1 rounded-lg bg-white text-rose-600 shadow-xs">支出 (固定費)</button>
-          <button type="button" onclick="setRecurringType('income')" id="btnRecTypeIncome" class="py-1 rounded-lg text-slate-600">収入 (給与等)</button>
+          <button type="button" onclick="setRecurringType('expense')" id="btnRecTypeExpense" class="py-1.5 rounded-lg bg-white text-rose-600 shadow-xs">支出 (固定費)</button>
+          <button type="button" onclick="setRecurringType('income')" id="btnRecTypeIncome" class="py-1.5 rounded-lg text-slate-600">収入 (給与等)</button>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-[10px] font-bold text-slate-500 mb-0.5">開始月</label>
-            <input type="month" id="recStartMonth" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs font-semibold outline-none">
+            <label class="block text-[10px] font-bold text-slate-600 mb-0.5">開始月</label>
+            <input type="month" id="recStartMonth" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none">
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-slate-500 mb-0.5">終了月 (任意)</label>
-            <input type="month" id="recEndMonth" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs font-semibold outline-none" placeholder="継続">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] font-bold text-slate-500 mb-0.5">毎月の登録日</label>
-            <select id="recDay" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs font-semibold outline-none"></select>
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-slate-500 mb-0.5">金額 (円)</label>
-            <input type="number" id="recAmount" placeholder="70000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-sm font-black font-mono outline-none">
+            <label class="block text-[10px] font-bold text-slate-600 mb-0.5">終了月 (任意)</label>
+            <input type="month" id="recEndMonth" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none" placeholder="継続">
           </div>
         </div>
 
         <div>
-          <label class="block text-[10px] font-bold text-slate-500 mb-0.5">項目名</label>
-          <input type="text" id="recTitle" placeholder="例: 住宅ローン、通信費" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs font-semibold outline-none">
+          <label class="block text-[10px] font-bold text-slate-600 mb-0.5">毎月の登録日</label>
+          <select id="recDay" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none"></select>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] font-bold text-slate-500 mb-0.5">科目</label>
-            <select id="recCategory" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 text-xs font-semibold outline-none"></select>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 mb-0.5">項目名</label>
+          <input type="text" id="recTitle" placeholder="例: 住宅ローン、水道光熱費" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none">
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 mb-0.5">金額 (円)</label>
+          <input type="number" id="recAmount" placeholder="70000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-sm font-black font-mono outline-none">
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 mb-0.5">科目</label>
+          <select id="recCategory" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none"></select>
+        </div>
+
+        <!-- 支払い/入金方法 アコーディオン選択 -->
+        <div class="relative">
+          <div class="flex items-center justify-between mb-0.5">
+            <label class="block text-[10px] font-bold text-slate-600" id="recPayMethodLabel">支払い方法</label>
+            <button type="button" onclick="openPaymentMethodManageModal()" class="text-[9.5px] text-blue-600 font-bold hover:underline">管理⚙️</button>
           </div>
-          <!-- 支払い/入金方法 -->
-          <div class="relative">
-            <div class="flex items-center justify-between mb-0.5">
-              <label class="block text-[10px] font-bold text-slate-500" id="recPayMethodLabel">支払い方法</label>
-              <button type="button" onclick="openPaymentMethodManageModal()" class="text-[9px] text-blue-600 font-bold hover:underline">管理⚙️</button>
+          <button type="button" id="recPaymentDropdownTrigger" onclick="toggleRecPaymentDropdown()" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center justify-between outline-none focus:border-blue-500 active:scale-[0.99] transition">
+            <div class="flex items-center space-x-1.5 truncate">
+              <span id="selectedRecPaymentIcon" class="flex-shrink-0"></span>
+              <span id="selectedRecPaymentType" class="text-[8.5px] font-bold px-1 py-0.2 rounded bg-slate-100 text-slate-700 flex-shrink-0">口座引落</span>
+              <span id="selectedRecPaymentName" class="text-slate-800 font-extrabold truncate text-xs">口座引落</span>
             </div>
-            <button type="button" id="recPaymentDropdownTrigger" onclick="toggleRecPaymentDropdown()" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl px-2 py-1 text-xs font-bold flex items-center justify-between outline-none">
-              <div class="flex items-center space-x-1 truncate">
-                <span id="selectedRecPaymentIcon" class="flex-shrink-0"></span>
-                <span id="selectedRecPaymentName" class="text-slate-800 font-extrabold truncate text-xs">口座引落</span>
-              </div>
-              <svg id="recPaymentDropdownArrow" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div id="recPaymentDropdownMenu" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-1.5 max-h-48 overflow-y-auto custom-scrollbar">
-              <div id="recPaymentDropdownList" class="space-y-1"></div>
+            <svg id="recPaymentDropdownArrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <div id="recPaymentDropdownMenu" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[70] p-1.5 max-h-48 overflow-y-auto custom-scrollbar animate-scale-up">
+            <div class="flex items-center justify-between px-1 pb-1 mb-1 border-b border-slate-100 text-[9px]">
+              <span class="font-bold text-slate-400">タップして展開・選択</span>
+              <button type="button" onclick="openPaymentMethodManageModal()" class="text-blue-600 hover:underline font-bold">管理⚙️</button>
             </div>
-            <input type="hidden" id="recPaymentMethod" value="口座引落">
+            <div id="recPaymentDropdownList" class="space-y-1.5"></div>
           </div>
+          <input type="hidden" id="recPaymentMethod" value="口座引落">
         </div>
 
         <div id="recMemberGroup">
-          <label class="block text-[10px] font-bold text-slate-500 mb-0.5">対象者</label>
-          <select id="recMember" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-xs font-semibold outline-none"></select>
+          <label class="block text-[10px] font-bold text-slate-600 mb-0.5">対象者</label>
+          <select id="recMember" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none"></select>
         </div>
       </div>
 
-      <!-- 下部ボタン (固定) -->
-      <div class="flex space-x-2 pt-2 border-t border-slate-100 flex-shrink-0 mt-0.5">
+      <!-- 下部ボタン（常時固定） -->
+      <div class="flex space-x-2 pt-2 border-t border-slate-100 flex-shrink-0">
         <button type="button" onclick="closeModal('recurringModal')" class="flex-1 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 active:scale-95 transition text-center cursor-pointer">キャンセル</button>
         <button type="button" onclick="saveRecurringRule()" id="btnSaveRecurring" class="flex-1 py-2 rounded-xl bg-blue-600 text-xs font-bold text-white hover:bg-blue-700 active:scale-95 transition text-center cursor-pointer shadow-sm">保存する</button>
       </div>
       <div id="recModalDeleteArea" class="hidden pt-1 border-t border-slate-100 flex-shrink-0">
-        <button type="button" onclick="confirmDeleteRecurringInModal()" class="w-full py-1 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition text-center cursor-pointer">
+        <button type="button" onclick="confirmDeleteRecurringInModal()" class="w-full py-1 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-lg transition text-center cursor-pointer">
           この定期ルールを削除
         </button>
       </div>
