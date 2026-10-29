@@ -163,6 +163,9 @@
       </div>
 
       <div class="flex items-center space-x-2">
+        <!-- 最新版反映確認用バージョンバッジ -->
+        <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[9.5px] border border-emerald-200 shadow-2xs">v2.5 (最新)</span>
+
         <button id="btnSync" onclick="openSyncMenuModal()" class="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-bold active:scale-95 transition border border-blue-200/60 shadow-xs">
           <svg id="syncIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span id="syncText">同期メニュー</span>
@@ -1031,8 +1034,11 @@
     <div class="w-13 h-13 rounded-3xl bg-white/10 flex items-center justify-center mb-3">
       <svg class="w-6 h-6 text-white animate-spin-custom" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
     </div>
-    <h3 id="receiptLoadingTitle" class="text-sm font-bold tracking-wide">レシートを自動解析中...</h3>
-    <p id="receiptLoadingDesc" class="text-xs text-slate-300 mt-1">金額・店舗名・科目を高精度に読み取っています</p>
+    <h3 id="receiptLoadingTitle" class="text-sm font-bold tracking-wide">レシートを高速解析中...</h3>
+    <div class="flex items-center space-x-1.5 mt-1 bg-white/10 px-3 py-1 rounded-full border border-white/20">
+      <span id="receiptTimerText" class="text-xs font-mono font-bold text-emerald-300">0.0秒</span>
+    </div>
+    <p id="receiptLoadingDesc" class="text-xs text-slate-300 mt-2">思考時間をカットして最短レスポンスで処理しています</p>
 
     <div class="mt-6 w-full max-w-xs space-y-2">
       <button type="button" onclick="abortReceiptAndOpenManual()" class="w-full py-2.5 px-4 rounded-2xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold backdrop-blur-md border border-white/20 active:scale-95 transition flex items-center justify-center space-x-1.5 shadow-sm">
@@ -1477,6 +1483,8 @@
     let currentReceiptQueueIndex = 0;
     let selectedReceiptMemberTarget = '';
     let receiptAbortController = null;
+    let receiptTimerInterval = null;
+    let receiptStartTime = 0;
     let isCardAnimating = false;
     let isBudgetExpanded = false;
     let isRankingExpanded = false;
@@ -3542,10 +3550,11 @@
       }
 
       showOverlay(true);
+      startReceiptTimer();
       const loadingTitle = document.getElementById('receiptLoadingTitle');
       const loadingDesc = document.getElementById('receiptLoadingDesc');
-      if (loadingTitle) loadingTitle.textContent = 'レシートを自動解析中...';
-      if (loadingDesc) loadingDesc.textContent = files.length > 1 ? `${files.length}枚のレシートを解析しています...` : '金額・店舗名・科目を高精度に読み取っています';
+      if (loadingTitle) loadingTitle.textContent = 'レシートを高速解析中...';
+      if (loadingDesc) loadingDesc.textContent = files.length > 1 ? `${files.length}枚のレシートを解析しています...` : '思考時間をカットして最短レスポンスで処理しています';
 
       receiptAbortController = new AbortController();
       pendingReceiptQueue = [];
@@ -3591,10 +3600,14 @@
           throw new Error('レシートの金額や品目を読み取れませんでした');
         }
 
+        const elapsedSec = stopReceiptTimer();
         showOverlay(false);
+        showToast(`${elapsedSec}秒で解析完了`);
+
         currentReceiptQueueIndex = 0;
         showReceiptQueueItem(currentReceiptQueueIndex);
       } catch (err) {
+        stopReceiptTimer();
         showOverlay(false);
         if (err.name !== 'AbortError') {
           console.error(err);
@@ -3604,6 +3617,23 @@
         receiptAbortController = null;
         event.target.value = '';
       }
+    }
+
+    function startReceiptTimer() {
+      receiptStartTime = Date.now();
+      const timerEl = document.getElementById('receiptTimerText');
+      if (timerEl) timerEl.textContent = '0.0秒';
+      clearInterval(receiptTimerInterval);
+      receiptTimerInterval = setInterval(() => {
+        const sec = ((Date.now() - receiptStartTime) / 1000).toFixed(1);
+        if (timerEl) timerEl.textContent = `${sec}秒`;
+      }, 100);
+    }
+
+    function stopReceiptTimer() {
+      clearInterval(receiptTimerInterval);
+      if (!receiptStartTime) return '0.0';
+      return ((Date.now() - receiptStartTime) / 1000).toFixed(1);
     }
 
     function showReceiptQueueItem(index) {
@@ -3806,6 +3836,7 @@
 
     function abortReceiptAndOpenManual() {
       if (receiptAbortController) receiptAbortController.abort();
+      stopReceiptTimer();
       showOverlay(false);
       openManualModal('expense');
     }
