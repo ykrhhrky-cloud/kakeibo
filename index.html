@@ -164,7 +164,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.30</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.31</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -1646,6 +1646,7 @@
       setupTrendYearDropdown();
       setupYearMonthDropdownList();
       setupSwipeGesture();
+      cleanupDuplicateRecurringTransactions();
       checkAndApplyRecurring();
       refreshDashboard();
 
@@ -4911,41 +4912,73 @@
       });
     }
 
+    // ① 既存の定期明細との紐付け補正および重複データの自動クリーンアップ
+    function cleanupDuplicateRecurringTransactions() {
+      const now = new Date();
+      const curYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+      recurringRules.forEach(rule => {
+        // 当月内の該当定期ルールに関連する明細をすべて集める
+        const matched = transactions.filter(t => {
+          if (!t.date || !t.date.startsWith(curYM)) return false;
+          if (t.recurringId && t.recurringId === rule.id) return true;
+          return (t.title === rule.title || (t.memo && t.memo.includes('定期') && t.category === rule.category));
+        });
+
+        // 該当明細が2件以上重複している場合、1件だけ残して古い余分な明細を削除
+        if (matched.length > 1) {
+          const keepItem = matched[0]; // 最新の1件を保持
+          keepItem.recurringId = rule.id;
+          const removeIds = matched.slice(1).map(m => m.id);
+          transactions = transactions.filter(t => !removeIds.includes(t.id));
+        } else if (matched.length === 1) {
+          matched[0].recurringId = rule.id;
+        }
+      });
+      saveStoredData();
+    }
+
+    // ② 二重作成を完全ブロックする定期チェック
     function checkAndApplyRecurring() {
       const now = new Date();
       const curY = now.getFullYear();
       const curM = now.getMonth() + 1;
-      const curD = now.getDate();
       const curYM = `${curY}-${String(curM).padStart(2, '0')}`;
+      const curD = now.getDate();
+      const lastDay = new Date(curY, curM, 0).getDate();
 
       let appliedCount = 0;
       recurringRules.forEach(rule => {
         if (rule.startMonth && curYM < rule.startMonth) return;
         if (rule.endMonth && curYM > rule.endMonth) return;
 
-        let targetDayNum;
-        const lastDay = new Date(curY, curM, 0).getDate();
-        if (rule.day === 'last') targetDayNum = lastDay;
-        else targetDayNum = Math.min(Number(rule.day) || 1, lastDay);
-
-        if (curD < targetDayNum) return;
-
-        const dateStr = `${curYM}-${String(targetDayNum).padStart(2, '0')}`;
-        const exists = transactions.some(t => t.date === dateStr && t.title === rule.title && Number(t.amount) === Number(rule.amount));
-        if (!exists) {
-          transactions.unshift({
-            id: `tx_rec_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-            date: dateStr,
-            type: rule.type || 'expense',
-            category: rule.category || 'その他',
-            amount: Number(rule.amount) || 0,
-            title: rule.title || '定期収支',
-            memo: '毎月の定期収支 (自動登録)',
-            member: rule.member || '',
-            paymentMethod: rule.paymentMethod || '口座引落',
-            createdAt: new Date().toLocaleString('ja-JP')
+        const targetDay = rule.day === 'last' ? lastDay : Math.min(Number(rule.day) || 1, lastDay);
+        if (curD >= targetDay) {
+          const dateStr = `${curYM}-${String(targetDay).padStart(2, '0')}`;
+          
+          // 【厳格な二重作成ブロック】日付に関わらず当月に1件でもあれば新規作成しない
+          const exists = transactions.some(t => {
+            if (!t.date || !t.date.startsWith(curYM)) return false;
+            if (t.recurringId && t.recurringId === rule.id) return true;
+            return t.title === rule.title && t.category === rule.category;
           });
-          appliedCount++;
+
+          if (!exists) {
+            transactions.unshift({
+              id: `tx_rec_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+              recurringId: rule.id,
+              date: dateStr,
+              type: rule.type || 'expense',
+              category: rule.category || 'その他',
+              amount: Number(rule.amount) || 0,
+              title: rule.title || '定期収支',
+              memo: '毎月の定期収支 (自動登録)',
+              member: rule.member || '',
+              paymentMethod: rule.paymentMethod || '口座引落',
+              createdAt: new Date().toLocaleString('ja-JP')
+            });
+            appliedCount++;
+          }
         }
       });
 
@@ -5023,6 +5056,7 @@
       chooseRecPaymentMethod(type === 'expense' ? '口座引落' : '口座入金');
     }
 
+    // ③ ルール編集時に当月明細を新しい日付・金額へ直接スライド上書き
     function saveRecurringRule() {
       const startMonth = document.getElementById('recStartMonth').value;
       const endMonth = document.getElementById('recEndMonth').value;
@@ -5038,9 +5072,16 @@
         return;
       }
 
+      const now = new Date();
+      const curYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const targetDayNum = day === 'last' ? lastDay : Math.min(Number(day) || 1, lastDay);
+      const newDateStr = `${curYM}-${String(targetDayNum).padStart(2, '0')}`;
+
       if (editingRecurringId) {
         const rule = recurringRules.find(r => r.id === editingRecurringId);
         if (rule) {
+          const oldTitle = rule.title;
           rule.startMonth = startMonth;
           rule.endMonth = endMonth;
           rule.day = day;
@@ -5050,12 +5091,39 @@
           rule.title = title;
           rule.paymentMethod = paymentMethod;
           rule.member = member;
+
+          // 当月内の明細から該当定期の明細を検索
+          const matchedList = transactions.filter(t => {
+            if (!t.date || !t.date.startsWith(curYM)) return false;
+            if (t.recurringId && t.recurringId === editingRecurringId) return true;
+            return t.title === oldTitle || (t.title === title && t.category === category);
+          });
+
+          if (matchedList.length > 0) {
+            // 最初の1件を新しい日付・金額・内容へ確実に上書き更新
+            const targetTx = matchedList[0];
+            targetTx.recurringId = editingRecurringId;
+            targetTx.date = newDateStr;
+            targetTx.type = currentRecurringType;
+            targetTx.category = category;
+            targetTx.paymentMethod = paymentMethod;
+            targetTx.amount = amount;
+            targetTx.title = title;
+            targetTx.member = member;
+
+            // 重複が存在していたら余分な方を削除
+            if (matchedList.length > 1) {
+              const extraIds = matchedList.slice(1).map(m => m.id);
+              transactions = transactions.filter(t => !extraIds.includes(t.id));
+            }
+          }
         }
         editingRecurringId = null;
-        showToast('定期ルールを更新しました');
+        showToast('定期ルールと当月明細を上書き更新しました');
       } else {
+        const newRuleId = `rec_${Date.now()}`;
         recurringRules.push({
-          id: `rec_${Date.now()}`,
+          id: newRuleId,
           startMonth,
           endMonth,
           day,
@@ -5107,7 +5175,9 @@
         card.onclick = () => openRecurringModal(rule.id);
 
         const color = rule.type === 'income' ? 'text-emerald-700' : 'text-rose-700';
-        const prefix = rule.type === 'income' ? '+¥' : '-¥';
+        const typeBadgeHtml = rule.type === 'income'
+          ? '<span class="px-1 py-0.2 rounded bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200 mr-1 flex-shrink-0">収入</span>'
+          : '<span class="px-1 py-0.2 rounded bg-rose-50 text-rose-700 font-extrabold text-[8.5px] border border-rose-200 mr-1 flex-shrink-0">支出</span>';
         const dayLabel = rule.day === 'last' ? '月末' : `${rule.day}日`;
         const iconSvg = getCategoryIcon(rule.category, 'w-4 h-4');
 
@@ -5129,9 +5199,10 @@
               <p class="font-extrabold text-slate-800 truncate text-xs">${escapeHtml(rule.title)}</p>
             </div>
           </div>
-          <div class="flex items-center space-x-2 flex-shrink-0">
-            <span class="font-black font-mono ${color} text-xs">${prefix}${Number(rule.amount).toLocaleString()}</span>
-            <button type="button" onclick="event.stopPropagation(); deleteRecurringRule('${rule.id}')" class="text-slate-400 hover:text-rose-600 p-1 transition" title="削除">
+          <div class="flex items-center space-x-1 flex-shrink-0">
+            ${typeBadgeHtml}
+            <span class="font-black font-mono ${color} text-xs">¥${Number(rule.amount).toLocaleString()}</span>
+            <button type="button" onclick="event.stopPropagation(); deleteRecurringRule('${rule.id}')" class="text-slate-400 hover:text-rose-600 p-1 transition ml-0.5" title="削除">
               &times;
             </button>
           </div>
