@@ -275,6 +275,18 @@
                   <span id="expenseTotal" class="text-xs font-black font-mono text-rose-700 truncate">▲¥0</span>
                 </div>
 
+                <!-- 期日前予定（未出金）がある場合のみ自動表示される確定・予定分離行 -->
+                <div id="expenseScheduleSplitRow" class="hidden flex items-center justify-between text-[8px] leading-tight pt-0.5">
+                  <div class="flex items-center space-x-0.5">
+                    <span class="text-slate-500 font-bold">確定:</span>
+                    <span id="confirmedExpenseTotal" class="font-mono font-extrabold text-slate-700">¥0</span>
+                  </div>
+                  <div class="flex items-center space-x-0.5 px-1 py-0.2 rounded bg-blue-50 text-blue-700 border border-blue-200/70">
+                    <span class="font-bold">予定:</span>
+                    <span id="upcomingExpenseTotal" class="font-mono font-black">¥0</span>
+                  </div>
+                </div>
+
                 <div class="flex items-center justify-between pt-0.5 border-t border-slate-100 text-[8.5px]">
                   <div class="flex items-center space-x-1">
                     <span class="text-slate-600 font-bold">固定:</span>
@@ -703,15 +715,6 @@
           <span>支払い方法が不明です。選択してください</span>
         </div>
 
-        <!-- 重複検知アラートバッジ -->
-        <div id="confReceiptDuplicateAlert" class="hidden p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[10.5px] font-bold flex items-start space-x-1.5 animate-scale-up">
-          <span class="text-base leading-none">⚠️</span>
-          <div>
-            <span class="font-extrabold block">重複の可能性があります</span>
-            <span id="confReceiptDuplicateDesc" class="text-[9.5px] text-rose-600 font-medium">既に同じ日付・金額の明細が存在します</span>
-          </div>
-        </div>
-
         <div>
           <label class="block text-[10.5px] font-bold text-slate-600 mb-1">対象メンバー</label>
           <select id="confReceiptMember" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2 text-xs font-semibold outline-none focus:border-blue-500"></select>
@@ -723,15 +726,25 @@
         </div>
       </div>
 
-      <div class="flex space-x-2 pt-2 border-t border-slate-100">
-        <button type="button" onclick="skipReceiptItem()" id="btnSkipReceiptItem" class="hidden py-2.5 px-3 rounded-2xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-700 active:scale-95 transition">
-          スキップ
+      <!-- 重複検知アラートバッジ（ボタン直上に配置） -->
+      <div id="confReceiptDuplicateAlert" class="hidden p-2.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-[10.5px] font-bold flex items-start space-x-2 animate-scale-up">
+        <svg class="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <div>
+          <span class="font-extrabold block">重複の可能性があります</span>
+          <span id="confReceiptDuplicateDesc" class="text-[9.5px] text-rose-600 font-medium">既に同じ日付・金額の明細が存在します</span>
+        </div>
+      </div>
+
+      <!-- ワンタップ3択アクション -->
+      <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-100">
+        <button type="button" onclick="skipReceiptItem()" id="btnSkipReceiptItem" class="py-2.5 px-1.5 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-bold text-slate-600 active:scale-95 transition text-center truncate">
+          登録をやめる
         </button>
-        <button type="button" onclick="retakeReceipt()" class="flex-1 py-2.5 rounded-2xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 active:scale-95 transition flex items-center justify-center space-x-1">
-          <span>📷 撮り直す</span>
+        <button type="button" onclick="retakeReceipt()" class="py-2.5 px-1.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-[11px] font-bold text-slate-700 active:scale-95 transition text-center truncate">
+          撮影をやり直す
         </button>
-        <button type="button" onclick="confirmSaveReceiptTransaction()" id="btnConfirmReceiptSubmit" class="flex-1 py-2.5 rounded-2xl bg-blue-600 text-xs font-bold text-white hover:bg-blue-700 active:scale-95 transition shadow-sm flex items-center justify-center space-x-1">
-          <span id="btnConfirmReceiptText">✅ この内容で登録</span>
+        <button type="button" onclick="confirmSaveReceiptTransaction()" id="btnConfirmReceiptSubmit" class="py-2.5 px-1.5 rounded-2xl bg-blue-600 text-[11px] font-bold text-white hover:bg-blue-700 active:scale-95 transition shadow-sm text-center truncate">
+          <span id="btnConfirmReceiptText">登録する</span>
         </button>
       </div>
     </div>
@@ -743,7 +756,7 @@
       <div class="flex items-center justify-between border-b border-slate-100 pb-2 flex-shrink-0">
         <div>
           <h3 class="text-sm font-extrabold text-slate-800">支払い方法の管理</h3>
-          <p class="text-[10px] text-slate-400">分類をタップして展開し、カードや電子マネーを追加・削除</p>
+          <p class="text-[10px] text-slate-400">分類をタップして展開し、追加・名称変更・並べ替え</p>
         </div>
         <button type="button" onclick="closeModal('paymentMethodManageModal')" class="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
       </div>
@@ -788,7 +801,7 @@
         <div class="relative">
           <div class="flex items-center justify-between mb-0.5">
             <label class="block text-[10px] font-bold text-slate-600">科目</label>
-            <button type="button" onclick="openCategoryReorderModal()" class="text-[9.5px] text-blue-600 font-bold hover:underline">並び順⚙️</button>
+            <button type="button" onclick="openCategoryReorderModal()" class="text-[9.5px] text-blue-600 font-bold hover:underline">管理⚙️</button>
           </div>
           <button type="button" id="categoryDropdownTrigger" onclick="toggleCategoryDropdown()" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center justify-between outline-none focus:border-blue-500 active:scale-[0.99] transition">
             <div class="flex items-center space-x-1.5 truncate">
@@ -1027,6 +1040,58 @@
     </div>
   </div>
 
+  <!-- 定期ルール削除2択安全モーダル（最前面 z-[100] 配置） -->
+  <div id="recurringDeleteOptionModal" onclick="if(event.target === this) closeModal('recurringDeleteOptionModal')" class="hidden fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div onclick="event.stopPropagation()" class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-3.5 animate-scale-up border border-slate-100">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0 border border-rose-200/70">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </div>
+          <div>
+            <h4 class="text-sm font-extrabold text-slate-800">定期ルールの削除方法</h4>
+            <p class="text-[10px] text-slate-400">帳簿に反映済みの明細の扱いを選択してください</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeModal('recurringDeleteOptionModal')" class="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200/80 rounded-2xl px-3 py-2 text-center">
+        <span id="recDelRuleInfo" class="text-xs font-extrabold text-slate-800 break-words">対象ルール</span>
+      </div>
+
+      <div class="space-y-2.5">
+        <!-- 選択肢1：解約（未来の予定のみ取り消す）【推奨】 -->
+        <button type="button" onclick="executeDeleteRecurring('future_only')" class="w-full text-left p-3 rounded-2xl bg-blue-50/80 hover:bg-blue-100/80 border-2 border-blue-300/80 transition active:scale-[0.99] shadow-2xs">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-black text-blue-900">解約（未来の予定のみ取り消す）</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-blue-600 text-white text-[9px] font-extrabold">推奨</span>
+          </div>
+          <p id="recDelFutureDesc" class="text-[10.5px] text-slate-600 leading-relaxed font-medium">
+            今日より未来の予定明細だけを削除し、過去〜今日までの実績は帳簿に残します。
+          </p>
+        </button>
+
+        <!-- 選択肢2：すべて削除（過去の実績も全消去）【誤登録用】 -->
+        <button type="button" onclick="executeDeleteRecurring('all')" class="w-full text-left p-3 rounded-2xl bg-rose-50/80 hover:bg-rose-100/80 border border-rose-200 transition active:scale-[0.99]">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-black text-rose-800">すべて削除（過去の実績も全消去）</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 border border-rose-200 text-[9px] font-extrabold">誤登録用</span>
+          </div>
+          <p class="text-[10.5px] text-rose-700/90 leading-relaxed font-medium">
+            誤って登録した際など、このルールから作られた過去〜未来すべての明細を完全に消去します。
+          </p>
+        </button>
+      </div>
+
+      <div class="pt-1">
+        <button type="button" onclick="closeModal('recurringDeleteOptionModal')" class="w-full py-2.5 rounded-2xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 active:scale-95 transition">
+          キャンセル
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- メンバー選択モーダル（レシート前） -->
   <div id="memberSelectForReceiptModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-2xl space-y-3.5 animate-scale-up text-center">
@@ -1068,21 +1133,63 @@
       </div>
 
       <div class="border-t border-slate-100 pt-3 space-y-2">
-        <label class="text-xs font-bold text-slate-800 block">Google Apps Script URL (スプレッドシート連携)</label>
-        <input type="url" id="gasUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2 text-xs font-mono outline-none">
-        <button onclick="saveGasUrl()" class="w-full py-2 bg-slate-800 text-white rounded-2xl text-xs font-bold hover:bg-slate-900 transition">保存</button>
-      </div>
-
-      <div class="border-t border-slate-100 pt-3">
-        <button onclick="openPaymentMethodManageModal()" class="w-full py-2.5 bg-slate-100 text-slate-700 rounded-2xl text-xs font-bold hover:bg-slate-200 transition text-center">
-          💳 支払い方法の管理
+        <button onclick="openCategoryReorderModal()" class="w-full py-2.5 bg-slate-100 text-slate-700 rounded-2xl text-xs font-bold hover:bg-slate-200 transition flex items-center justify-center space-x-1.5">
+          <svg class="w-4 h-4 text-slate-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+          <span>科目の追加・編集・並び替え</span>
+        </button>
+        <button onclick="openPaymentMethodManageModal()" class="w-full py-2.5 bg-slate-100 text-slate-700 rounded-2xl text-xs font-bold hover:bg-slate-200 transition flex items-center justify-center space-x-1.5">
+          <svg class="w-4 h-4 text-slate-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="10" x2="22" y2="10" stroke-width="2"/></svg>
+          <span>支払い方法の管理</span>
         </button>
       </div>
 
       <div class="border-t border-slate-100 pt-3">
-        <button onclick="confirmResetAllData()" class="w-full py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-2xl text-xs font-bold hover:bg-rose-100 transition">
-          端末内の全データを初期化
+        <label class="text-xs font-bold text-slate-800 block mb-1">Googleスプレッドシート連携URL (GAS)</label>
+        <input type="text" id="gasUrl" placeholder="https://script.google.com/macros/s/..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2 text-xs font-mono outline-none">
+        <button onclick="saveGasUrl()" class="w-full mt-2 py-2 bg-blue-50 text-blue-600 rounded-2xl text-xs font-bold hover:bg-blue-100 transition">URLを保存</button>
+      </div>
+
+      <div class="border-t border-slate-100 pt-3">
+        <button onclick="confirmResetAllData()" class="w-full py-2 text-rose-500 text-xs font-bold hover:bg-rose-50 rounded-2xl transition">全データを初期化</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 科目管理モーダル（追加・名称変更・削除・並び替え） -->
+  <div id="categoryReorderModal" class="hidden fixed inset-0 z-[60] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-3 animate-scale-up flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 flex-shrink-0">
+        <div class="flex items-center space-x-1.5">
+          <span class="w-6 h-6 rounded-xl bg-blue-50 border border-blue-200/60 flex items-center justify-center flex-shrink-0">
+            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+          </span>
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-800">科目の追加・編集・並び替え</h3>
+            <p class="text-[10px] text-slate-400 mt-0.5">追加・名称変更・削除・並び順の変更が可能</p>
+          </div>
+        </div>
+        <button onclick="closeModal('categoryReorderModal')" class="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-2xl text-[11px] font-bold flex-shrink-0">
+        <button type="button" onclick="switchReorderTab('variable')" id="tabReorderVariable" class="py-1.5 rounded-xl bg-white text-blue-600 shadow-xs transition">変動費</button>
+        <button type="button" onclick="switchReorderTab('fixed')" id="tabReorderFixed" class="py-1.5 rounded-xl text-slate-600 hover:text-slate-900 transition">固定費</button>
+        <button type="button" onclick="switchReorderTab('income')" id="tabReorderIncome" class="py-1.5 rounded-xl text-slate-600 hover:text-slate-900 transition">収入</button>
+      </div>
+
+      <div id="reorderListContainer" class="flex-1 overflow-y-auto custom-scrollbar space-y-1.5 pr-1 py-1"></div>
+
+      <!-- 新規科目追加フォーム -->
+      <div class="flex items-center space-x-1.5 pt-2 border-t border-slate-100 flex-shrink-0">
+        <input type="text" id="inputNewCategoryName" onkeydown="if(event.key==='Enter'){event.preventDefault();addNewCategoryInModal();}" placeholder="新しい科目名を入力..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold outline-none focus:border-blue-500">
+        <button type="button" onclick="addNewCategoryInModal()" class="px-3.5 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 active:scale-95 transition flex-shrink-0 shadow-xs">
+          ＋ 追加
         </button>
+      </div>
+
+      <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between flex-shrink-0">
+        <button type="button" onclick="resetCategoryOrderInModal()" class="text-[11px] font-bold text-slate-400 hover:text-rose-600 underline transition">初期状態に戻す</button>
+        <button type="button" onclick="closeModal('categoryReorderModal')" class="px-5 py-2 rounded-2xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-900 active:scale-95 transition shadow-sm">完了</button>
       </div>
     </div>
   </div>
@@ -1234,37 +1341,6 @@
     </div>
   </div>
 
-  <!-- 科目並び替えモーダル -->
-  <div id="categoryReorderModal" class="hidden fixed inset-0 z-[60] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-3 animate-scale-up flex flex-col max-h-[85vh]">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 flex-shrink-0">
-        <div class="flex items-center space-x-1.5">
-          <span class="w-6 h-6 rounded-xl bg-blue-50 border border-blue-200/60 flex items-center justify-center flex-shrink-0">
-            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-          </span>
-          <div>
-            <h3 class="text-sm font-extrabold text-slate-800">科目の並び順を変更</h3>
-            <p class="text-[10px] text-slate-400 mt-0.5">よく使う科目を上へ移動</p>
-          </div>
-        </div>
-        <button onclick="closeModal('categoryReorderModal')" class="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
-      </div>
-
-      <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-2xl text-[11px] font-bold flex-shrink-0">
-        <button type="button" onclick="switchReorderTab('variable')" id="tabReorderVariable" class="py-1.5 rounded-xl bg-white text-blue-600 shadow-xs transition">変動費</button>
-        <button type="button" onclick="switchReorderTab('fixed')" id="tabReorderFixed" class="py-1.5 rounded-xl text-slate-600 hover:text-slate-900 transition">固定費</button>
-        <button type="button" onclick="switchReorderTab('income')" id="tabReorderIncome" class="py-1.5 rounded-xl text-slate-600 hover:text-slate-900 transition">収入</button>
-      </div>
-
-      <div id="reorderListContainer" class="flex-1 overflow-y-auto custom-scrollbar space-y-1.5 pr-1 py-1"></div>
-
-      <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between flex-shrink-0">
-        <button type="button" onclick="resetCategoryOrderInModal()" class="text-[11px] font-bold text-slate-400 hover:text-rose-600 underline transition">初期順に戻す</button>
-        <button type="button" onclick="closeModal('categoryReorderModal')" class="px-5 py-2 rounded-2xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 active:scale-95 transition shadow-sm">完了</button>
-      </div>
-    </div>
-  </div>
-
   <!-- 期間直接指定モーダル -->
   <div id="customDateModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-xs rounded-3xl p-5 shadow-2xl space-y-3 animate-scale-up">
@@ -1348,9 +1424,9 @@
       cash: '現金',
       other: 'その他'
     };
-
-    // 展開中の支払い方法アコーディオンのセット（初期値はすべて閉じた状態）
-    let expandedPayTypes = new Set();
+    // 展開中の支払い方法アコーディオンのセット（管理モーダルは初期状態で一番上の「クレジットカード」のみ展開）
+    let expandedPayTypes = new Set(['credit']);
+    let editingPaymentMethodId = null;
     let manualPayExpandedTypes = new Set();
     let confPayExpandedTypes = new Set();
     let recPayExpandedTypes = new Set();
@@ -1588,6 +1664,7 @@
     let selectedManualMember = null;
     let editingTxId = null;
     let editingRecurringId = null;
+    let pendingDeleteRecurringId = null;
     let currentRecurringType = 'expense';
     let pieChartInstance = null;
     let trendChartInstance = null;
@@ -1647,7 +1724,7 @@
       setupYearMonthDropdownList();
       setupSwipeGesture();
       cleanupDuplicateRecurringTransactions();
-      checkAndApplyRecurring();
+      syncAllRecurringRules();
       refreshDashboard();
 
       document.addEventListener('click', (e) => {
@@ -2301,8 +2378,225 @@
     }
 
     function openPaymentMethodManageModal() {
+      expandedPayTypes = new Set(['credit']); // 一番上のみ展開、他は閉じる
+      editingPaymentMethodId = null;
       renderPaymentMethodList();
       openModal('paymentMethodManageModal');
+    }
+
+    function togglePayTypeAccordion(type) {
+      if (expandedPayTypes.has(type)) {
+        expandedPayTypes.delete(type);
+      } else {
+        expandedPayTypes.add(type);
+      }
+      editingPaymentMethodId = null;
+      renderPaymentMethodList();
+    }
+
+    function renderPaymentMethodList() {
+      const container = document.getElementById('paymentMethodAccordionContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const types = ['credit', 'electronic', 'bank', 'cash', 'other'];
+
+      types.forEach(tKey => {
+        const items = paymentMethods.filter(pm => pm.type === tKey);
+        const isExpanded = expandedPayTypes.has(tKey);
+        const iconSvg = getPaymentMethodIcon(tKey, 'w-4 h-4');
+        const typeLabel = paymentTypeLabels[tKey] || tKey;
+
+        const card = document.createElement('div');
+        card.className = 'bg-slate-50 border border-slate-200/80 rounded-2xl overflow-hidden transition-all duration-200 shadow-2xs';
+
+        // ヘッダーボタン（44px基準）
+        const header = document.createElement('button');
+        header.type = 'button';
+        header.className = 'w-full min-h-[44px] p-3 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 select-none transition text-left';
+        header.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          togglePayTypeAccordion(tKey);
+        };
+
+        header.innerHTML = `
+          <div class="flex items-center space-x-2 min-w-0 pr-2">
+            <span class="flex-shrink-0 flex items-center justify-center">${iconSvg}</span>
+            <span class="font-extrabold text-xs text-slate-800">${typeLabel}</span>
+            <span class="text-[10px] font-bold text-slate-400 font-mono">(${items.length}件)</span>
+          </div>
+          <div class="w-6 h-6 flex items-center justify-center flex-shrink-0 rounded-full bg-white/80 border border-slate-200/60 shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        `;
+        card.appendChild(header);
+
+        // ボディ部（展開時のみ表示）
+        if (isExpanded) {
+          const body = document.createElement('div');
+          body.className = 'p-2.5 pt-0 border-t border-slate-200/50 space-y-2 animate-scale-up bg-white/60';
+
+          // 登録済みアイテムリスト
+          const listDiv = document.createElement('div');
+          listDiv.className = 'space-y-1.5 pt-1.5';
+
+          if (items.length === 0) {
+            listDiv.innerHTML = '<p class="text-[10px] text-slate-400 py-1 pl-1">まだ登録がありません</p>';
+          } else {
+            items.forEach((pm, subIdx) => {
+              const realIdx = paymentMethods.findIndex(p => p.id === pm.id || (p.name === pm.name && p.type === pm.type));
+              const isEditing = (editingPaymentMethodId === pm.id);
+              const isFirst = (subIdx === 0);
+              const isLast = (subIdx === items.length - 1);
+
+              const itemRow = document.createElement('div');
+              itemRow.className = 'p-2 px-2.5 rounded-xl bg-white border border-slate-200/70 flex items-center justify-between text-xs shadow-2xs gap-1.5';
+
+              if (isEditing) {
+                itemRow.innerHTML = `
+                  <input type="text" id="editPayInput_${pm.id}" value="${escapeHtml(pm.name)}" onkeydown="if(event.key==='Enter'){event.preventDefault();saveEditPaymentMethod('${pm.id}');}" class="flex-1 min-w-0 bg-slate-50 border border-blue-400 rounded-lg px-2 py-1 text-xs font-bold outline-none">
+                  <div class="flex items-center space-x-1 flex-shrink-0">
+                    <button type="button" onclick="saveEditPaymentMethod('${pm.id}')" class="px-2 py-1 rounded-lg bg-blue-600 text-white text-[10px] font-bold active:scale-95">保存</button>
+                    <button type="button" onclick="cancelEditPaymentMethod()" class="px-1.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold active:scale-95">取消</button>
+                  </div>
+                `;
+              } else {
+                itemRow.innerHTML = `
+                  <span class="font-bold text-slate-700 truncate flex-1 min-w-0 pr-1 text-[11px]">${escapeHtml(pm.name)}</span>
+                  <div class="flex items-center space-x-1 flex-shrink-0">
+                    <button type="button" onclick="startEditPaymentMethod('${pm.id}')" class="p-1 rounded-lg bg-slate-50 hover:bg-blue-50 text-slate-500 hover:text-blue-600 border border-slate-200/80 active:scale-90 transition" title="名称変更">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+                    ${!isFirst ? `
+                      <button type="button" onclick="movePaymentMethodToTop('${tKey}', '${pm.id}')" class="px-1 py-0.5 rounded-lg bg-slate-50 border border-slate-200/80 text-[9.5px] font-bold text-slate-500 hover:text-blue-600 active:scale-90 transition" title="先頭へ移動">🔝</button>
+                    ` : ''}
+                    <button type="button" onclick="movePaymentMethodStep('${tKey}', '${pm.id}', -1)" ${isFirst ? 'disabled' : ''} class="w-6 h-6 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-center text-[10px] text-slate-600 hover:text-blue-600 disabled:opacity-30 disabled:pointer-events-none active:scale-90 transition font-bold" title="1つ上へ">▲</button>
+                    <button type="button" onclick="movePaymentMethodStep('${tKey}', '${pm.id}', 1)" ${isLast ? 'disabled' : ''} class="w-6 h-6 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-center text-[10px] text-slate-600 hover:text-blue-600 disabled:opacity-30 disabled:pointer-events-none active:scale-90 transition font-bold" title="1つ下へ">▼</button>
+                    <button type="button" onclick="promptDeletePaymentMethod(${realIdx})" class="p-1 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 border border-slate-200/80 active:scale-90 transition" title="削除">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  </div>
+                `;
+              }
+              listDiv.appendChild(itemRow);
+            });
+          }
+          body.appendChild(listDiv);
+
+          // その中分類専用の新規追加フォーム（Enterキー対応）
+          const addForm = document.createElement('div');
+          addForm.className = 'flex items-center space-x-1.5 pt-1';
+          addForm.innerHTML = `
+            <input type="text" id="inputAddPay_${tKey}" onkeydown="if(event.key==='Enter'){event.preventDefault();addPaymentMethodForType('${tKey}');}" placeholder="${typeLabel}の名称（例: ${tKey === 'credit' ? 'Olive, 三井住友' : tKey === 'electronic' ? 'Suica, 楽天ペイ' : tKey === 'bank' ? '三井住友銀行' : '手渡し'}）" class="flex-1 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none focus:border-blue-500">
+            <button type="button" onclick="addPaymentMethodForType('${tKey}')" class="px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-bold active:scale-95 transition flex-shrink-0 shadow-xs">
+              追加
+            </button>
+          `;
+          body.appendChild(addForm);
+
+          card.appendChild(body);
+        }
+
+        container.appendChild(card);
+      });
+    }
+
+    function startEditPaymentMethod(pmId) {
+      editingPaymentMethodId = pmId;
+      renderPaymentMethodList();
+      setTimeout(() => {
+        const input = document.getElementById(`editPayInput_${pmId}`);
+        if (input) { input.focus(); input.select(); }
+      }, 30);
+    }
+
+    function cancelEditPaymentMethod() {
+      editingPaymentMethodId = null;
+      renderPaymentMethodList();
+    }
+
+    function saveEditPaymentMethod(pmId) {
+      const input = document.getElementById(`editPayInput_${pmId}`);
+      if (!input) return;
+      const newName = input.value.trim();
+      if (!newName) {
+        showToast('支払い方法の名称を入力してください', true);
+        return;
+      }
+      const target = paymentMethods.find(p => p.id === pmId);
+      if (!target) return;
+
+      if (target.name !== newName && paymentMethods.some(p => p.name === newName)) {
+        showToast('同名の支払い方法が既に存在します', true);
+        return;
+      }
+
+      const oldName = target.name;
+      target.name = newName;
+
+      // 過去の登録済み明細・定期ルールの名称も自動連動更新
+      if (oldName !== newName) {
+        transactions.forEach(t => {
+          if (t.paymentMethod === oldName) t.paymentMethod = newName;
+        });
+        recurringRules.forEach(r => {
+          if (r.paymentMethod === oldName) r.paymentMethod = newName;
+        });
+        if (selectedManualPaymentMethod === oldName) selectedManualPaymentMethod = newName;
+        if (selectedReceiptPaymentMethod === oldName) selectedReceiptPaymentMethod = newName;
+        if (selectedRecPaymentMethod === oldName) selectedRecPaymentMethod = newName;
+      }
+
+      editingPaymentMethodId = null;
+      saveStoredData();
+      renderPaymentMethodList();
+      populatePaymentMethodDropdowns();
+      refreshDashboard();
+      showToast(`「${newName}」に名称を変更しました`);
+    }
+
+    function movePaymentMethodStep(type, pmId, delta) {
+      const typeIndices = [];
+      paymentMethods.forEach((pm, idx) => {
+        if (pm.type === type) typeIndices.push(idx);
+      });
+      const subPos = typeIndices.findIndex(idx => paymentMethods[idx].id === pmId);
+      if (subPos === -1) return;
+      const targetSubPos = subPos + delta;
+      if (targetSubPos < 0 || targetSubPos >= typeIndices.length) return;
+
+      const fromGlobalIdx = typeIndices[subPos];
+      const toGlobalIdx = typeIndices[targetSubPos];
+
+      const [moved] = paymentMethods.splice(fromGlobalIdx, 1);
+      paymentMethods.splice(toGlobalIdx, 0, moved);
+
+      saveStoredData();
+      renderPaymentMethodList();
+      populatePaymentMethodDropdowns();
+    }
+
+    function movePaymentMethodToTop(type, pmId) {
+      const typeIndices = [];
+      paymentMethods.forEach((pm, idx) => {
+        if (pm.type === type) typeIndices.push(idx);
+      });
+      const subPos = typeIndices.findIndex(idx => paymentMethods[idx].id === pmId);
+      if (subPos <= 0) return;
+
+      const fromGlobalIdx = typeIndices[subPos];
+      const firstGlobalIdx = typeIndices[0];
+
+      const [moved] = paymentMethods.splice(fromGlobalIdx, 1);
+      paymentMethods.splice(firstGlobalIdx, 0, moved);
+
+      saveStoredData();
+      renderPaymentMethodList();
+      populatePaymentMethodDropdowns();
+      showToast(`「${moved.name}」を先頭に移動しました`);
     }
 
     function togglePayTypeAccordion(type) {
@@ -3030,8 +3324,11 @@
 
       let periodIncome = 0;
       let periodExpense = 0;
+      let confirmedExpense = 0;
+      let upcomingExpense = 0;
       let fixedExpense = 0;
       let variableExpense = 0;
+      const todayStr = getTodayString();
 
       filtered.forEach(t => {
         const amt = Number(t.amount) || 0;
@@ -3039,6 +3336,11 @@
           periodIncome += amt;
         } else {
           periodExpense += amt;
+          if (t.date && t.date > todayStr) {
+            upcomingExpense += amt;
+          } else {
+            confirmedExpense += amt;
+          }
           if (getCategoryGroup(t.category) === 'fixed') fixedExpense += amt;
           else variableExpense += amt;
         }
@@ -3067,10 +3369,22 @@
 
       const incEl = document.getElementById('incomeTotal');
       const expEl = document.getElementById('expenseTotal');
+      const splitRowEl = document.getElementById('expenseScheduleSplitRow');
+      const confExpEl = document.getElementById('confirmedExpenseTotal');
+      const upExpEl = document.getElementById('upcomingExpenseTotal');
       const fixedEl = document.getElementById('fixedExpenseTotal');
       const varEl = document.getElementById('variableExpenseTotal');
       if (incEl) incEl.textContent = `¥${periodIncome.toLocaleString()}`;
       if (expEl) expEl.textContent = `▲¥${periodExpense.toLocaleString()}`;
+      if (splitRowEl) {
+        if (upcomingExpense > 0) {
+          splitRowEl.classList.remove('hidden');
+          if (confExpEl) confExpEl.textContent = `¥${confirmedExpense.toLocaleString()}`;
+          if (upExpEl) upExpEl.textContent = `¥${upcomingExpense.toLocaleString()}`;
+        } else {
+          splitRowEl.classList.add('hidden');
+        }
+      }
       if (fixedEl) fixedEl.textContent = `¥${fixedExpense.toLocaleString()}`;
       if (varEl) varEl.textContent = `¥${variableExpense.toLocaleString()}`;
 
@@ -3235,6 +3549,10 @@
 
       const memoSub = t.memo ? `<span class="text-[11px] text-slate-500 font-medium truncate block max-w-[140px]">${escapeHtml(t.memo)}</span>` : '';
       const displayDate = t.date ? t.date.slice(5).replace('-', '/') : '';
+      const isUpcomingTx = (t.date && t.date > getTodayString());
+      const upcomingBadgeHtml = isUpcomingTx
+        ? '<span class="px-1 py-0.2 rounded bg-blue-50 text-blue-700 font-extrabold text-[8px] border border-blue-200/80 flex-shrink-0">予定</span>'
+        : '';
 
       let memberBadgeHtml = '';
       if (t.type === 'expense' && t.member && membersList.includes(t.member)) {
@@ -3274,6 +3592,7 @@
               ${newBadgeHtml}
               <p class="text-xs font-bold text-slate-800 truncate">${escapeHtml(t.title || '未分類')}</p>
               <span class="text-[9.5px] font-semibold text-slate-400 flex-shrink-0">${displayDate}</span>
+              ${upcomingBadgeHtml}
             </div>
             <div class="flex items-center space-x-1 mt-0">
               ${groupBadge}
@@ -3457,10 +3776,7 @@
         if (memberGroup) memberGroup.classList.add('hidden');
         if (payLabel) payLabel.textContent = '入金方法';
       }
-
-      updateManualPaymentTriggerUI();
       renderCategoryDropdownList();
-      updateTitleSuggestions();
     }
 
     function toggleCategoryDropdown() {
@@ -3469,7 +3785,8 @@
       if (menu) {
         const isHidden = menu.classList.contains('hidden');
         if (isHidden) {
-          closeManualPaymentDropdown(); // 支払い方法が開いていれば必ず閉じる（排他制御）
+          closeManualPaymentDropdown();
+          renderCategoryDropdownList();
           menu.classList.remove('hidden');
           if (arrow) arrow.classList.add('rotate-180');
         } else {
@@ -3485,72 +3802,109 @@
       if (arrow) arrow.classList.remove('rotate-180');
     }
 
-    function chooseCategory(cat, closeMenu = true) {
+    function chooseCategory(cat, shouldClose = true) {
       selectedManualCategory = cat;
       const hiddenSelect = document.getElementById('manualCategory');
       if (hiddenSelect) hiddenSelect.value = cat;
 
       const iconEl = document.getElementById('selectedCategoryIcon');
-      const nameEl = document.getElementById('selectedCategoryName');
       const badgeEl = document.getElementById('selectedCategoryBadge');
+      const nameEl = document.getElementById('selectedCategoryName');
 
-      const iconHtml = getCategoryIcon(cat, 'w-4 h-4');
-      const grp = getCategoryGroup(cat);
-
-      if (iconEl) iconEl.innerHTML = iconHtml;
+      if (iconEl) iconEl.innerHTML = getCategoryIcon(cat, 'w-4 h-4');
       if (nameEl) nameEl.textContent = cat;
 
       if (badgeEl) {
-        if (currentManualType === 'income') {
+        const grp = getCategoryGroup(cat);
+        if (grp === 'income') {
           badgeEl.textContent = '収入';
-          badgeEl.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-600 flex-shrink-0';
-        } else if (getCategoryGroup(cat) === 'fixed') {
+          badgeEl.className = 'text-[8.5px] font-bold px-1 py-0.2 rounded bg-emerald-50 text-emerald-700 flex-shrink-0';
+        } else if (grp === 'fixed') {
           badgeEl.textContent = '固定費';
-          badgeEl.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-600 flex-shrink-0';
+          badgeEl.className = 'text-[8.5px] font-bold px-1 py-0.2 rounded bg-indigo-50 text-indigo-700 flex-shrink-0';
         } else {
           badgeEl.textContent = '変動費';
-          badgeEl.className = 'text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-50 text-amber-600 flex-shrink-0';
+          badgeEl.className = 'text-[8.5px] font-bold px-1 py-0.2 rounded bg-amber-50 text-amber-600 flex-shrink-0';
         }
       }
 
-      if (closeMenu) closeCategoryDropdown();
+      if (shouldClose) closeCategoryDropdown();
     }
 
     function renderCategoryDropdownList() {
       const container = document.getElementById('categoryDropdownList');
+      const hiddenSelect = document.getElementById('manualCategory');
       if (!container) return;
       container.innerHTML = '';
+      if (hiddenSelect) hiddenSelect.innerHTML = '';
 
-      let list = currentManualType === 'expense' ? [...variableExpenseCategories, ...fixedExpenseCategories] : [...incomeCategories];
-      if (!selectedManualCategory || !list.includes(selectedManualCategory)) selectedManualCategory = list[0] || '';
-      chooseCategory(selectedManualCategory, false);
+      const groups = currentManualType === 'income'
+        ? [{ label: '収入', items: incomeCategories, badgeClass: 'bg-emerald-50 text-emerald-700' }]
+        : [
+            { label: '変動費', items: variableExpenseCategories, badgeClass: 'bg-amber-50 text-amber-700' },
+            { label: '固定費', items: fixedExpenseCategories, badgeClass: 'bg-indigo-50 text-indigo-700' }
+          ];
 
-      list.forEach(cat => {
-        const item = document.createElement('div');
-        item.className = 'flex items-center justify-between p-2.5 rounded-xl text-xs cursor-pointer select-none transition hover:bg-slate-50 text-slate-700 font-semibold';
-        const icon = getCategoryIcon(cat, 'w-4 h-4');
-        item.innerHTML = `
-          <div class="flex items-center space-x-2 truncate" onclick="chooseCategory('${cat}', true)">
-            <span class="flex-shrink-0 flex items-center justify-center">${icon}</span>
-            <span class="font-bold">${cat}</span>
-          </div>
-          ${fixedExpenseCategories.includes(cat) && currentManualType === 'expense' ? '<span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-600">固定費</span>' : ''}
-        `;
-        container.appendChild(item);
+      const allItems = groups.flatMap(g => g.items);
+      if (!selectedManualCategory || !allItems.includes(selectedManualCategory)) {
+        selectedManualCategory = allItems[0] || 'その他';
+      }
+
+      groups.forEach(grp => {
+        if (groups.length > 1) {
+          const header = document.createElement('div');
+          header.className = `text-[9px] font-black px-2 py-0.5 mt-1 rounded ${grp.badgeClass}`;
+          header.textContent = grp.label;
+          container.appendChild(header);
+        }
+
+        grp.items.forEach(cat => {
+          if (hiddenSelect) {
+            const opt = document.createElement('option');
+            opt.value = cat;
+            opt.textContent = cat;
+            hiddenSelect.appendChild(opt);
+          }
+
+          const isSelected = (selectedManualCategory === cat);
+          const row = document.createElement('button');
+          row.type = 'button';
+          row.className = `w-full p-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition text-left ${
+            isSelected ? 'bg-blue-50 text-blue-700 border border-blue-200 font-extrabold' : 'hover:bg-slate-50 text-slate-700'
+          }`;
+          row.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            chooseCategory(cat, true);
+          };
+          row.innerHTML = `
+            <div class="flex items-center space-x-2 min-w-0">
+              <span class="flex-shrink-0 flex items-center justify-center">${getCategoryIcon(cat, 'w-4 h-4')}</span>
+              <span class="truncate">${escapeHtml(cat)}</span>
+            </div>
+            ${isSelected ? '<span class="text-blue-600 font-black text-xs">✓</span>' : ''}
+          `;
+          container.appendChild(row);
+        });
       });
+
+      chooseCategory(selectedManualCategory, false);
     }
 
-    // ==================== 科目並び替え機能の完全実装 ====================
+    // ==================== 科目管理機能（追加・編集・削除・並び替え） ====================
     let draggedModalCategory = null;
+    let editingCategoryName = null;
 
     function openCategoryReorderModal() {
       activeReorderTab = 'variable';
+      editingCategoryName = null;
       switchReorderTab('variable');
       openModal('categoryReorderModal');
     }
 
     function switchReorderTab(tab) {
       activeReorderTab = tab;
+      editingCategoryName = null;
       const tabVar = document.getElementById('tabReorderVariable');
       const tabFix = document.getElementById('tabReorderFixed');
       const tabInc = document.getElementById('tabReorderIncome');
@@ -3582,35 +3936,57 @@
         const icon = getCategoryIcon(cat, 'w-4 h-4');
         const isFirst = index === 0;
         const isLast = index === list.length - 1;
+        const isEditing = (editingCategoryName === cat);
 
         const card = document.createElement('div');
-        card.className = 'reorder-card bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-2xl p-2 px-3 flex items-center justify-between text-xs transition';
-        card.draggable = true;
+        card.className = 'reorder-card bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-2xl p-2 px-2.5 flex items-center justify-between text-xs transition gap-1.5';
+        card.draggable = !isEditing;
         card.dataset.category = cat;
         card.dataset.index = index;
 
-        card.innerHTML = `
-          <div class="flex items-center space-x-2.5 truncate flex-1 min-w-0 pr-2">
-            <span class="flex-shrink-0 flex items-center justify-center">${icon}</span>
-            <span class="font-extrabold text-slate-800 text-xs truncate">${cat}</span>
-          </div>
+        if (isEditing) {
+          card.innerHTML = `
+            <div class="flex items-center space-x-2 flex-1 min-w-0">
+              <span class="flex-shrink-0 flex items-center justify-center">${icon}</span>
+              <input type="text" id="editCatInput_${index}" value="${escapeHtml(cat)}" onkeydown="if(event.key==='Enter'){event.preventDefault();saveEditCategoryName(${index});}" class="flex-1 min-w-0 bg-white border border-blue-400 rounded-lg px-2 py-1 text-xs font-bold outline-none">
+            </div>
+            <div class="flex items-center space-x-1 flex-shrink-0">
+              <button type="button" onclick="saveEditCategoryName(${index})" class="px-2 py-1 rounded-lg bg-blue-600 text-white text-[10px] font-bold active:scale-95">保存</button>
+              <button type="button" onclick="cancelEditCategoryName()" class="px-1.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-600 text-[10px] font-bold active:scale-95">取消</button>
+            </div>
+          `;
+        } else {
+          card.innerHTML = `
+            <div class="flex items-center space-x-2 truncate flex-1 min-w-0 pr-1">
+              <span class="flex-shrink-0 flex items-center justify-center">${icon}</span>
+              <span class="font-extrabold text-slate-800 text-xs truncate">${escapeHtml(cat)}</span>
+            </div>
 
-          <div class="flex items-center space-x-1 flex-shrink-0">
-            ${!isFirst ? `
-              <button type="button" onclick="moveCategoryToTop('${cat}')" class="p-1 px-1.5 rounded-lg bg-white border border-slate-200 text-[10px] font-bold text-slate-500 hover:text-blue-600 active:scale-90 transition" title="先頭へ移動">
-                🔝
+            <div class="flex items-center space-x-1 flex-shrink-0">
+              <button type="button" onclick="startEditCategoryName('${escapeHtml(cat)}')" class="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-blue-600 active:scale-90 transition" title="名称変更">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
               </button>
-            ` : ''}
 
-            <button type="button" onclick="moveCategoryStep('${cat}', -1)" ${isFirst ? 'disabled' : ''} class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-300 disabled:opacity-30 disabled:pointer-events-none active:scale-90 transition font-bold" title="1つ上へ">
-              ▲
-            </button>
+              ${!isFirst ? `
+                <button type="button" onclick="moveCategoryToTop('${escapeHtml(cat)}')" class="p-1 px-1.5 rounded-lg bg-white border border-slate-200 text-[10px] font-bold text-slate-500 hover:text-blue-600 active:scale-90 transition" title="先頭へ移動">
+                  🔝
+                </button>
+              ` : ''}
 
-            <button type="button" onclick="moveCategoryStep('${cat}', 1)" ${isLast ? 'disabled' : ''} class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-300 disabled:opacity-30 disabled:pointer-events-none active:scale-90 transition font-bold" title="1つ下へ">
-              ▼
-            </button>
-          </div>
-        `;
+              <button type="button" onclick="moveCategoryStep('${escapeHtml(cat)}', -1)" ${isFirst ? 'disabled' : ''} class="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[10px] text-slate-600 hover:text-blue-600 hover:border-blue-300 disabled:opacity-30 disabled:pointer-events-none active:scale-90 transition font-bold" title="1つ上へ">
+                ▲
+              </button>
+
+              <button type="button" onclick="moveCategoryStep('${escapeHtml(cat)}', 1)" ${isLast ? 'disabled' : ''} class="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-[10px] text-slate-600 hover:text-blue-600 hover:border-blue-300 disabled:opacity-30 disabled:pointer-events-none active:scale-90 transition font-bold" title="1つ下へ">
+                ▼
+              </button>
+
+              <button type="button" onclick="promptDeleteCategory('${escapeHtml(cat)}')" class="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 active:scale-90 transition" title="削除">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          `;
+        }
 
         card.addEventListener('dragstart', (e) => {
           draggedModalCategory = cat;
@@ -3646,6 +4022,108 @@
 
         container.appendChild(card);
       });
+    }
+
+    function addNewCategoryInModal() {
+      const input = document.getElementById('inputNewCategoryName');
+      if (!input) return;
+      const newCat = input.value.trim();
+      if (!newCat) {
+        showToast('追加する科目名を入力してください', true);
+        return;
+      }
+      if (getAllAvailableCategories().includes(newCat)) {
+        showToast('同名の科目が既に登録されています', true);
+        return;
+      }
+      const list = getCurrentReorderList();
+      list.push(newCat);
+      selectedCategoriesFilter.add(newCat);
+      input.value = '';
+      applyCategoryOrderChanges();
+      showToast(`科目「${newCat}」を追加しました`);
+    }
+
+    function startEditCategoryName(cat) {
+      editingCategoryName = cat;
+      renderReorderList();
+      const list = getCurrentReorderList();
+      const idx = list.indexOf(cat);
+      setTimeout(() => {
+        const input = document.getElementById(`editCatInput_${idx}`);
+        if (input) { input.focus(); input.select(); }
+      }, 30);
+    }
+
+    function cancelEditCategoryName() {
+      editingCategoryName = null;
+      renderReorderList();
+    }
+
+    function saveEditCategoryName(index) {
+      const list = getCurrentReorderList();
+      const oldName = list[index];
+      if (!oldName) return;
+      const input = document.getElementById(`editCatInput_${index}`);
+      if (!input) return;
+      const newName = input.value.trim();
+
+      if (!newName) {
+        showToast('科目名を入力してください', true);
+        return;
+      }
+      if (oldName !== newName && getAllAvailableCategories().includes(newName)) {
+        showToast('同名の科目が既に存在します', true);
+        return;
+      }
+
+      list[index] = newName;
+
+      // 過去の明細・定期ルール・フィルター選択状態も新しい科目名へ自動連動
+      if (oldName !== newName) {
+        transactions.forEach(t => {
+          if (t.category === oldName) t.category = newName;
+        });
+        recurringRules.forEach(r => {
+          if (r.category === oldName) r.category = newName;
+        });
+        if (selectedCategoriesFilter.has(oldName)) {
+          selectedCategoriesFilter.delete(oldName);
+          selectedCategoriesFilter.add(newName);
+        }
+        if (selectedManualCategory === oldName) {
+          selectedManualCategory = newName;
+        }
+      }
+
+      editingCategoryName = null;
+      applyCategoryOrderChanges();
+      refreshDashboard();
+      showToast(`「${newName}」に名称を変更しました`);
+    }
+
+    function promptDeleteCategory(cat) {
+      const list = getCurrentReorderList();
+      if (list.length <= 1) {
+        showToast('最低1つの科目を残す必要があります', true);
+        return;
+      }
+      const titleEl = document.getElementById('deleteConfirmTitle');
+      if (titleEl) titleEl.textContent = '科目を削除しますか？';
+      document.getElementById('deleteConfirmMessage').textContent = `科目「${cat}」を削除します。（※過去に登録済みの明細データはそのまま残ります）`;
+
+      const btn = document.getElementById('btnExecuteDelete');
+      btn.onclick = () => {
+        closeModal('deleteConfirmModal');
+        const idx = list.indexOf(cat);
+        if (idx !== -1) {
+          list.splice(idx, 1);
+          selectedCategoriesFilter.delete(cat);
+          applyCategoryOrderChanges();
+          showToast(`科目「${cat}」を削除しました`);
+        }
+      };
+      openModal('deleteConfirmModal');
     }
 
     function moveCategoryStep(cat, delta) {
@@ -4052,13 +4530,12 @@
           const dDate = tx.duplicateTarget.date ? tx.duplicateTarget.date.replace(/-/g, '/') : '';
           dupDesc.textContent = `既存明細「${tx.duplicateTarget.title}」(¥${Number(tx.duplicateTarget.amount).toLocaleString()} / ${dDate}) と重複している可能性があります`;
         }
-        if (skipBtn) skipBtn.classList.remove('hidden');
       } else {
         if (dupAlert) dupAlert.classList.add('hidden');
-        if (skipBtn) {
-          if (pendingReceiptQueue.length > 1) skipBtn.classList.remove('hidden');
-          else skipBtn.classList.add('hidden');
-        }
+      }
+
+      if (skipBtn) {
+        skipBtn.textContent = (pendingReceiptQueue.length > 1) ? 'この明細をやめる' : '登録をやめる';
       }
 
       const memSel = document.getElementById('confReceiptMember');
@@ -4078,8 +4555,8 @@
       const btnText = document.getElementById('btnConfirmReceiptText');
       if (btnText) {
         btnText.textContent = (index === pendingReceiptQueue.length - 1)
-          ? '✅ この内容で登録'
-          : `✅ 登録して次へ (${index + 1}/${pendingReceiptQueue.length})`;
+          ? '登録する'
+          : `登録して次へ (${index + 1}/${pendingReceiptQueue.length})`;
       }
 
       openModal('receiptConfirmModal');
@@ -4087,7 +4564,8 @@
 
     function skipReceiptItem() {
       if (pendingReceiptQueue.length === 0) return;
-      showToast('レシートの登録をスキップしました');
+      const isMulti = pendingReceiptQueue.length > 1;
+      showToast(isMulti ? 'この明細の登録を中止しました' : 'レシートの登録をやめました');
       currentReceiptQueueIndex++;
       if (currentReceiptQueueIndex < pendingReceiptQueue.length) {
         showReceiptQueueItem(currentReceiptQueueIndex);
@@ -4912,79 +5390,156 @@
       });
     }
 
-    // ① 既存の定期明細との紐付け補正および重複データの自動クリーンアップ
+    // ① 既存の定期明細を確定性IDへ変換・統合し、重複データを自動クリーンアップ
     function cleanupDuplicateRecurringTransactions() {
-      const now = new Date();
-      const curYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      let hasChanges = false;
 
       recurringRules.forEach(rule => {
-        // 当月内の該当定期ルールに関連する明細をすべて集める
-        const matched = transactions.filter(t => {
-          if (!t.date || !t.date.startsWith(curYM)) return false;
+        const expectedPrefix = `tx_rec_${rule.id}_`;
+
+        // この定期ルールに関連するすべての明細を抽出
+        const related = transactions.filter(t => {
+          if (!t.date) return false;
+          if (t.id && t.id.startsWith(expectedPrefix)) return true;
           if (t.recurringId && t.recurringId === rule.id) return true;
-          return (t.title === rule.title || (t.memo && t.memo.includes('定期') && t.category === rule.category));
+          return (t.memo && t.memo.includes('定期') && (t.title === rule.title || t.category === rule.category));
         });
 
-        // 該当明細が2件以上重複している場合、1件だけ残して古い余分な明細を削除
-        if (matched.length > 1) {
-          const keepItem = matched[0]; // 最新の1件を保持
-          keepItem.recurringId = rule.id;
-          const removeIds = matched.slice(1).map(m => m.id);
-          transactions = transactions.filter(t => !removeIds.includes(t.id));
-        } else if (matched.length === 1) {
-          matched[0].recurringId = rule.id;
-        }
+        // 年月（YYYY-MM）ごとにグルーピングして1件に統合
+        const byMonth = {};
+        related.forEach(t => {
+          const ym = t.date.slice(0, 7);
+          if (!byMonth[ym]) byMonth[ym] = [];
+          byMonth[ym].push(t);
+        });
+
+        Object.entries(byMonth).forEach(([ym, items]) => {
+          const deterministicId = `tx_rec_${rule.id}_${ym}`;
+          // 既に確定性IDを持つ明細があればそれを優先保持
+          let keepItem = items.find(item => item.id === deterministicId) || items[0];
+
+          if (keepItem.id !== deterministicId || keepItem.recurringId !== rule.id) {
+            keepItem.id = deterministicId;
+            keepItem.recurringId = rule.id;
+            hasChanges = true;
+          }
+
+          // 同じ月に2件以上重複している場合は余分な明細を削除
+          if (items.length > 1) {
+            const extraItems = items.filter(item => item !== keepItem);
+            transactions = transactions.filter(t => !extraItems.includes(t));
+            hasChanges = true;
+          }
+        });
       });
-      saveStoredData();
+
+      if (hasChanges) {
+        saveStoredData();
+      }
     }
 
-    // ② 二重作成を完全ブロックする定期チェック
-    function checkAndApplyRecurring() {
+    // ② 確定性IDによる開始月〜当月までの過去遡り一括投影＆同期
+    function syncAllRecurringRules(targetRuleId = null, highlightCurrentMonth = false) {
       const now = new Date();
       const curY = now.getFullYear();
       const curM = now.getMonth() + 1;
       const curYM = `${curY}-${String(curM).padStart(2, '0')}`;
-      const curD = now.getDate();
-      const lastDay = new Date(curY, curM, 0).getDate();
 
-      let appliedCount = 0;
-      recurringRules.forEach(rule => {
-        if (rule.startMonth && curYM < rule.startMonth) return;
-        if (rule.endMonth && curYM > rule.endMonth) return;
+      let hasChanges = false;
+      const rulesToProcess = targetRuleId
+        ? recurringRules.filter(r => r.id === targetRuleId)
+        : recurringRules;
 
-        const targetDay = rule.day === 'last' ? lastDay : Math.min(Number(rule.day) || 1, lastDay);
-        if (curD >= targetDay) {
-          const dateStr = `${curYM}-${String(targetDay).padStart(2, '0')}`;
-          
-          // 【厳格な二重作成ブロック】日付に関わらず当月に1件でもあれば新規作成しない
-          const exists = transactions.some(t => {
-            if (!t.date || !t.date.startsWith(curYM)) return false;
-            if (t.recurringId && t.recurringId === rule.id) return true;
-            return t.title === rule.title && t.category === rule.category;
-          });
+      rulesToProcess.forEach(rule => {
+        const startYM = rule.startMonth || curYM;
+        if (startYM > curYM) return; // 開始月が未来の場合は未生成
 
-          if (!exists) {
+        // 終了上限月（endMonthが指定されていればcurYMとの小さい方）
+        const maxYM = (rule.endMonth && rule.endMonth < curYM) ? rule.endMonth : curYM;
+        if (startYM > maxYM) return;
+
+        const [startY, startM] = startYM.split('-').map(Number);
+        const [endY, endM] = maxYM.split('-').map(Number);
+        if (!startY || !startM || !endY || !endM) return;
+
+        let y = startY;
+        let m = startM;
+
+        while (y < endY || (y === endY && m <= endM)) {
+          const ymStr = `${y}-${String(m).padStart(2, '0')}`;
+          const lastDayOfMonth = new Date(y, m, 0).getDate();
+          const targetDay = rule.day === 'last' ? lastDayOfMonth : Math.min(Number(rule.day) || 1, lastDayOfMonth);
+          const dateStr = `${ymStr}-${String(targetDay).padStart(2, '0')}`;
+          const deterministicId = `tx_rec_${rule.id}_${ymStr}`;
+
+          const ruleType = rule.type || 'expense';
+          const ruleCategory = rule.category || 'その他';
+          const ruleAmount = Number(rule.amount) || 0;
+          const ruleTitle = rule.title || '定期収支';
+          const ruleMember = ruleType === 'expense' ? (rule.member || '') : '';
+          const rulePayment = rule.paymentMethod || (ruleType === 'income' ? '口座入金' : '口座引落');
+
+          const existingTx = transactions.find(t => t.id === deterministicId);
+          if (existingTx) {
+            // 既存の確定性ID明細を最新ルール内容で上書き同期
+            if (
+              existingTx.date !== dateStr ||
+              existingTx.type !== ruleType ||
+              existingTx.category !== ruleCategory ||
+              Number(existingTx.amount) !== ruleAmount ||
+              existingTx.title !== ruleTitle ||
+              (existingTx.member || '') !== ruleMember ||
+              existingTx.paymentMethod !== rulePayment ||
+              existingTx.recurringId !== rule.id
+            ) {
+              existingTx.recurringId = rule.id;
+              existingTx.date = dateStr;
+              existingTx.type = ruleType;
+              existingTx.category = ruleCategory;
+              existingTx.amount = ruleAmount;
+              existingTx.title = ruleTitle;
+              existingTx.member = ruleMember;
+              existingTx.paymentMethod = rulePayment;
+              hasChanges = true;
+            }
+          } else {
+            // 未生成の月を新規生成（確定性ID付与）
             transactions.unshift({
-              id: `tx_rec_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+              id: deterministicId,
               recurringId: rule.id,
               date: dateStr,
-              type: rule.type || 'expense',
-              category: rule.category || 'その他',
-              amount: Number(rule.amount) || 0,
-              title: rule.title || '定期収支',
+              type: ruleType,
+              category: ruleCategory,
+              amount: ruleAmount,
+              title: ruleTitle,
               memo: '毎月の定期収支 (自動登録)',
-              member: rule.member || '',
-              paymentMethod: rule.paymentMethod || '口座引落',
+              member: ruleMember,
+              paymentMethod: rulePayment,
               createdAt: new Date().toLocaleString('ja-JP')
             });
-            appliedCount++;
+            hasChanges = true;
+          }
+
+          if (highlightCurrentMonth && ymStr === curYM) {
+            recentNewTxMap.set(deterministicId, Date.now());
+          }
+
+          m++;
+          if (m > 12) {
+            m = 1;
+            y++;
           }
         }
       });
 
-      if (appliedCount > 0) {
+      if (hasChanges) {
         saveStoredData();
       }
+    }
+
+    // 互換エイリアス
+    function checkAndApplyRecurring() {
+      syncAllRecurringRules();
     }
 
     function openRecurringModal(ruleId = null) {
@@ -5056,7 +5611,7 @@
       chooseRecPaymentMethod(type === 'expense' ? '口座引落' : '口座入金');
     }
 
-    // ③ ルール編集時に当月明細を新しい日付・金額へ直接スライド上書き
+    // ③ ルール保存・編集時の全洗い替え（既存紐付け明細のクリーンアップ＆全月分一括再生成）
     function saveRecurringRule() {
       const startMonth = document.getElementById('recStartMonth').value;
       const endMonth = document.getElementById('recEndMonth').value;
@@ -5072,16 +5627,16 @@
         return;
       }
 
-      const now = new Date();
-      const curYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-      const targetDayNum = day === 'last' ? lastDay : Math.min(Number(day) || 1, lastDay);
-      const newDateStr = `${curYM}-${String(targetDayNum).padStart(2, '0')}`;
+      if (endMonth && startMonth && endMonth < startMonth) {
+        showToast('終了月は開始月以降を指定してください', true);
+        return;
+      }
+
+      let targetRuleId = null;
 
       if (editingRecurringId) {
         const rule = recurringRules.find(r => r.id === editingRecurringId);
         if (rule) {
-          const oldTitle = rule.title;
           rule.startMonth = startMonth;
           rule.endMonth = endMonth;
           rule.day = day;
@@ -5091,39 +5646,22 @@
           rule.title = title;
           rule.paymentMethod = paymentMethod;
           rule.member = member;
+          targetRuleId = rule.id;
 
-          // 当月内の明細から該当定期の明細を検索
-          const matchedList = transactions.filter(t => {
-            if (!t.date || !t.date.startsWith(curYM)) return false;
-            if (t.recurringId && t.recurringId === editingRecurringId) return true;
-            return t.title === oldTitle || (t.title === title && t.category === category);
+          // 編集時：このルールに紐づく既存明細を一度すべてクリーンアップ（全洗い替え準備）
+          const idPrefix = `tx_rec_${targetRuleId}_`;
+          transactions = transactions.filter(t => {
+            if (t.recurringId === targetRuleId) return false;
+            if (t.id && t.id.startsWith(idPrefix)) return false;
+            return true;
           });
-
-          if (matchedList.length > 0) {
-            // 最初の1件を新しい日付・金額・内容へ確実に上書き更新
-            const targetTx = matchedList[0];
-            targetTx.recurringId = editingRecurringId;
-            targetTx.date = newDateStr;
-            targetTx.type = currentRecurringType;
-            targetTx.category = category;
-            targetTx.paymentMethod = paymentMethod;
-            targetTx.amount = amount;
-            targetTx.title = title;
-            targetTx.member = member;
-
-            // 重複が存在していたら余分な方を削除
-            if (matchedList.length > 1) {
-              const extraIds = matchedList.slice(1).map(m => m.id);
-              transactions = transactions.filter(t => !extraIds.includes(t.id));
-            }
-          }
         }
         editingRecurringId = null;
-        showToast('定期ルールと当月明細を上書き更新しました');
+        showToast('定期ルールと全該当月の明細を上書き更新しました');
       } else {
-        const newRuleId = `rec_${Date.now()}`;
+        targetRuleId = `rec_${Date.now()}`;
         recurringRules.push({
-          id: newRuleId,
+          id: targetRuleId,
           startMonth,
           endMonth,
           day,
@@ -5134,27 +5672,97 @@
           paymentMethod,
           member
         });
-        showToast('定期ルールを保存しました');
+        showToast('定期ルールを保存し、対象月を一括反映しました');
+      }
+
+      // 開始月〜当月まで確定性IDで一括投影（当月分にはNEWバッジを付与）
+      if (targetRuleId) {
+        syncAllRecurringRules(targetRuleId, true);
       }
 
       saveStoredData();
       closeModal('recurringModal');
       renderRecurringList();
-      checkAndApplyRecurring();
       refreshDashboard();
     }
 
     function confirmDeleteRecurringInModal() {
       if (!editingRecurringId) return;
-      deleteRecurringRule(editingRecurringId);
+      const targetId = editingRecurringId;
       closeModal('recurringModal');
+      openRecurringDeleteOptions(targetId);
+    }
+
+    function openRecurringDeleteOptions(id) {
+      const rule = recurringRules.find(r => r.id === id);
+      if (!rule) return;
+      pendingDeleteRecurringId = id;
+
+      const infoEl = document.getElementById('recDelRuleInfo');
+      if (infoEl) {
+        const dayLabel = rule.day === 'last' ? '月末' : `毎月${rule.day}日`;
+        infoEl.textContent = `「${rule.title}」（${dayLabel} / ¥${Number(rule.amount).toLocaleString()}）`;
+      }
+
+      const futureDescEl = document.getElementById('recDelFutureDesc');
+      if (futureDescEl) {
+        const todayDisplay = getTodayString().replace(/-/g, '/');
+        futureDescEl.textContent = `今日（${todayDisplay}）より未来の予定明細だけを削除し、過去〜今日までの実績は帳簿に残します。`;
+      }
+
+      openModal('recurringDeleteOptionModal');
+    }
+
+    function executeDeleteRecurring(mode) {
+      const ruleId = pendingDeleteRecurringId;
+      if (!ruleId) return;
+
+      const today = getTodayString(); // YYYY-MM-DD
+      const idPrefix = `tx_rec_${ruleId}_`;
+      const isTargetTx = (t) => (t.recurringId === ruleId) || (t.id && t.id.startsWith(idPrefix));
+
+      let removedCount = 0;
+
+      if (mode === 'future_only') {
+        // 解約：今日より未来の予定明細のみ取り消し、過去〜今日の実績は残す
+        transactions = transactions.filter(t => {
+          if (isTargetTx(t) && t.date && t.date > today) {
+            if (t.id && !deletedTxIds.includes(t.id)) deletedTxIds.push(t.id);
+            removedCount++;
+            return false;
+          }
+          return true;
+        });
+      } else if (mode === 'all') {
+        // 全削除：過去〜未来の該当明細をすべて消去
+        transactions = transactions.filter(t => {
+          if (isTargetTx(t)) {
+            if (t.id && !deletedTxIds.includes(t.id)) deletedTxIds.push(t.id);
+            removedCount++;
+            return false;
+          }
+          return true;
+        });
+      }
+
+      // 定期ルール本体を削除
+      recurringRules = recurringRules.filter(r => r.id !== ruleId);
+      pendingDeleteRecurringId = null;
+
+      saveStoredData();
+      closeModal('recurringDeleteOptionModal');
+      renderRecurringList();
+      refreshDashboard();
+
+      if (mode === 'future_only') {
+        showToast(removedCount > 0 ? `定期ルールを解約しました（未来の予定${removedCount}件を取消）` : '定期ルールを解約しました（過去の実績は保持）');
+      } else {
+        showToast(`定期ルールと関連明細（計${removedCount}件）をすべて削除しました`);
+      }
     }
 
     function deleteRecurringRule(id) {
-      recurringRules = recurringRules.filter(r => r.id !== id);
-      saveStoredData();
-      renderRecurringList();
-      showToast('定期ルールを削除しました');
+      openRecurringDeleteOptions(id);
     }
 
     function renderRecurringList() {
@@ -5202,9 +5810,6 @@
           <div class="flex items-center space-x-1 flex-shrink-0">
             ${typeBadgeHtml}
             <span class="font-black font-mono ${color} text-xs">¥${Number(rule.amount).toLocaleString()}</span>
-            <button type="button" onclick="event.stopPropagation(); deleteRecurringRule('${rule.id}')" class="text-slate-400 hover:text-rose-600 p-1 transition ml-0.5" title="削除">
-              &times;
-            </button>
           </div>
         `;
         listEl.appendChild(card);
