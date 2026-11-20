@@ -164,7 +164,7 @@
         <div class="min-w-0">
           <div class="flex items-center space-x-1.5 whitespace-nowrap">
             <h1 class="text-sm font-extrabold tracking-tight text-slate-800 leading-none whitespace-nowrap">スマート家計簿</h1>
-            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.31</span>
+            <span class="px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200/80 shadow-2xs whitespace-nowrap">v1.32</span>
           </div>
           <span id="headerPeriodSub" class="text-[10px] font-bold text-blue-600 block mt-0.5 leading-none">当月</span>
         </div>
@@ -630,7 +630,7 @@
 
       <button onclick="switchView('recurring')" id="tab-recurring" class="tab-btn flex-1 flex flex-col items-center space-y-0.5 text-slate-400 transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        <span class="text-[10px] font-semibold">固定費管理</span>
+        <span class="text-[10px] font-semibold">定期収支</span>
       </button>
 
       <button onclick="openManualModal('expense')" class="flex-1 flex flex-col items-center space-y-0.5 text-slate-400 hover:text-slate-600 transition">
@@ -931,30 +931,49 @@
     </div>
   </div>
 
-  <!-- 定期登録・編集モーダル（見た目復元 ＆ 左右ブレ完全防止） -->
+  <!-- 定期登録・編集モーダル（スマホ横はみ出し完全防止 ＆ カレンダーアイコンピッカーUI） -->
   <div id="recurringModal" onclick="if(event.target === this) closeModal('recurringModal')" style="touch-action: none; overscroll-behavior: contain;" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 select-none overflow-hidden">
-    <div onclick="event.stopPropagation()" class="bg-white w-full max-w-sm rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col animate-scale-up overflow-visible relative">
+    <div onclick="event.stopPropagation()" class="bg-white w-full max-w-sm rounded-3xl p-3.5 sm:p-4 shadow-2xl flex flex-col animate-scale-up overflow-hidden relative">
       <!-- ヘッダー -->
       <div class="flex items-center justify-between border-b border-slate-100 pb-2 flex-shrink-0">
-        <h3 class="text-sm font-bold text-slate-800" id="recurringModalTitle">定期収支の新規登録</h3>
+        <h3 class="text-sm font-extrabold text-slate-800" id="recurringModalTitle">定期収支の設定</h3>
         <button type="button" onclick="closeModal('recurringModal')" class="w-7 h-7 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 text-xl leading-none transition" aria-label="閉じる">&times;</button>
       </div>
 
-      <!-- フォーム本体（スクロールバー完全排除・1枚固定収容） -->
-      <div class="py-2 space-y-2 overflow-visible">
+      <!-- フォーム本体 -->
+      <div class="py-2 space-y-2 min-w-0 max-w-full overflow-hidden">
         <div class="grid grid-cols-2 gap-1.5 p-0.5 bg-slate-100 rounded-xl text-xs font-bold">
-          <button type="button" onclick="setRecurringType('expense')" id="btnRecTypeExpense" class="py-1.5 rounded-lg bg-white text-rose-600 shadow-xs">支出 (固定費)</button>
-          <button type="button" onclick="setRecurringType('income')" id="btnRecTypeIncome" class="py-1.5 rounded-lg text-slate-600">収入 (給与等)</button>
+          <button type="button" onclick="setRecurringType('expense')" id="btnRecTypeExpense" class="py-1.5 rounded-lg bg-white text-rose-600 shadow-xs font-extrabold transition">支出</button>
+          <button type="button" onclick="setRecurringType('income')" id="btnRecTypeIncome" class="py-1.5 rounded-lg text-slate-600 font-bold transition">収入</button>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] font-bold text-slate-600 mb-0.5">開始月</label>
-            <input type="month" id="recStartMonth" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none">
+        <!-- 開始月・終了月 2列グリッド（横はみ出し完全防止） -->
+        <div class="grid grid-cols-2 gap-2 min-w-0">
+          <div class="min-w-0 max-w-full overflow-hidden">
+            <div class="flex items-center justify-between mb-0.5 min-w-0">
+              <label class="text-[10px] font-bold text-slate-600 truncate">開始月</label>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl pl-2.5 pr-1 h-[34px] flex items-center justify-between min-w-0 max-w-full overflow-hidden relative">
+              <span id="recStartMonthDisplay" class="text-xs font-bold text-slate-800 pointer-events-none select-none truncate min-w-0 flex-1">2026年11月</span>
+              <div class="relative w-[36px] h-[34px] flex items-center justify-center flex-shrink-0 text-slate-500">
+                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/></svg>
+                <input type="month" id="recStartMonth" onchange="updateRecMonthDisplay('start')" class="opacity-0 absolute inset-0 w-full h-full min-w-0 max-w-full cursor-pointer">
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="block text-[10px] font-bold text-slate-600 mb-0.5">終了月 (任意)</label>
-            <input type="month" id="recEndMonth" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none" placeholder="継続">
+
+          <div class="min-w-0 max-w-full overflow-hidden">
+            <div class="flex items-center justify-between mb-0.5 min-w-0">
+              <label class="text-[10px] font-bold text-slate-600 truncate">終了月</label>
+              <button type="button" id="btnClearRecEndMonth" onclick="clearRecEndMonth()" class="hidden text-[9.5px] font-bold text-blue-600 hover:underline flex-shrink-0">解除</button>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl pl-2.5 pr-1 h-[34px] flex items-center justify-between min-w-0 max-w-full overflow-hidden relative">
+              <span id="recEndMonthDisplay" class="text-xs font-semibold text-slate-400 pointer-events-none select-none truncate min-w-0 flex-1">期限なし</span>
+              <div class="relative w-[36px] h-[34px] flex items-center justify-center flex-shrink-0 text-slate-500">
+                <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/></svg>
+                <input type="month" id="recEndMonth" onchange="updateRecMonthDisplay('end')" class="opacity-0 absolute inset-0 w-full h-full min-w-0 max-w-full cursor-pointer">
+              </div>
+            </div>
           </div>
         </div>
 
@@ -993,7 +1012,7 @@
             <svg id="recPaymentDropdownArrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
           </button>
 
-          <div id="recPaymentDropdownMenu" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[70] p-1.5 max-h-48 overflow-y-auto custom-scrollbar animate-scale-up">
+          <div id="recPaymentDropdownMenu" class="hidden absolute left-0 right-0 bottom-full mb-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[70] p-1.5 max-h-44 overflow-y-auto custom-scrollbar animate-scale-up">
             <div class="flex items-center justify-between px-1 pb-1 mb-1 border-b border-slate-100 text-[9px]">
               <span class="font-bold text-slate-400">タップして展開・選択</span>
               <button type="button" onclick="openPaymentMethodManageModal()" class="text-blue-600 hover:underline font-bold">管理⚙️</button>
@@ -1012,11 +1031,12 @@
       <!-- 下部ボタン（常時固定） -->
       <div class="flex space-x-2 pt-2 border-t border-slate-100 flex-shrink-0">
         <button type="button" onclick="closeModal('recurringModal')" class="flex-1 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 active:scale-95 transition text-center cursor-pointer">キャンセル</button>
-        <button type="button" onclick="saveRecurringRule()" id="btnSaveRecurring" class="flex-1 py-2 rounded-xl bg-blue-600 text-xs font-bold text-white hover:bg-blue-700 active:scale-95 transition text-center cursor-pointer shadow-sm">保存する</button>
+        <button type="button" onclick="saveRecurringRule()" id="btnSaveRecurring" class="flex-1 py-2 rounded-xl bg-blue-600 text-xs font-bold text-white hover:bg-blue-700 active:scale-95 transition text-center cursor-pointer shadow-sm">この内容で登録</button>
       </div>
-      <div id="recModalDeleteArea" class="hidden pt-1 border-t border-slate-100 flex-shrink-0">
-        <button type="button" onclick="confirmDeleteRecurringInModal()" class="w-full py-1 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-lg transition text-center cursor-pointer">
-          この定期ルールを削除
+      <div id="recModalDeleteArea" class="hidden pt-2 mt-2 border-t border-slate-100 flex-shrink-0">
+        <button type="button" onclick="confirmDeleteRecurringInModal()" class="w-full py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/80 text-xs font-bold active:scale-95 transition flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs">
+          <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1" d="M3 6h18"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1" d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1" d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17" stroke-width="2.1" stroke-linecap="round"/><line x1="14" y1="11" x2="14" y2="17" stroke-width="2.1" stroke-linecap="round"/></svg>
+          <span>この定期ルールを削除</span>
         </button>
       </div>
     </div>
@@ -1050,7 +1070,7 @@
           </div>
           <div>
             <h4 class="text-sm font-extrabold text-slate-800">定期ルールの削除方法</h4>
-            <p class="text-[10px] text-slate-400">帳簿に反映済みの明細の扱いを選択してください</p>
+            <p class="text-[10px] text-slate-400">すでに登録されている明細の扱いを選択してください。</p>
           </div>
         </div>
         <button type="button" onclick="closeModal('recurringDeleteOptionModal')" class="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
@@ -5520,7 +5540,7 @@
             hasChanges = true;
           }
 
-          if (highlightCurrentMonth && ymStr === curYM) {
+          if (highlightCurrentMonth) {
             recentNewTxMap.set(deterministicId, Date.now());
           }
 
@@ -5542,9 +5562,49 @@
       syncAllRecurringRules();
     }
 
+    function formatMonthJp(ymStr) {
+      if (!ymStr || !ymStr.includes('-')) return '';
+      const [y, m] = ymStr.split('-');
+      return `${Number(y)}年${Number(m)}月`;
+    }
+
+    function updateRecMonthDisplay(target) {
+      if (target === 'start') {
+        const input = document.getElementById('recStartMonth');
+        const disp = document.getElementById('recStartMonthDisplay');
+        if (input && disp) {
+          disp.textContent = input.value ? formatMonthJp(input.value) : '未設定';
+        }
+      } else if (target === 'end') {
+        const input = document.getElementById('recEndMonth');
+        const disp = document.getElementById('recEndMonthDisplay');
+        const clearBtn = document.getElementById('btnClearRecEndMonth');
+        if (input && disp) {
+          if (input.value) {
+            disp.textContent = formatMonthJp(input.value);
+            disp.className = 'text-xs font-bold text-slate-800 pointer-events-none select-none truncate min-w-0 flex-1';
+            if (clearBtn) clearBtn.classList.remove('hidden');
+          } else {
+            disp.textContent = '期限なし';
+            disp.className = 'text-xs font-semibold text-slate-400 pointer-events-none select-none truncate min-w-0 flex-1';
+            if (clearBtn) clearBtn.classList.add('hidden');
+          }
+        }
+      }
+    }
+
+    function clearRecEndMonth() {
+      const input = document.getElementById('recEndMonth');
+      if (input) {
+        input.value = '';
+        updateRecMonthDisplay('end');
+      }
+    }
+
     function openRecurringModal(ruleId = null) {
       editingRecurringId = ruleId;
       const titleEl = document.getElementById('recurringModalTitle');
+      const submitBtn = document.getElementById('btnSaveRecurring');
       const delArea = document.getElementById('recModalDeleteArea');
       const now = new Date();
       const curYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -5552,10 +5612,13 @@
       if (ruleId) {
         const rule = recurringRules.find(r => r.id === ruleId);
         if (!rule) return;
-        if (titleEl) titleEl.textContent = '定期ルールの編集';
+        if (titleEl) titleEl.textContent = '定期収支の編集';
+        if (submitBtn) submitBtn.textContent = '変更を保存';
         setRecurringType(rule.type || 'expense');
         document.getElementById('recStartMonth').value = rule.startMonth || curYM;
         document.getElementById('recEndMonth').value = rule.endMonth || '';
+        updateRecMonthDisplay('start');
+        updateRecMonthDisplay('end');
         document.getElementById('recDay').value = rule.day || '25';
         document.getElementById('recTitle').value = rule.title || '';
         document.getElementById('recAmount').value = rule.amount || '';
@@ -5564,10 +5627,13 @@
         document.getElementById('recMember').value = rule.member || '';
         if (delArea) delArea.classList.remove('hidden');
       } else {
-        if (titleEl) titleEl.textContent = '定期収支の新規登録';
+        if (titleEl) titleEl.textContent = '定期収支の設定';
+        if (submitBtn) submitBtn.textContent = 'この内容で登録';
         setRecurringType('expense');
         document.getElementById('recStartMonth').value = curYM;
         document.getElementById('recEndMonth').value = '';
+        updateRecMonthDisplay('start');
+        updateRecMonthDisplay('end');
         document.getElementById('recDay').value = '25';
         document.getElementById('recTitle').value = '';
         document.getElementById('recAmount').value = '';
@@ -5586,13 +5652,13 @@
       const payLabel = document.getElementById('recPayMethodLabel');
 
       if (type === 'expense') {
-        if (btnExp) btnExp.className = 'py-1.5 rounded-xl bg-white text-rose-600 shadow-xs';
-        if (btnInc) btnInc.className = 'py-1.5 rounded-xl text-slate-600';
+        if (btnExp) btnExp.className = 'py-1.5 rounded-lg bg-white text-rose-600 shadow-xs font-extrabold transition';
+        if (btnInc) btnInc.className = 'py-1.5 rounded-lg text-slate-600 font-bold transition';
         if (memGrp) memGrp.classList.remove('hidden');
         if (payLabel) payLabel.textContent = '支払い方法';
       } else {
-        if (btnInc) btnInc.className = 'py-1.5 rounded-xl bg-white text-emerald-600 shadow-xs';
-        if (btnExp) btnExp.className = 'py-1.5 rounded-xl text-slate-600';
+        if (btnInc) btnInc.className = 'py-1.5 rounded-lg bg-white text-emerald-600 shadow-xs font-extrabold transition';
+        if (btnExp) btnExp.className = 'py-1.5 rounded-lg text-slate-600 font-bold transition';
         if (memGrp) memGrp.classList.add('hidden');
         if (payLabel) payLabel.textContent = '入金方法';
       }
@@ -5675,7 +5741,7 @@
         showToast('定期ルールを保存し、対象月を一括反映しました');
       }
 
-      // 開始月〜当月まで確定性IDで一括投影（当月分にはNEWバッジを付与）
+      // 開始月〜当月まで確定性IDで一括投影（対象全月分にNEWバッジを付与）
       if (targetRuleId) {
         syncAllRecurringRules(targetRuleId, true);
       }
@@ -5779,37 +5845,58 @@
 
       recurringRules.forEach(rule => {
         const card = document.createElement('div');
-        card.className = 'p-3 bg-slate-50/80 rounded-2xl border border-slate-100 flex items-center justify-between text-xs cursor-pointer hover:bg-slate-100/90 transition shadow-2xs';
+        card.className = 'p-3 bg-slate-50/80 rounded-2xl border border-slate-100 flex items-center justify-between text-xs cursor-pointer hover:bg-slate-100/90 active:scale-[0.99] transition shadow-2xs select-none';
         card.onclick = () => openRecurringModal(rule.id);
 
         const color = rule.type === 'income' ? 'text-emerald-700' : 'text-rose-700';
         const typeBadgeHtml = rule.type === 'income'
           ? '<span class="px-1 py-0.2 rounded bg-emerald-50 text-emerald-700 font-extrabold text-[8.5px] border border-emerald-200 mr-1 flex-shrink-0">収入</span>'
           : '<span class="px-1 py-0.2 rounded bg-rose-50 text-rose-700 font-extrabold text-[8.5px] border border-rose-200 mr-1 flex-shrink-0">支出</span>';
-        const dayLabel = rule.day === 'last' ? '月末' : `${rule.day}日`;
+        const dayLabel = rule.day === 'last' ? '毎月月末' : `毎月${rule.day}日`;
         const iconSvg = getCategoryIcon(rule.category, 'w-4 h-4');
 
-        let periodSub = `${rule.startMonth || '開始'}`;
-        if (rule.endMonth) periodSub += `〜${rule.endMonth}`;
-        else periodSub += '〜継続';
+        const startDisp = rule.startMonth ? formatMonthJp(rule.startMonth) : '開始月';
+        const endDisp = rule.endMonth ? formatMonthJp(rule.endMonth) : '期限なし';
+        const periodBadge = `${startDisp}〜${endDisp}`;
+
+        const payName = rule.paymentMethod || (rule.type === 'income' ? '口座入金' : '口座引落');
+        const payMeta = getPaymentMethodMeta(payName);
+        const payIcon = getPaymentMethodIcon(rule.type === 'income' ? 'bank' : payMeta.type, 'w-3 h-3');
+
+        let memberBadgeHtml = '';
+        if (rule.type === 'expense' && rule.member && membersList.includes(rule.member)) {
+          const meta = memberMeta[rule.member];
+          const initial = rule.member.charAt(0);
+          memberBadgeHtml = `<span class="w-4 h-4 rounded-full border ${meta.borderCol} ${meta.lightBg} ${meta.textCol} text-[8.5px] font-black flex items-center justify-center flex-shrink-0" title="${escapeHtml(rule.member)}">${initial}</span>`;
+        }
 
         card.innerHTML = `
-          <div class="flex items-center space-x-2.5 min-w-0 pr-2">
+          <div class="flex items-center space-x-2.5 min-w-0 pr-2 flex-1">
             <div class="w-8 h-8 rounded-xl bg-white border border-slate-200/80 flex items-center justify-center flex-shrink-0 shadow-2xs">
               ${iconSvg}
             </div>
-            <div class="min-w-0">
-              <div class="flex items-center space-x-1.5 mb-0.5">
-                <span class="px-1.5 py-0.2 bg-white border border-slate-200 rounded text-[9px] font-bold">${dayLabel}</span>
-                <span class="text-slate-400 font-semibold text-[10px]">${rule.category}</span>
-                <span class="text-[9px] font-mono text-slate-400">${periodSub}</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center space-x-1 mb-0.5 flex-wrap gap-y-0.5">
+                <span class="px-1.5 py-0.2 bg-blue-50 text-blue-700 border border-blue-200/80 rounded text-[9px] font-extrabold flex-shrink-0">${dayLabel}</span>
+                <span class="px-1.5 py-0.2 bg-white border border-slate-200/80 rounded text-[8.5px] font-bold text-slate-500 flex-shrink-0">${periodBadge}</span>
               </div>
               <p class="font-extrabold text-slate-800 truncate text-xs">${escapeHtml(rule.title)}</p>
+              <div class="flex items-center space-x-1 mt-0.5 flex-wrap gap-y-0.5">
+                ${memberBadgeHtml}
+                <span class="px-1.5 py-0.2 bg-white rounded border border-slate-200/70 text-[8.5px] font-bold text-slate-600">${escapeHtml(rule.category)}</span>
+                <span class="inline-flex items-center space-x-0.5 px-1.5 py-0.2 bg-slate-100/90 border border-slate-200/70 rounded text-[8.5px] font-bold text-slate-600">
+                  ${payIcon}
+                  <span class="truncate max-w-[75px]">${escapeHtml(payName)}</span>
+                </span>
+              </div>
             </div>
           </div>
-          <div class="flex items-center space-x-1 flex-shrink-0">
-            ${typeBadgeHtml}
-            <span class="font-black font-mono ${color} text-xs">¥${Number(rule.amount).toLocaleString()}</span>
+          <div class="flex items-center space-x-1.5 flex-shrink-0">
+            <div class="flex items-center">
+              ${typeBadgeHtml}
+              <span class="font-black font-mono ${color} text-xs">¥${Number(rule.amount).toLocaleString()}</span>
+            </div>
+            <span class="text-slate-400 text-base font-bold leading-none pl-0.5">›</span>
           </div>
         `;
         listEl.appendChild(card);
